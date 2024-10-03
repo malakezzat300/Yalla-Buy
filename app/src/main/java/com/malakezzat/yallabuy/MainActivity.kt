@@ -12,6 +12,8 @@ import com.malakezzat.yallabuy.data.remot.ProductsRemoteDataSourceImpl
 import com.malakezzat.yallabuy.data.remot.RetrofitHelper
 import com.malakezzat.yallabuy.data.sharedpref.GlobalSharedPreferenceDataSourceImp
 import com.malakezzat.yallabuy.ui.NavigationApp
+import com.malakezzat.yallabuy.ui.auth.viewmodel.SignUpViewModelFactory
+import com.malakezzat.yallabuy.ui.auth.viewmodel.login.LogInViewModelFactory
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModelFactory
 import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
 
@@ -27,6 +29,12 @@ class MainActivity : ComponentActivity() {
     private val homeScreenViewModelFactory by lazy {
         HomeScreenViewModelFactory(repo)
     }
+    private val signUpViewModelFactory by lazy {
+        SignUpViewModelFactory(repo)
+    }
+    private val logInViewModelFactory by lazy {
+        LogInViewModelFactory(repo)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -36,7 +44,9 @@ class MainActivity : ComponentActivity() {
         setContent {
           YallaBuyTheme {
             NavigationApp(
-                homeScreenViewModelFactory
+                homeScreenViewModelFactory,
+                signUpViewModelFactory,
+                logInViewModelFactory
             )
         }
         }
