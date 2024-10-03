@@ -2,6 +2,7 @@ package com.malakezzat.yallabuy.ui
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -47,6 +48,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -55,6 +57,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -63,6 +66,7 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.malakezzat.yallabuy.R
+import com.malakezzat.yallabuy.data.firebase.FirebaseAuthun
 import com.malakezzat.yallabuy.ui.auth.viewmodel.SignUpViewModel
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
 
@@ -127,14 +131,7 @@ fun CreateAccountScreen(context : Context) {
         Button(
             onClick = {
                 isLoading = true
-                signInWithEmailAndPassword(email,pass, userName,context){ success, error ->
-                    isLoading = false
-                    if(success){
 
-                    }else{
-                        errorMessage = error
-                    }
-                }
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -195,54 +192,7 @@ fun CreateAccountScreen(context : Context) {
         }
     }
 }
-fun signInWithEmailAndPassword(email: String, password: String,name : String, context : Context ,callback: (Boolean, String?) -> Unit) {
-    val auth = FirebaseAuth.getInstance()
-//    val signInRequest = BeginSignInRequest.builder()
-//        .setGoogleIdTokenRequestOptions(
-//            BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-//                .setSupported(true)
-//                // Your server's client ID, not your Android client ID.
-//                .setServerClientId(context.getString(R.string.web_id))
-//                // Only show accounts previously used to sign in.
-//                .setFilterByAuthorizedAccounts(true)
-//                .build())
 
-    auth.createUserWithEmailAndPassword(email, password)
-        .addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val user = auth.currentUser
-                val profileUpdates = UserProfileChangeRequest.Builder()
-                    .setDisplayName(name)
-                    .build()
-                user?.updateProfile(profileUpdates)
-                    ?.addOnCompleteListener { profileUpdateTask ->
-                        if (profileUpdateTask.isSuccessful) {
-                            user.sendEmailVerification()
-                                .addOnCompleteListener { verificationTask ->
-                                    if (verificationTask.isSuccessful) {
-                                        Log.i("User Is Successfully Created", "username: $name")
-                                    }
-                                }
-                        } else {
-                            Log.e("CreateUser", "Failed to update user profile: ${profileUpdateTask.exception?.message}")
-                        }
-                    }
-
-            } else {
-                try {
-                    throw task.exception!!
-                } catch (e: FirebaseAuthWeakPasswordException) {
-                    Log.e("CreateUser", "Weak password.")
-                } catch (e: FirebaseAuthInvalidCredentialsException) {
-                    Log.e("CreateUser", "Invalid email.")
-                } catch (e: FirebaseAuthUserCollisionException) {
-                    Log.e("CreateUser", "User already exists.")
-                } catch (e: Exception) {
-                    Log.e("CreateUser", "Error: ${e.message}")
-                }
-            }
-        }
-}
 
 @Composable
 fun SignupScreen(viewModel: SignUpViewModel,
@@ -250,6 +200,184 @@ fun SignupScreen(viewModel: SignUpViewModel,
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var passwordVisibility by remember { mutableStateOf(false) }
+    var auth = FirebaseAuthun()
+    val context = LocalContext.current
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp)
+            .background(Color.White),
+//        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Column( horizontalAlignment = Alignment.Start,
+
+            ) {
+            Text(text = "Signup",
+                fontSize = 30.sp,
+                color = Color.Black,
+                modifier = Modifier.padding(8.dp)
+            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(text = "Already have an account?")
+                TextButton(onClick = {navController.navigate(Screen.LogInScreen.route) }) {
+                    Text(text = " Login", color = Color.Cyan)
+                }
+            }
+//            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(text = "Full Name", fontSize = 18.sp, modifier = Modifier.padding(8.dp))
+
+        OutlinedTextField(
+            value = fullName,
+            onValueChange = {input -> fullName = input },
+            //label = { Text(text = "Full Name") },
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.fillMaxWidth()
+                .background(color = Color.White)
+                .padding(10.dp),
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+        )
+
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = "Email", fontSize = 18.sp, modifier = Modifier.padding(8.dp))
+        // Email Input
+        OutlinedTextField(
+            value = email,
+            onValueChange = { input -> email=input },
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.fillMaxWidth()
+                .background(color = Color.White)
+                .padding(10.dp),
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = "Password", fontSize = 18.sp, modifier = Modifier.padding(8.dp))
+        // Password Input
+        OutlinedTextField(
+            value = password,
+            onValueChange = { input -> password = input },
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.fillMaxWidth()
+                .background(color = Color.White)
+                .padding(10.dp),
+            visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                val image = if (passwordVisibility) {
+                    //  Icons.Filled.Visibility
+                } else {
+                    // Icons.Filled.VisibilityOff
+                }
+
+                IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+                    //Icon(imageVector = image, contentDescription = null)
+                }
+            },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+
+
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = "Confirm Password", fontSize = 18.sp, modifier = Modifier.padding(8.dp))
+        // Password Input
+        OutlinedTextField(
+            value = confirmPassword,
+            onValueChange = { input -> confirmPassword = input },
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.fillMaxWidth()
+                .background(color = Color.White)
+                .padding(10.dp),
+            visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                val image = if (passwordVisibility) {
+                    //  Icons.Filled.Visibility
+                } else {
+                    // Icons.Filled.VisibilityOff
+                }
+
+                IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+                    //Icon(imageVector = image, contentDescription = null)
+                }
+            },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+
+
+        )
+
+        // Create Account Button
+        Button(
+            onClick = {
+              //  viewModel.signInWithEmailAndPassword(email,password,fullName)
+                if(email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || email.isEmpty()){
+                    Toast.makeText(context,"complete empty fields please",Toast.LENGTH_LONG)
+                }else{
+                    if(password == confirmPassword){
+                        auth.signInWithEmailAndPassword(email,password,fullName)
+                    }else{
+                        Toast.makeText(context,"password and confirm password are not the same",Toast.LENGTH_LONG)
+                    }
+                }
+                
+            },
+            shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Black,        // Default background color
+                contentColor = Color.White,         // Text color
+                disabledContainerColor = Color.Gray // Background color when disabled
+            ),
+            modifier = Modifier.fillMaxWidth()
+                .padding(10.dp)
+                .height(60.dp)
+
+        ) {
+            Text(text = "Create Account")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Signup with Google
+        TextButton(
+            onClick = { /* Handle Google Signup */ },
+            modifier = Modifier.fillMaxWidth()
+
+        ) {
+            Text(text = "Signup with Google")
+            Icon(
+                painter = painterResource(id = R.drawable.google),
+                contentDescription = null,
+                tint = Color.Unspecified,
+                modifier = Modifier.size(25.dp)
+
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+
+
+    }
+}
+
+@Preview
+@Composable
+fun SignupScreenPreview() {
+    var fullName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var ConfirmPassword by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
 
     Column(
@@ -262,7 +390,7 @@ fun SignupScreen(viewModel: SignUpViewModel,
     ) {
         Column( horizontalAlignment = Alignment.Start,
 
-        ) {
+            ) {
             Text(text = "Signup",
                 fontSize = 30.sp,
                 color = Color.Black,
@@ -271,9 +399,9 @@ fun SignupScreen(viewModel: SignUpViewModel,
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(text = "Already have an account?")
-                TextButton(onClick = {navController.navigate(Screen.LogInScreen.route) }) {
-                Text(text = " Login", color = Color.Cyan)
-                 }
+                TextButton(onClick = {/*navController.navigate(Screen.LogInScreen.route) */}) {
+                    Text(text = " Login", color = Color.Cyan)
+                }
             }
 //            Spacer(modifier = Modifier.height(8.dp))
 
@@ -300,7 +428,7 @@ fun SignupScreen(viewModel: SignUpViewModel,
         // Email Input
         OutlinedTextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = { input -> email=input },
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth()
                 .background(color = Color.White)
@@ -315,7 +443,7 @@ fun SignupScreen(viewModel: SignUpViewModel,
         // Password Input
         OutlinedTextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = { input -> password = input },
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth()
                 .background(color = Color.White)
@@ -323,9 +451,9 @@ fun SignupScreen(viewModel: SignUpViewModel,
             visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 val image = if (passwordVisibility) {
-                  //  Icons.Filled.Visibility
+                    //  Icons.Filled.Visibility
                 } else {
-                   // Icons.Filled.VisibilityOff
+                    // Icons.Filled.VisibilityOff
                 }
 
                 IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
@@ -338,11 +466,38 @@ fun SignupScreen(viewModel: SignUpViewModel,
 
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = "Confirm Password", fontSize = 18.sp, modifier = Modifier.padding(8.dp))
+        // Password Input
+        OutlinedTextField(
+            value = ConfirmPassword,
+            onValueChange = { input -> ConfirmPassword = input },
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.fillMaxWidth()
+                .background(color = Color.White)
+                .padding(10.dp),
+            visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                val image = if (passwordVisibility) {
+                    //  Icons.Filled.Visibility
+                } else {
+                    // Icons.Filled.VisibilityOff
+                }
+
+                IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+                    //Icon(imageVector = image, contentDescription = null)
+                }
+            },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+
+
+        )
 
         // Create Account Button
         Button(
-            onClick = { /* Handle signup logic */ },
+            onClick = {
+            },
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Black,        // Default background color
@@ -363,10 +518,11 @@ fun SignupScreen(viewModel: SignUpViewModel,
         TextButton(
             onClick = { /* Handle Google Signup */ },
             modifier = Modifier.fillMaxWidth()
+
         ) {
             Text(text = "Signup with Google")
             Icon(
-                painter = painterResource(id = R.drawable.google), // replace with your Facebook icon resource
+                painter = painterResource(id = R.drawable.google),
                 contentDescription = null,
                 tint = Color.Unspecified,
                 modifier = Modifier.size(25.dp)
