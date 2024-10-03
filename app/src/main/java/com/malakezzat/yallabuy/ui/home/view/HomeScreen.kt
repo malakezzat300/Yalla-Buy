@@ -229,25 +229,57 @@ fun BottomNavigationBar() {
         contentColor = Color.Black
     ) {
         BottomNavigationItem(
-            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+            icon = {
+                Image(
+                    painter = painterResource(id = R.drawable.home_2),
+                    contentDescription = "Home",
+                    modifier = Modifier.size(24.dp)
+                )
+            },
             label = { Text("Home") },
             selected = true,
             onClick = { /* Home Action */ }
         )
         BottomNavigationItem(
-            icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "My Cart") },
+            icon = { Image(
+                painter = painterResource(id = R.drawable.category_2),
+                contentDescription = "categories",
+                modifier = Modifier.size(24.dp)
+            )
+    },
+            label = { Text("Home") },
+            selected = true,
+            onClick = { /* Home Action */ }
+        )
+        BottomNavigationItem(
+            icon = { Image(
+                painter = painterResource(id = R.drawable.shopping_cart),
+                contentDescription = "Home",
+                modifier = Modifier.size(24.dp)
+            )
+            },
             label = { Text("My Cart") },
             selected = false,
             onClick = { /* My Cart Action */ }
         )
         BottomNavigationItem(
-            icon = { Icon(Icons.Default.Favorite, contentDescription = "Wishlist") },
+            icon = { Image(
+                painter = painterResource(id = R.drawable.heart),
+                contentDescription = "Home",
+                modifier = Modifier.size(24.dp)
+            )
+            },
             label = { Text("Wishlist") },
             selected = false,
             onClick = { /* Wishlist Action */ }
         )
         BottomNavigationItem(
-            icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
+            icon = { Image(
+                painter = painterResource(id = R.drawable.profile),
+                contentDescription = "Home",
+                modifier = Modifier.size(24.dp)
+            )
+            },
             label = { Text("Profile") },
             selected = false,
             onClick = { /* Profile Action */ }
