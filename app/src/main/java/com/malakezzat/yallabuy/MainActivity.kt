@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             YallaBuyTheme {
 
-                    CreateAccountScreen()
+                    CreateAccountScreen(this)
 
             }
         }

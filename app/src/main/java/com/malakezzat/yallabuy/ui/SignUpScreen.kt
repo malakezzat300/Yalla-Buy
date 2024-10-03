@@ -1,5 +1,6 @@
 package com.malakezzat.yallabuy.ui
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -36,13 +37,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.malakezzat.yallabuy.R
-@Preview
+
 @Composable
-fun CreateAccountScreen() {
+fun CreateAccountScreen(context : Context) {
     var userName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
@@ -55,7 +57,6 @@ fun CreateAccountScreen() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Title and Subtitle
         Text(
             text = "Create Account",
             style = MaterialTheme.typography.titleLarge,
@@ -69,7 +70,6 @@ fun CreateAccountScreen() {
         )
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Username TextField
         OutlinedTextField(
             value = userName,
             onValueChange = {input -> userName = input},
@@ -79,7 +79,6 @@ fun CreateAccountScreen() {
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Email/Phone TextField
         OutlinedTextField(
             value = email,
             onValueChange = {input -> email = input},
@@ -102,11 +101,10 @@ fun CreateAccountScreen() {
         )
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Create Account Button
         Button(
             onClick = {
                 isLoading = true
-                signInWithEmailAndPassword(email,pass, userName){ success, error ->
+                signInWithEmailAndPassword(email,pass, userName,context){ success, error ->
                     isLoading = false
                     if(success){
 
@@ -133,7 +131,6 @@ fun CreateAccountScreen() {
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Or Sign Up with Other Methods
         Text(
             text = "Or using other method",
             color = Color.Gray,
@@ -141,7 +138,6 @@ fun CreateAccountScreen() {
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Sign Up with Google Button
         OutlinedButton(
             onClick = { /* Handle Google Sign Up */ },
             modifier = Modifier.fillMaxWidth(),
@@ -159,7 +155,6 @@ fun CreateAccountScreen() {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Sign Up with Facebook Button
         OutlinedButton(
             onClick = { /* Handle Facebook Sign Up */ },
             modifier = Modifier.fillMaxWidth(),
@@ -177,8 +172,17 @@ fun CreateAccountScreen() {
         }
     }
 }
-fun signInWithEmailAndPassword(email: String, password: String,name : String ,callback: (Boolean, String?) -> Unit) {
+fun signInWithEmailAndPassword(email: String, password: String,name : String, context : Context ,callback: (Boolean, String?) -> Unit) {
     val auth = FirebaseAuth.getInstance()
+//    val signInRequest = BeginSignInRequest.builder()
+//        .setGoogleIdTokenRequestOptions(
+//            BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+//                .setSupported(true)
+//                // Your server's client ID, not your Android client ID.
+//                .setServerClientId(context.getString(R.string.web_id))
+//                // Only show accounts previously used to sign in.
+//                .setFilterByAuthorizedAccounts(true)
+//                .build())
 
     auth.signInWithEmailAndPassword(email, password)
         .addOnCompleteListener { task ->
@@ -189,6 +193,13 @@ fun signInWithEmailAndPassword(email: String, password: String,name : String ,ca
                     .setDisplayName(name)
                     .build()
                 user?.updateProfile(profileUpdates)
+                    ?.addOnCompleteListener { updateTask ->
+                        if (updateTask.isSuccessful) {
+                            callback(true, null)
+                        } else {
+                            callback(false, updateTask.exception?.message)
+                        }
+                    }
             } else {
                 callback(false, task.exception?.message)
             }
