@@ -1,7 +1,10 @@
 package com.malakezzat.yallabuy.ui.home.view
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -24,20 +28,30 @@ import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -48,6 +62,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun HomeScreen(
@@ -63,7 +78,7 @@ fun HomeScreen(
                 .padding(it)
                 .verticalScroll(rememberScrollState())
         ) {
-            ExclusiveSalesBanner()
+            AdList()
             CategoriesSection()
             LatestProductsSection()
         }
@@ -94,25 +109,54 @@ fun TopBar() {
     )
 }
 
-
-@Preview(showBackground = true, showSystemUi = true)
+//@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun ExclusiveSalesBanner() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(Color(0xFF3A8BFF))
-            .height(150.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("30% OFF", color = Color.White, fontSize = 16.sp)
-            Text("On Headphones", color = Color.White, fontSize = 14.sp)
-            Text("Exclusive Sales", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Medium)
+fun AdList() {
+    val context = LocalContext.current
+    val scrollState = rememberLazyListState()
+    var scrollDirection by remember { mutableStateOf(1) }
+
+    LazyRow(state = scrollState) {
+        items(10){
+            AdCard(painterResource(id = R.drawable.ad1))
+            AdCard(painterResource(id = R.drawable.ad2))
         }
     }
+
+    LaunchedEffect(Unit) {
+        delay(2000)
+        val needToScrollItems = 20 - scrollState.layoutInfo.visibleItemsInfo.size + 1
+        val scrollWidth = needToScrollItems * ( context.resources.displayMetrics.widthPixels )
+        while (true) {
+            scrollState.animateScrollBy(
+                value = (scrollDirection * scrollWidth).toFloat(),
+                animationSpec = tween(
+                    durationMillis = 3000 * needToScrollItems,
+                    easing = LinearEasing
+                )
+            )
+            scrollDirection *= -1
+        }
+    }
+}
+
+@Composable
+fun AdCard(painter : Painter) {
+    Card (
+        modifier = Modifier
+            .padding(24.dp)
+            .fillMaxWidth()
+            .height(200.dp),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(12.dp),
+    ) {
+        Image(
+            painter = painter,
+            contentDescription = "ad",
+        )
+
+    }
+
 }
 
 @Composable
