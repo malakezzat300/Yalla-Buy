@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg height="800px" width="800px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
-	 viewBox="0 0 291.319 291.319" xml:space="preserve">
-<g>
-	<path style="fill:#3B5998;" d="M145.659,0c80.45,0,145.66,65.219,145.66,145.66c0,80.45-65.21,145.659-145.66,145.659
-		S0,226.109,0,145.66C0,65.219,65.21,0,145.659,0z"/>
-	<path style="fill:#FFFFFF;" d="M163.394,100.277h18.772v-27.73h-22.067v0.1c-26.738,0.947-32.218,15.977-32.701,31.763h-0.055
-		v13.847h-18.207v27.156h18.207v72.793h27.439v-72.793h22.477l4.342-27.156h-26.81v-8.366
-		C154.791,104.556,158.341,100.277,163.394,100.277z"/>
-</g>
-</svg>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="800dp"
+    android:height="800dp"
+    android:viewportWidth="291.32"
+    android:viewportHeight="291.32">
+  <path
+      android:pathData="M145.66,0c80.45,0 145.66,65.22 145.66,145.66c0,80.45 -65.21,145.66 -145.66,145.66S0,226.11 0,145.66C0,65.22 65.21,0 145.66,0z"
+      android:fillColor="#3B5998"/>
+  <path
+      android:pathData="M163.39,100.28h18.77v-27.73h-22.07v0.1c-26.74,0.95 -32.22,15.98 -32.7,31.76h-0.05v13.85h-18.21v27.16h18.21v72.79h27.44v-72.79h22.48l4.34,-27.16h-26.81v-8.37C154.79,104.56 158.34,100.28 163.39,100.28z"
+      android:fillColor="#FFFFFF"/>
+</vector>

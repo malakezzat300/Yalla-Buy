@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -21,6 +22,10 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,6 +39,9 @@ import com.malakezzat.yallabuy.R
 @Preview
 @Composable
 fun CreateAccountScreen() {
+    var userName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var pass by remember { mutableStateOf("") }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -57,8 +65,8 @@ fun CreateAccountScreen() {
 
         // Username TextField
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
+            value = userName,
+            onValueChange = {input -> userName = input},
             label = { Text("Create your username") },
             leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
             modifier = Modifier.fillMaxWidth()
@@ -67,8 +75,8 @@ fun CreateAccountScreen() {
 
         // Email/Phone TextField
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
+            value = email,
+            onValueChange = {input -> email = input},
             label = { Text("Enter your email or phone number") },
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
             modifier = Modifier.fillMaxWidth()
@@ -77,11 +85,11 @@ fun CreateAccountScreen() {
 
         // Password TextField
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
+            value = pass,
+            onValueChange = {input -> pass = input},
             label = { Text("Create your password") },
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
-            trailingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+           // trailingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation()
         )
@@ -89,7 +97,9 @@ fun CreateAccountScreen() {
 
         // Create Account Button
         Button(
-            onClick = { /* Handle create account */ },
+            onClick = { /* Handle create account */
+
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
@@ -115,11 +125,11 @@ fun CreateAccountScreen() {
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(8.dp)
         ) {
-//            Icon(
-//                painter = painterResource(id = coil.base.R.drawable.notification_bg), // replace with your Google icon resource
-//                contentDescription = null,
-//                tint = Color.Unspecified
-//            )
+            Icon(
+                painter = painterResource(id = R.drawable.google), // replace with your Google icon resource
+                contentDescription = null,
+                tint = Color.Unspecified
+            )
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = "Sign Up with Google")
         }
@@ -135,7 +145,9 @@ fun CreateAccountScreen() {
             Icon(
                 painter = painterResource(id = R.drawable.facebook), // replace with your Facebook icon resource
                 contentDescription = null,
-                tint = Color.Unspecified
+                tint = Color.Unspecified,
+                modifier = Modifier.size(25.dp)
+
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = "Sign Up with Facebook")
