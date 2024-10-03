@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -35,6 +36,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.malakezzat.yallabuy.R
 @Preview
 @Composable
@@ -42,6 +46,8 @@ fun CreateAccountScreen() {
     var userName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -80,6 +86,7 @@ fun CreateAccountScreen() {
             label = { Text("Enter your email or phone number") },
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
             modifier = Modifier.fillMaxWidth()
+
         )
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -97,8 +104,16 @@ fun CreateAccountScreen() {
 
         // Create Account Button
         Button(
-            onClick = { /* Handle create account */
+            onClick = {
+                isLoading = true
+                signInWithEmailAndPassword(email,pass, userName){ success, error ->
+                    isLoading = false
+                    if(success){
 
+                    }else{
+                        errorMessage = error
+                    }
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -106,9 +121,16 @@ fun CreateAccountScreen() {
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5C4CE3))
         ) {
-            Text(text = "Create Account", color = Color.White)
+            if (isLoading) {
+                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+            } else {
+                Text(text = "Create Account", color = Color.White)
+            }
         }
-
+        errorMessage?.let {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = it, color = Color.Red)
+        }
         Spacer(modifier = Modifier.height(16.dp))
 
         // Or Sign Up with Other Methods
@@ -128,7 +150,8 @@ fun CreateAccountScreen() {
             Icon(
                 painter = painterResource(id = R.drawable.google), // replace with your Google icon resource
                 contentDescription = null,
-                tint = Color.Unspecified
+                tint = Color.Unspecified,
+                modifier = Modifier.size(25.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = "Sign Up with Google")
@@ -153,4 +176,21 @@ fun CreateAccountScreen() {
             Text(text = "Sign Up with Facebook")
         }
     }
+}
+fun signInWithEmailAndPassword(email: String, password: String,name : String ,callback: (Boolean, String?) -> Unit) {
+    val auth = FirebaseAuth.getInstance()
+
+    auth.signInWithEmailAndPassword(email, password)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                callback(true, null)
+                val user = auth.currentUser
+                val profileUpdates = UserProfileChangeRequest.Builder()
+                    .setDisplayName(name)
+                    .build()
+                user?.updateProfile(profileUpdates)
+            } else {
+                callback(false, task.exception?.message)
+            }
+        }
 }

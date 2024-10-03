@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -61,6 +62,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.espresso.core)
+    implementation(libs.firebase.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -94,4 +96,8 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.8.1")
 
 // implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
+
+    //firebase
+    implementation ("com.google.firebase:firebase-auth:23.0.0")
+    implementation ("com.google.android.gms:play-services-auth")
 }
