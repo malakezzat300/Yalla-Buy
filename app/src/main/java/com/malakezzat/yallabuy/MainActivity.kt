@@ -1,5 +1,6 @@
 package com.malakezzat.yallabuy
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,37 +12,38 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.malakezzat.yallabuy.data.ProductsRepository
+import com.malakezzat.yallabuy.data.ProductsRepositoryImpl
+import com.malakezzat.yallabuy.data.remot.ProductService
+import com.malakezzat.yallabuy.data.remot.ProductsRemoteDataSourceImpl
+import com.malakezzat.yallabuy.data.remot.RetrofitHelper
+import com.malakezzat.yallabuy.data.sharedpref.GlobalSharedPreferenceDataSource
+import com.malakezzat.yallabuy.data.sharedpref.GlobalSharedPreferenceDataSourceImp
+import com.malakezzat.yallabuy.ui.NavigationApp
+import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModelFactory
 import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
 
 class MainActivity : ComponentActivity() {
+
+    private val repo by lazy {
+        ProductsRepositoryImpl.getInstance(
+            ProductsRemoteDataSourceImpl.
+            getInstance( RetrofitHelper.getInstance().create(ProductService::class.java)),
+            GlobalSharedPreferenceDataSourceImp(this.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE))
+        )
+    }
+    private val homeScreenViewModelFactory by lazy {
+        HomeScreenViewModelFactory(repo)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent {
-            YallaBuyTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+        setContent {YallaBuyTheme {
+            NavigationApp(
+                homeScreenViewModelFactory
+            )
+        }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    YallaBuyTheme {
-        Greeting("Android")
-    }
-}
