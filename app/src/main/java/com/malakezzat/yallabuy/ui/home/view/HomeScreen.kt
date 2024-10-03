@@ -226,7 +226,8 @@ fun ProductCard(productName: String, currentPrice: String, originalPrice: String
 fun BottomNavigationBar() {
     BottomNavigation(
         backgroundColor = Color.White,
-        contentColor = Color.Black
+        contentColor = Color.Black,
+        modifier = Modifier.padding(bottom = 8.dp)
     ) {
         BottomNavigationItem(
             icon = {
