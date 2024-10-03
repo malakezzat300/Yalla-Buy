@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "382235296223",
+    "project_id": "yalla-buy-97506",
+    "storage_bucket": "yalla-buy-97506.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:382235296223:android:11482c208ebc411cb9446a",
+        "android_client_info": {
+          "package_name": "com.malakezzat.yallabuy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAsv1CCu5PnueUu7qMkL5BB-JZoexhn62s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
