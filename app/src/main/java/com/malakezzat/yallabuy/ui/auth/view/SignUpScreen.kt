@@ -55,6 +55,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
@@ -62,6 +63,8 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.malakezzat.yallabuy.R
+import com.malakezzat.yallabuy.ui.auth.viewmodel.SignUpViewModel
+import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
 
 @Composable
 fun CreateAccountScreen(context : Context) {
@@ -240,9 +243,10 @@ fun signInWithEmailAndPassword(email: String, password: String,name : String, co
             }
         }
 }
-@Preview
+
 @Composable
-fun SignupScreen() {
+fun SignupScreen(viewModel: SignUpViewModel,
+                 navController: NavController) {
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -267,7 +271,7 @@ fun SignupScreen() {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(text = "Already have an account?")
-                TextButton(onClick = { /* Handle login navigation */ }) {
+                TextButton(onClick = {navController.navigate(Screen.LogInScreen.route) }) {
                 Text(text = " Login", color = Color.Cyan)
                  }
             }
@@ -301,7 +305,9 @@ fun SignupScreen() {
             modifier = Modifier.fillMaxWidth()
                 .background(color = Color.White)
                 .padding(10.dp),
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email)
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -326,7 +332,10 @@ fun SignupScreen() {
                     //Icon(imageVector = image, contentDescription = null)
                 }
             },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password)
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+
+
         )
 
         Spacer(modifier = Modifier.height(16.dp))

@@ -7,6 +7,8 @@ import androidx.navigation.Navigation
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.malakezzat.yallabuy.ui.auth.viewmodel.SignUpViewModel
+import com.malakezzat.yallabuy.ui.auth.viewmodel.SignUpViewModelFactory
 import com.malakezzat.yallabuy.ui.home.view.HomeScreen
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModelFactory
@@ -15,6 +17,7 @@ import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModelFactory
 fun NavigationApp(
 
     homeScreenViewModelFactory: HomeScreenViewModelFactory,
+    signUpViewModelFactory: SignUpViewModelFactory,
     navController: NavHostController = rememberNavController()
 
 ) {
@@ -22,6 +25,10 @@ fun NavigationApp(
         composable(Screen.HomeScreen.route) {
             val viewModel: HomeScreenViewModel = viewModel(factory = homeScreenViewModelFactory)
             HomeScreen(viewModel = viewModel, navController)
+        }
+        composable(Screen.SignUpScreen.route){
+            val viewModel: SignUpViewModel = viewModel(factory = signUpViewModelFactory)
+            SignupScreen(viewModel , navController)
         }
     }
 
