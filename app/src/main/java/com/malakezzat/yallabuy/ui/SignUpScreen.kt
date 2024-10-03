@@ -276,7 +276,7 @@ fun SignupScreen() {
 
 
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Full Name")
+        Text(text = "Full Name", fontSize = 18.sp, modifier = Modifier.padding(8.dp))
 
         OutlinedTextField(
             value = fullName,
@@ -293,7 +293,7 @@ fun SignupScreen() {
 
 
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "Email")
+        Text(text = "Email", fontSize = 18.sp, modifier = Modifier.padding(8.dp))
         // Email Input
         OutlinedTextField(
             value = email,
@@ -306,7 +306,7 @@ fun SignupScreen() {
         )
 
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "Password")
+        Text(text = "Password", fontSize = 18.sp, modifier = Modifier.padding(8.dp))
         // Password Input
         OutlinedTextField(
             value = password,
@@ -357,6 +357,13 @@ fun SignupScreen() {
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "Signup with Google")
+            Icon(
+                painter = painterResource(id = R.drawable.google), // replace with your Facebook icon resource
+                contentDescription = null,
+                tint = Color.Unspecified,
+                modifier = Modifier.size(25.dp)
+
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
