@@ -109,7 +109,7 @@ fun TopBar() {
     )
 }
 
-//@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun AdList() {
     val context = LocalContext.current
@@ -221,7 +221,7 @@ fun ProductCard(productName: String, currentPrice: String, originalPrice: String
         Text(originalPrice, textDecoration = TextDecoration.LineThrough)
     }
 }
-@Preview(showBackground = true, showSystemUi = true)
+//@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun BottomNavigationBar() {
     BottomNavigation(
@@ -236,7 +236,7 @@ fun BottomNavigationBar() {
                     modifier = Modifier.size(24.dp)
                 )
             },
-            label = { Text("Home") },
+            label = { Text("Home", style = TextStyle(fontSize = 12.sp)) },
             selected = true,
             onClick = { /* Home Action */ }
         )
@@ -247,7 +247,7 @@ fun BottomNavigationBar() {
                 modifier = Modifier.size(24.dp)
             )
     },
-            label = { Text("Home") },
+            label = { Text("categories", style = TextStyle(fontSize = 11.5.sp)) },
             selected = true,
             onClick = { /* Home Action */ }
         )
@@ -258,7 +258,7 @@ fun BottomNavigationBar() {
                 modifier = Modifier.size(24.dp)
             )
             },
-            label = { Text("My Cart") },
+            label = { Text("My Cart", style = TextStyle(fontSize = 12.sp)) },
             selected = false,
             onClick = { /* My Cart Action */ }
         )
@@ -269,7 +269,7 @@ fun BottomNavigationBar() {
                 modifier = Modifier.size(24.dp)
             )
             },
-            label = { Text("Wishlist") },
+            label = { Text("Wishlist", style = TextStyle(fontSize = 12.sp)) },
             selected = false,
             onClick = { /* Wishlist Action */ }
         )
@@ -280,7 +280,7 @@ fun BottomNavigationBar() {
                 modifier = Modifier.size(24.dp)
             )
             },
-            label = { Text("Profile") },
+            label = { Text("Profile", style = TextStyle(fontSize = 12.sp)) },
             selected = false,
             onClick = { /* Profile Action */ }
         )
