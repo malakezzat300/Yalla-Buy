@@ -98,6 +98,9 @@ dependencies {
     //Navigation
     implementation("androidx.navigation:navigation-compose:2.8.1")
 
+    implementation("androidx.compose.material:material:1.3.1")
+    implementation ("androidx.compose.material:material-icons-extended:1.0.0")
+
 // implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
     implementation ("androidx.compose.material3:material3:1.0.1")
 }

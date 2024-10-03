@@ -1,11 +1,212 @@
 package com.malakezzat.yallabuy.ui.home.view
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.MailOutline
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
 
 @Composable
 fun HomeScreen(
     viewModel: HomeScreenViewModel,
     navController: NavController
-){}
+){
+    Scaffold(
+        topBar = { TopBar() },
+        bottomBar = { BottomNavigationBar() }
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(it)
+                .verticalScroll(rememberScrollState())
+        ) {
+            ExclusiveSalesBanner()
+            CategoriesSection()
+            LatestProductsSection()
+        }
+    }
+
+}
+
+
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopBar() {
+    CenterAlignedTopAppBar(
+        title = {
+            Text("Yalla Buy", style = MaterialTheme.typography.titleLarge)
+        },
+        actions = {
+            IconButton(onClick = { /* Search Action */ }) {
+                Icon(Icons.Default.Search, contentDescription = "Search")
+            }
+        },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = Color.White,
+            titleContentColor = Color.Black,
+            actionIconContentColor = Color.Black
+        )
+    )
+}
+
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun ExclusiveSalesBanner() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color(0xFF3A8BFF))
+            .height(150.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("30% OFF", color = Color.White, fontSize = 16.sp)
+            Text("On Headphones", color = Color.White, fontSize = 14.sp)
+            Text("Exclusive Sales", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Medium)
+        }
+    }
+}
+
+@Composable
+fun CategoriesSection() {
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text("Categories", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold))
+        LazyRow(
+            modifier = Modifier.padding(top = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(25) { CategoryItem("Electronics", Icons.Default.MailOutline)}
+        }
+    }
+}
+
+
+@Composable
+fun CategoryItem(name: String, icon: ImageVector) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Icon(icon, contentDescription = name, modifier = Modifier.size(40.dp))
+        Text(name, style = TextStyle(fontSize = 12.sp))
+    }
+}
+
+
+//@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun LatestProductsSection() {
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text("Latest Products", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold))
+        LazyRow(
+            modifier = Modifier.padding(top = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(5) {
+                ProductCard("Nike air jordan retro", "$126.00", "$186.00")
+                ProductCard("Classic black glasses", "$8.50", "$10.00")
+            }
+        }
+    }
+}
+
+@Composable
+fun ProductCard(productName: String, currentPrice: String, originalPrice: String) {
+    Column(
+        modifier = Modifier
+            .width(150.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color.LightGray)
+            .padding(8.dp)
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_launcher_background), // استبدل بـ resource حقيقي
+            contentDescription = productName,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp),
+            contentScale = ContentScale.Crop
+        )
+        Text(productName, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
+        Text(currentPrice, color = Color.Green)
+        Text(originalPrice, textDecoration = TextDecoration.LineThrough)
+    }
+}
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun BottomNavigationBar() {
+    BottomNavigation(
+        backgroundColor = Color.White,
+        contentColor = Color.Black
+    ) {
+        BottomNavigationItem(
+            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+            label = { Text("Home") },
+            selected = true,
+            onClick = { /* Home Action */ }
+        )
+        BottomNavigationItem(
+            icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "My Cart") },
+            label = { Text("My Cart") },
+            selected = false,
+            onClick = { /* My Cart Action */ }
+        )
+        BottomNavigationItem(
+            icon = { Icon(Icons.Default.Favorite, contentDescription = "Wishlist") },
+            label = { Text("Wishlist") },
+            selected = false,
+            onClick = { /* Wishlist Action */ }
+        )
+        BottomNavigationItem(
+            icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
+            label = { Text("Profile") },
+            selected = false,
+            onClick = { /* Profile Action */ }
+        )
+    }
+}
