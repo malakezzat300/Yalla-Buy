@@ -29,6 +29,7 @@ import androidx.compose.material3.Label
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -280,15 +281,13 @@ fun SignupScreen() {
 
         OutlinedTextField(
             value = fullName,
-            onValueChange = { fullName = it },
+            onValueChange = {input -> fullName = input },
             //label = { Text(text = "Full Name") },
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth()
                 .background(color = Color.White)
                 .padding(10.dp),
-
-
-
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
         )
 
 
