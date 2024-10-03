@@ -97,7 +97,4 @@ dependencies {
 
 // implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
 
-    //firebase
-    implementation ("com.google.firebase:firebase-auth:23.0.0")
-    implementation ("com.google.android.gms:play-services-auth")
 }
