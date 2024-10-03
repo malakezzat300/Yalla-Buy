@@ -87,6 +87,9 @@ dependencies {
     //Coroutine
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0")
 
+    //okhttp3
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
+
     //ViewModel
     implementation("androidx.lifecycle:lifecycle-runtime-compose-android:2.8.6")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
