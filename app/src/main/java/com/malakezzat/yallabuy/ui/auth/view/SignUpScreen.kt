@@ -239,7 +239,8 @@ fun SignupScreen(viewModel: SignUpViewModel,
             onValueChange = {input -> fullName = input },
             //label = { Text(text = "Full Name") },
             shape = RoundedCornerShape(10.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .background(color = Color.White)
                 .padding(10.dp),
             colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
@@ -253,7 +254,8 @@ fun SignupScreen(viewModel: SignUpViewModel,
             value = email,
             onValueChange = { input -> email=input },
             shape = RoundedCornerShape(10.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .background(color = Color.White)
                 .padding(10.dp),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
@@ -268,7 +270,8 @@ fun SignupScreen(viewModel: SignUpViewModel,
             value = password,
             onValueChange = { input -> password = input },
             shape = RoundedCornerShape(10.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .background(color = Color.White)
                 .padding(10.dp),
             visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
@@ -296,7 +299,8 @@ fun SignupScreen(viewModel: SignUpViewModel,
             value = confirmPassword,
             onValueChange = { input -> confirmPassword = input },
             shape = RoundedCornerShape(10.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .background(color = Color.White)
                 .padding(10.dp),
             visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
@@ -328,6 +332,7 @@ fun SignupScreen(viewModel: SignUpViewModel,
                         auth.signInWithEmailAndPassword(email,password,fullName)
                     }else{
                         Toast.makeText(context,"password and confirm password are not the same",Toast.LENGTH_LONG)
+                        Log.i("TAG", "SignupScreen: password and confirm password are not the same")
                     }
                 }
                 
@@ -338,7 +343,8 @@ fun SignupScreen(viewModel: SignUpViewModel,
                 contentColor = Color.White,         // Text color
                 disabledContainerColor = Color.Gray // Background color when disabled
             ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(10.dp)
                 .height(60.dp)
 
@@ -350,7 +356,9 @@ fun SignupScreen(viewModel: SignUpViewModel,
 
         // Signup with Google
         TextButton(
-            onClick = { /* Handle Google Signup */ },
+            onClick = { auth.signInWithGoogle(context.getString(R.string.web_id), onSuccess = {user->
+                Log.i("TAG", "SignupScreen:  ${user?.email}")
+            }, onError = {}) },
             modifier = Modifier.fillMaxWidth()
 
         ) {
@@ -416,7 +424,8 @@ fun SignupScreenPreview() {
             onValueChange = {input -> fullName = input },
             //label = { Text(text = "Full Name") },
             shape = RoundedCornerShape(10.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .background(color = Color.White)
                 .padding(10.dp),
             colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
@@ -430,7 +439,8 @@ fun SignupScreenPreview() {
             value = email,
             onValueChange = { input -> email=input },
             shape = RoundedCornerShape(10.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .background(color = Color.White)
                 .padding(10.dp),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
@@ -445,7 +455,8 @@ fun SignupScreenPreview() {
             value = password,
             onValueChange = { input -> password = input },
             shape = RoundedCornerShape(10.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .background(color = Color.White)
                 .padding(10.dp),
             visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
@@ -473,7 +484,8 @@ fun SignupScreenPreview() {
             value = ConfirmPassword,
             onValueChange = { input -> ConfirmPassword = input },
             shape = RoundedCornerShape(10.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .background(color = Color.White)
                 .padding(10.dp),
             visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
@@ -504,7 +516,8 @@ fun SignupScreenPreview() {
                 contentColor = Color.White,         // Text color
                 disabledContainerColor = Color.Gray // Background color when disabled
             ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(10.dp)
                 .height(60.dp)
 
