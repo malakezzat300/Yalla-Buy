@@ -1,8 +1,12 @@
 package com.malakezzat.yallabuy.ui
 
 import android.content.Context
+import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -19,10 +24,17 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Label
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,15 +42,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
+import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.malakezzat.yallabuy.R
@@ -184,24 +203,164 @@ fun signInWithEmailAndPassword(email: String, password: String,name : String, co
 //                .setFilterByAuthorizedAccounts(true)
 //                .build())
 
-    auth.signInWithEmailAndPassword(email, password)
+    auth.createUserWithEmailAndPassword(email, password)
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                callback(true, null)
                 val user = auth.currentUser
                 val profileUpdates = UserProfileChangeRequest.Builder()
                     .setDisplayName(name)
                     .build()
                 user?.updateProfile(profileUpdates)
-                    ?.addOnCompleteListener { updateTask ->
-                        if (updateTask.isSuccessful) {
-                            callback(true, null)
+                    ?.addOnCompleteListener { profileUpdateTask ->
+                        if (profileUpdateTask.isSuccessful) {
+                            user.sendEmailVerification()
+                                .addOnCompleteListener { verificationTask ->
+                                    if (verificationTask.isSuccessful) {
+                                        Log.i("User Is Successfully Created", "username: $name")
+                                    }
+                                }
                         } else {
-                            callback(false, updateTask.exception?.message)
+                            Log.e("CreateUser", "Failed to update user profile: ${profileUpdateTask.exception?.message}")
                         }
                     }
+
             } else {
-                callback(false, task.exception?.message)
+                try {
+                    throw task.exception!!
+                } catch (e: FirebaseAuthWeakPasswordException) {
+                    Log.e("CreateUser", "Weak password.")
+                } catch (e: FirebaseAuthInvalidCredentialsException) {
+                    Log.e("CreateUser", "Invalid email.")
+                } catch (e: FirebaseAuthUserCollisionException) {
+                    Log.e("CreateUser", "User already exists.")
+                } catch (e: Exception) {
+                    Log.e("CreateUser", "Error: ${e.message}")
+                }
             }
         }
+}
+@Preview
+@Composable
+fun SignupScreen() {
+    var fullName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var passwordVisibility by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp)
+            .background(Color.White),
+//        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Column( horizontalAlignment = Alignment.Start,
+
+        ) {
+            Text(text = "Signup",
+                fontSize = 30.sp,
+                color = Color.Black,
+                modifier = Modifier.padding(8.dp)
+            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(text = "Already have an account?")
+                TextButton(onClick = { /* Handle login navigation */ }) {
+                Text(text = " Login", color = Color.Cyan)
+                 }
+            }
+//            Spacer(modifier = Modifier.height(8.dp))
+
+        }
+
+
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(text = "Full Name")
+
+        OutlinedTextField(
+            value = fullName,
+            onValueChange = { fullName = it },
+            //label = { Text(text = "Full Name") },
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.fillMaxWidth()
+                .background(color = Color.White)
+                .padding(10.dp),
+
+
+
+        )
+
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = "Email")
+        // Email Input
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.fillMaxWidth()
+                .background(color = Color.White)
+                .padding(10.dp),
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email)
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = "Password")
+        // Password Input
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.fillMaxWidth()
+                .background(color = Color.White)
+                .padding(10.dp),
+            visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                val image = if (passwordVisibility) {
+                  //  Icons.Filled.Visibility
+                } else {
+                   // Icons.Filled.VisibilityOff
+                }
+
+                IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+                    //Icon(imageVector = image, contentDescription = null)
+                }
+            },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Create Account Button
+        Button(
+            onClick = { /* Handle signup logic */ },
+            shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Black,        // Default background color
+                contentColor = Color.White,         // Text color
+                disabledContainerColor = Color.Gray // Background color when disabled
+            ),
+            modifier = Modifier.fillMaxWidth()
+                .padding(10.dp)
+                .height(60.dp)
+
+        ) {
+            Text(text = "Create Account")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Signup with Google
+        TextButton(
+            onClick = { /* Handle Google Signup */ },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "Signup with Google")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+
+    }
 }
