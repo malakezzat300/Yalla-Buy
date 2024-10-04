@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -163,7 +166,7 @@ fun AdCard(painter : Painter) {
     }
 
 }
-@Preview(showBackground = true, showSystemUi = true)
+//@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun CategoriesSection() {
     Column(modifier = Modifier.padding(16.dp)) {
@@ -203,7 +206,7 @@ fun CategoryItem(name: String, icon: ImageVector) {
             modifier = Modifier.padding(top = 4.dp))
     }
 }
-@Preview(showBackground = true, showSystemUi = true)
+//@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun CategoryItemtest() {
     Column(modifier = Modifier
@@ -222,45 +225,117 @@ fun CategoryItemtest() {
 }
 
 
-//@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun LatestProductsSection() {
     Column(modifier = Modifier.padding(16.dp)) {
-        Text("Latest Products", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold))
-        LazyRow(
-            modifier = Modifier.padding(top = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        Text("All Products", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        ,modifier = Modifier.padding(26.dp)
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(400.dp)
         ) {
-            items(5) {
-                ProductCard("Nike air jordan retro", "$126.00", "$186.00")
-                ProductCard("Classic black glasses", "$8.50", "$10.00")
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(15) { index ->
+                    ProductCard("Product ${index + 1}", "$${(index + 1) * 10}.00", "$${(index + 1) * 15}.00")
+                }
             }
         }
     }
 }
 
+
+//@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ProductCard(productName: String, currentPrice: String, originalPrice: String) {
-    Column(
+    Box(
         modifier = Modifier
             .width(150.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(Color.LightGray)
-            .padding(8.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.White)
+            .padding(14.dp)
     ) {
+        // Background image of the product
         Image(
-            painter = painterResource(id = R.drawable.ic_launcher_background), // استبدل بـ resource حقيقي
+            painter = painterResource(id = R.drawable.rectangle9),
             contentDescription = productName,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(100.dp),
             contentScale = ContentScale.Crop
         )
-        Text(productName, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
-        Text(currentPrice, color = Color.Green)
-        Text(originalPrice, textDecoration = TextDecoration.LineThrough)
+
+        // Wishlist icon positioned at the top right corner
+        Image(
+            painter = painterResource(id = R.drawable.wishlist),
+            contentDescription = "wishlist",
+            modifier = Modifier
+                .size(40.dp) // Adjust size as needed
+                .align(Alignment.TopEnd) // Align the image to the top end corner
+                .padding(5.dp) // Add padding around the image
+        )
+
+        // Column for product details
+        Column(
+            modifier = Modifier.padding(top = 110.dp) // Ensure text does not overlap with the image
+        ) {
+            Text(productName, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
+            Text(currentPrice, color = Color.Green)
+            Text(originalPrice, textDecoration = TextDecoration.LineThrough)
+        }
     }
 }
+
+
+
+/*@Composable
+fun ProductCard() {
+    Box(
+        modifier = Modifier
+            .width(150.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.White)
+            .padding(14.dp)
+    ) {
+        // Background image of the product
+        Image(
+            painter = painterResource(id = R.drawable.rectangle9),
+            contentDescription = "productName",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp),
+            contentScale = ContentScale.Crop
+        )
+
+        // Wishlist icon positioned at the top right corner
+        Image(
+            painter = painterResource(id = R.drawable.wishlist),
+            contentDescription = "wishlist",
+            modifier = Modifier
+                .size(40.dp) // Adjust size as needed
+                .align(Alignment.TopEnd) // Align the image to the top end corner
+                .padding(5.dp) // Add padding around the image
+        )
+
+        // Column for product details
+        Column(
+            modifier = Modifier.padding(top = 110.dp) // Ensure text does not overlap with the image
+        ) {
+            Text("productName", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
+            Text("currentPrice", color = Color.Green)
+            Text("originalPrice", textDecoration = TextDecoration.LineThrough)
+        }
+    }
+}*/
+
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun BottomNavigationBar() {
