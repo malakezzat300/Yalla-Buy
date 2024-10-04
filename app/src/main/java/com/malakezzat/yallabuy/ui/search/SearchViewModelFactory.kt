@@ -3,7 +3,6 @@ package com.malakezzat.yallabuy.ui.search
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.malakezzat.yallabuy.data.ProductsRepository
-import com.malakezzat.yallabuy.ui.auth.viewmodel.SignUpViewModel
 import java.lang.IllegalArgumentException
 
 class SearchViewModelFactory(private val repository: ProductsRepository):

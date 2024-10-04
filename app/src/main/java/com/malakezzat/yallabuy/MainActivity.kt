@@ -19,6 +19,7 @@ import com.malakezzat.yallabuy.ui.NavigationApp
 import com.malakezzat.yallabuy.ui.auth.viewmodel.SignUpViewModelFactory
 import com.malakezzat.yallabuy.ui.auth.viewmodel.login.LogInViewModelFactory
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModelFactory
+import com.malakezzat.yallabuy.ui.search.SearchViewModelFactory
 import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
 
 class MainActivity : ComponentActivity() {
@@ -39,6 +40,9 @@ class MainActivity : ComponentActivity() {
     private val logInViewModelFactory by lazy {
         LogInViewModelFactory(repo)
     }
+    private val searchViewModelFactory by lazy {
+        SearchViewModelFactory(repo)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -50,7 +54,8 @@ class MainActivity : ComponentActivity() {
             NavigationApp(
                 homeScreenViewModelFactory,
                 signUpViewModelFactory,
-                logInViewModelFactory
+                logInViewModelFactory,
+                searchViewModelFactory
             )
         }
         }
