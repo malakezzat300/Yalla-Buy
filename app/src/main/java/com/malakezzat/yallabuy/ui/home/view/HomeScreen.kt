@@ -137,9 +137,9 @@ fun CustomTopBar() {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = painterResource(id = R.drawable.home_2), // logo
+                painter = painterResource(id = R.drawable.logo), // logo
                 contentDescription = "Logo",
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(30.dp)
             )
             Text(
                 text = "YallaBuy",
