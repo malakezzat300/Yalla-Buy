@@ -79,7 +79,7 @@ fun HomeScreen(
     navController: NavController
 ){
     Scaffold(
-        topBar = { TopBar() },
+        topBar = { CustomTopBar() },
         bottomBar = { BottomNavigationBar() }
     ) {
         Column(
@@ -98,8 +98,8 @@ fun HomeScreen(
 
 
 
-
-@OptIn(ExperimentalMaterial3Api::class)
+//@Preview(showBackground = true, showSystemUi = true)
+/*@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar() {
     CenterAlignedTopAppBar(
@@ -107,8 +107,12 @@ fun TopBar() {
             Text("Yalla Buy", style = MaterialTheme.typography.titleLarge)
         },
         actions = {
-            IconButton(onClick = { /* Search Action */ }) {
-                Icon(Icons.Default.Search, contentDescription = "Search")
+            IconButton(onClick = { *//* Search Action *//* }) {
+                Image(
+                    painter = painterResource(id = R.drawable.search_normal),
+                    contentDescription = "Search Icon",
+                    modifier = Modifier.size(24.dp)
+                )
             }
         },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -117,7 +121,54 @@ fun TopBar() {
             actionIconContentColor = Color.Black
         )
     )
+}*/
+
+
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun CustomTopBar() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 38.dp, start = 10.dp, end = 10.dp, bottom = 10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                painter = painterResource(id = R.drawable.home_2), // logo
+                contentDescription = "Logo",
+                modifier = Modifier.size(40.dp)
+            )
+            Text(
+                text = "YallaBuy",
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                modifier = Modifier.padding(start = 4.dp)
+            )
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = { /* Search Action */ }) {
+                Image(
+                    painter = painterResource(id = R.drawable.search_normal),
+                    contentDescription = "Search Icon",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            Image(
+                painter = painterResource(id = R.drawable.rectangle1),
+                contentDescription = "User Profile",
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(18.dp))
+            )
+        }
+    }
 }
+
 
 
 @Composable
@@ -191,7 +242,7 @@ fun CategoriesSection() {
         }
     }
 }
-@Preview(showBackground = true, showSystemUi = true)
+//@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun CategoryItem() {
     Column(modifier = Modifier
@@ -232,7 +283,7 @@ fun CategoryItemtest() {
 /*Text("All Products", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
         ,modifier = Modifier.padding(26.dp)
         )*/
-@Preview(showBackground = true, showSystemUi = true)
+//@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun LatestProductsSection() {
     Column(modifier = Modifier.padding(16.dp)) {
@@ -310,7 +361,7 @@ fun ProductCard(productName: String, currentPrice: String, originalPrice: String
 }
 
 
-@Preview(showBackground = true, showSystemUi = true)
+//@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ProductCard() {
     Box(
