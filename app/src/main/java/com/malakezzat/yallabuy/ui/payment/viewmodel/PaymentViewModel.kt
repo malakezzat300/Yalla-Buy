@@ -102,7 +102,7 @@ class PaymentViewModel(private val paymentRemoteDataSource: PaymentRemoteDataSou
     fun refundPayment(refundRequest: RefundRequest) {
         viewModelScope.launch {
             paymentRemoteDataSource.refundPayment(refundRequest)
-            // handle the result if needed
+
         }
     }
 }

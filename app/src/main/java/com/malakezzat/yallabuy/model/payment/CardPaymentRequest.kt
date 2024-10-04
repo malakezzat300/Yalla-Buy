@@ -1,26 +1,26 @@
 package com.malakezzat.paymenttest2.model
 
 data class CardPaymentRequest(
-    val source: PaymentSource,      // Card payment source details
-    val payment_token: String       // The payment key token received from getPaymentKey
+    val source: PaymentSource,
+    val payment_token: String
 )
 
 data class PaymentSource(
-    val identifier: String,         // Card number or token
-    val subtype: String             // "TOKEN" for card tokenization
+    val identifier: String,
+    val subtype: String
 )
 
 data class PaymentResponse(
-    val id: Int,                    // Payment ID
-    val amount_cents: Int,          // Amount in cents
-    val is_refunded: Boolean,       // Whether the payment was refunded
-    val pending: Boolean,           // Whether the payment is still pending
-    val success: Boolean,           // Whether the payment was successful
-    val currency: String,           // Currency code
-    val source_data: SourceData     // Payment source details
+    val id: Int,
+    val amount_cents: Int,
+    val is_refunded: Boolean,
+    val pending: Boolean,
+    val success: Boolean,
+    val currency: String,
+    val source_data: SourceData
 )
 
 data class SourceData(
-    val pan: String,                // Masked card number (e.g., **** **** **** 1234)
-    val type: String                // Type of card (e.g., credit, debit)
+    val pan: String,
+    val type: String
 )

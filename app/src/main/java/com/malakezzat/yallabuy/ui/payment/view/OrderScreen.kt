@@ -54,7 +54,7 @@ fun OrderScreen(viewModel: PaymentViewModel) {
 
             authToken?.let { token ->
                 val order = FakeData.orderRequest.apply { this.auth_token = token  }
-                viewModel.createOrder(token,order) // Create order
+                viewModel.createOrder(token,order)
             }
         }) {
             if (isLoading) {

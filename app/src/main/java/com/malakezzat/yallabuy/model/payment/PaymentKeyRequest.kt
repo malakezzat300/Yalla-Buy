@@ -1,12 +1,12 @@
 package com.malakezzat.paymenttest2.model
 
 data class PaymentKeyRequest(
-    val amount_cents: Int,          // Amount in cents
-    val currency: String,           // Currency code (e.g., EGP, USD)
-    val order_id: String,           // Order ID generated after creating an order
-    val billing_data: BillingData,  // Billing details for the user
-    val integration_id: Int,        // Integration ID for card payments
-    val lock_order_when_paid: String // "false" or "true"
+    val amount_cents: Int,
+    val currency: String,
+    val order_id: String,
+    val billing_data: BillingData,
+    val integration_id: Int,
+    val lock_order_when_paid: String
 )
 
 data class BillingData(
@@ -26,5 +26,5 @@ data class BillingData(
 )
 
 data class PaymentKeyResponse(
-    val token: String  // The payment key token
+    val token: String
 )

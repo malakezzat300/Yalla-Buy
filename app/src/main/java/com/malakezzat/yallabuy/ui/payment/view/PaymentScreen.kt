@@ -30,19 +30,20 @@ fun PaymentScreen(onPaymentSuccess: () -> Unit) {
     ) {
         Text(text = "Enter Payment Details", style = MaterialTheme.typography.headlineLarge)
 
-        // Input fields for card information
         OutlinedTextField(
-            value = "", // handle state
-            onValueChange = { /* handle value change */ },
+            value = "",
+            onValueChange = {
+
+            },
             label = { Text("Card Number") },
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Button to initiate payment
+
         Button(onClick = {
-            // call your Paymob API
+
         }) {
             Text("Pay Now")
         }

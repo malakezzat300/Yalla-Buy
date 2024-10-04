@@ -75,7 +75,7 @@ fun CheckoutScreen(
         Text("Choose Delivery Address", fontWeight = FontWeight.Bold, fontSize = 18.sp)
         Spacer(modifier = Modifier.height(8.dp))
 
-        var expanded by remember { mutableStateOf(false) }  // To control the dropdown state
+        var expanded by remember { mutableStateOf(false) }
 
         Box(
             modifier = Modifier.fillMaxWidth()
@@ -111,7 +111,6 @@ fun CheckoutScreen(
         Text(text = if (selectedAddress.isEmpty()) "No address selected" else "Selected Address: $selectedAddress")
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Enter Coupon Code
         Text("Enter Coupon Code", fontWeight = FontWeight.Bold, fontSize = 18.sp)
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -134,7 +133,6 @@ fun CheckoutScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
 
-        // Select Payment Method
         Text("Choose Payment Method", fontWeight = FontWeight.Bold, fontSize = 18.sp)
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -156,10 +154,9 @@ fun CheckoutScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Final Confirmation
         Button(
             onClick = {
-                // Handle order confirmation process here
+
             },
             modifier = Modifier.fillMaxWidth()
         ) {

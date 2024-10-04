@@ -19,7 +19,7 @@ data class OrderRequest(
 data class OrderResponse(
     val id: String,
     val amount_cents: Long,
-    // Add more fields as needed
+
 )
 
 data class DeliveryDetails(
