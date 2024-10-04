@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
-import com.ramcosta.composedestinations.annotation.Destination
 
 @Composable
 fun PaymentScreen(onPaymentSuccess: () -> Unit) {
