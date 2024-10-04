@@ -3,6 +3,9 @@ package com.malakezzat.yallabuy.data
 import com.malakezzat.yallabuy.data.local.ProductsLocalDataSource
 import com.malakezzat.yallabuy.data.remot.ProductsRemoteDataSource
 import com.malakezzat.yallabuy.data.sharedpref.GlobalSharedPreferenceDataSource
+import com.malakezzat.yallabuy.model.CustomCollection
+import com.malakezzat.yallabuy.model.Product
+import kotlinx.coroutines.flow.Flow
 
 class ProductsRepositoryImpl private constructor(
     private var productsRemoteDataSource: ProductsRemoteDataSource,
@@ -23,4 +26,12 @@ class ProductsRepositoryImpl private constructor(
         }
     }
 }
+
+    override suspend fun getAllProducts(): Flow<List<Product>> {
+        return productsRemoteDataSource.getAllProducts()
     }
+
+    override suspend fun getCategories(): Flow<List<CustomCollection>> {
+        return productsRemoteDataSource.getCategories()
+    }
+}

@@ -2,17 +2,21 @@ package com.malakezzat.yallabuy.ui.home.view
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
@@ -52,6 +56,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -109,7 +114,7 @@ fun TopBar() {
     )
 }
 
-@Preview(showBackground = true, showSystemUi = true)
+
 @Composable
 fun AdList() {
     val context = LocalContext.current
@@ -158,11 +163,21 @@ fun AdCard(painter : Painter) {
     }
 
 }
-
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun CategoriesSection() {
     Column(modifier = Modifier.padding(16.dp)) {
-        Text("Categories", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold))
+        Row (
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ){
+            Text("Categories", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
+            Text("SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
+                color = Color.Cyan
+            )
+        }
+
         LazyRow(
             modifier = Modifier.padding(top = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -172,12 +187,37 @@ fun CategoriesSection() {
     }
 }
 
-
 @Composable
 fun CategoryItem(name: String, icon: ImageVector) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(icon, contentDescription = name, modifier = Modifier.size(40.dp))
-        Text(name, style = TextStyle(fontSize = 12.sp))
+    Column(modifier = Modifier
+        .padding(8.dp)
+        .clip(RoundedCornerShape(12.dp))
+        .background(Color(0xFFF7F7F7))
+        .border(BorderStroke(1.dp, Color(0xFFE0E0E0)))
+        .size(90.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center) {
+        Icon(Icons.Default.MailOutline, contentDescription = "name", modifier = Modifier.size(40.dp))
+        Text(text = "name",
+            style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
+            modifier = Modifier.padding(top = 4.dp))
+    }
+}
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun CategoryItemtest() {
+    Column(modifier = Modifier
+        .padding(8.dp)
+        .clip(RoundedCornerShape(12.dp))
+        .background(Color(0xFFF7F7F7))
+        .border(BorderStroke(1.dp, Color(0xFFE0E0E0)))
+        .size(90.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center) {
+        Icon(Icons.Default.MailOutline, contentDescription = "name", modifier = Modifier.size(40.dp))
+        Text(text = "name",
+            style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
+            modifier = Modifier.padding(top = 4.dp))
     }
 }
 

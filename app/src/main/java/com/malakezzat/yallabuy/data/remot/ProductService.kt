@@ -1,5 +1,6 @@
 package com.malakezzat.yallabuy.data.remot
 
+import com.malakezzat.yallabuy.model.Category
 import com.malakezzat.yallabuy.model.ProductResponse
 import com.malakezzat.yallabuy.model.ProductsResponse
 import retrofit2.http.Body
@@ -14,4 +15,6 @@ interface ProductService {
     @POST("products.json")
     suspend fun createProduct(@Body product: ProductResponse): ProductResponse
 
+    @GET("custom_collections.json")
+    suspend fun getCategories(): Category
 }
