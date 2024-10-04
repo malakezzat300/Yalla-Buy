@@ -5,6 +5,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.FirebaseApp
 import com.malakezzat.yallabuy.data.ProductsRepositoryImpl
 import com.malakezzat.yallabuy.data.remot.ProductService
@@ -18,7 +21,7 @@ import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModelFactory
 import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
 
 class MainActivity : ComponentActivity() {
-
+    private lateinit var googleSignInClient: GoogleSignInClient
     private val repo by lazy {
         ProductsRepositoryImpl.getInstance(
             ProductsRemoteDataSourceImpl.
@@ -39,7 +42,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         FirebaseApp.initializeApp(this)
-    
+
         enableEdgeToEdge()
         setContent {
           YallaBuyTheme {

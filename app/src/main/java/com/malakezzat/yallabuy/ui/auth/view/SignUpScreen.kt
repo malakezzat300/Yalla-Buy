@@ -3,6 +3,8 @@ package com.malakezzat.yallabuy.ui
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -59,6 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
@@ -205,6 +208,14 @@ fun SignupScreen(viewModel: SignUpViewModel,
     var isLoading by remember { mutableStateOf(false) }
     var auth = FirebaseAuthun()
     val context = LocalContext.current
+
+    val googleSignInClient = GoogleSignIn.getClient(context, auth.getGoogleSignInOptions(context))
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        auth.handleSignInResult(task, context, navController)
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -365,9 +376,13 @@ fun SignupScreen(viewModel: SignUpViewModel,
 
         // Signup with Google
         TextButton(
-            onClick = { auth.signInWithGoogle(context.getString(R.string.web_id), onSuccess = {user->
-                Log.i("TAG", "SignupScreen:  ${user?.email}")
-            }, onError = {}) },
+            onClick = {
+                val signInIntent = googleSignInClient.signInIntent
+                launcher.launch(signInIntent)
+//                auth.signInWithGoogle(context.getString(R.string.web_id), onSuccess = {user->
+//                Log.i("TAG", "SignupScreen:  ${user?.email}")
+//            }, onError = {})
+                      },
             modifier = Modifier.fillMaxWidth()
 
         ) {

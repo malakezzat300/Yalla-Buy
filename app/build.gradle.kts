@@ -100,4 +100,8 @@ dependencies {
 
 // implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
     implementation ("androidx.compose.material3:material3:1.0.1")
+
+    implementation ("com.google.firebase:firebase-auth:22.1.1")
+    implementation ("com.google.android.gms:play-services-auth:20.7.0")
+
 }
