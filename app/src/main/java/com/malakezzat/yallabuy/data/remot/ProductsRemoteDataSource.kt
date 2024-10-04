@@ -8,5 +8,5 @@ import kotlinx.coroutines.flow.Flow
 interface ProductsRemoteDataSource {
             suspend fun getAllProducts(): Flow<List<Product>>
 
-            suspend fun getCategories():Flow<List<CustomCollection>>
+            suspend fun getCategories():Flow<Category>
 }

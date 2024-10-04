@@ -32,11 +32,11 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         emit(emptyList())
     }
 
-    override suspend fun getCategories(): Flow<List<CustomCollection>> = flow {
-        val response = productService.getCategories().customCollections
+    override suspend fun getCategories(): Flow<Category> = flow {
+        val response = productService.getCategories()
         emit(response)
     }.catch { e ->
         Log.e(TAG, "Error fetching Categories", e)
-        emit(emptyList())
+        throw e
     }
 }
