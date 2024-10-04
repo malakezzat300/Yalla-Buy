@@ -3,7 +3,7 @@ package com.malakezzat.paymenttest2.model
 data class PaymentKeyRequest(
     val amount_cents: Int,
     val currency: String,
-    val order_id: String,
+    var order_id: String,
     val billing_data: BillingData,
     val integration_id: Int,
     val lock_order_when_paid: String

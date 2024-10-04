@@ -11,7 +11,7 @@ import com.malakezzat.paymenttest2.model.RefundResponse
 import kotlinx.coroutines.flow.Flow
 
 interface PaymentRemoteDataSource {
-    suspend fun getAuthToken(apiKey: String): Flow<String?>
+    suspend fun getAuthToken(): Flow<String?>
     suspend fun createOrder(authToken: String, orderRequest: OrderRequest): Flow<OrderResponse?>
     suspend fun getPaymentKey(paymentKeyRequest: PaymentKeyRequest): String?
     suspend fun processCardPayment(cardPaymentRequest: CardPaymentRequest): PaymentResponse?

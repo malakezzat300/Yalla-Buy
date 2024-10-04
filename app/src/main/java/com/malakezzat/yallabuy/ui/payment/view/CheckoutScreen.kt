@@ -21,6 +21,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,12 +30,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.malakezzat.paymenttest2.PaymentRemoteDataSourceImpl
+import com.malakezzat.paymenttest2.model.BillingData
+import com.malakezzat.paymenttest2.model.FakeData
+import com.malakezzat.paymenttest2.model.PaymentKeyRequest
+import com.malakezzat.yallabuy.ui.Screen
+import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
 
 @Composable
-fun CheckoutView() {
+fun CheckoutView(viewModel: PaymentViewModel,
+                 navController: NavController,
+                 orderId : String?
+) {
     val availableAddresses = listOf("123 Main St", "456 Pine St", "789 Oak St")
     val paymentMethods = listOf("Credit Card","Cash on Delivery")
 
@@ -48,7 +62,10 @@ fun CheckoutView() {
         },
         onPaymentMethodSelected = { method ->
             Log.d("Checkout", "Payment Method Selected: $method")
-        }
+        },
+        orderId = orderId,
+        viewModel,
+        navController,
     )
 }
 
@@ -58,11 +75,16 @@ fun CheckoutScreen(
     paymentMethods: List<String>,
     onAddressSelected: (String) -> Unit,
     onCouponApplied: (String) -> Unit,
-    onPaymentMethodSelected: (String) -> Unit
+    onPaymentMethodSelected: (String) -> Unit,
+    orderId: String?,
+    viewModel: PaymentViewModel,
+    navController: NavController
 ) {
     var selectedAddress by remember { mutableStateOf("") }
     var couponCode by remember { mutableStateOf("") }
     var selectedPaymentMethod by remember { mutableStateOf("") }
+
+    val paymentKey by viewModel.paymentKey.collectAsState()
 
     Column(
         modifier = Modifier
@@ -154,9 +176,20 @@ fun CheckoutScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        val paymentKeyRequest = FakeData.paymentKeyRequest.apply {
+            this.order_id = orderId.toString()
+        }
+        viewModel.fetchPaymentKey(paymentKeyRequest)
+        viewModel.paymentKey.value
+
         Button(
             onClick = {
-
+                if(selectedPaymentMethod == "Credit Card"){
+                    navController.navigate(Screen.PaymentScreen.route)
+                    paymentKey
+                } else {
+                    //with cash
+                }
             },
             modifier = Modifier.fillMaxWidth()
         ) {

@@ -19,10 +19,10 @@ class PaymentRemoteDataSourceImpl : PaymentRemoteDataSource {
         RetrofitHelper.getInstance().create(PaymobApiService::class.java)
     }
 
-    override suspend fun getAuthToken(apiKey: String): Flow<String?> = flow {
+    override suspend fun getAuthToken(): Flow<String?> = flow {
         try {
-            val response = paymentService.getAuthToken(AuthRequest(api_key = apiKey))
-            emit(response.token) // Emit the token if successful
+            val response = paymentService.getAuthToken()
+            emit(response.token)
         } catch (e: Exception) {
             Log.i("paymentTestLog", "getAuthToken: $e")
         }
@@ -31,7 +31,7 @@ class PaymentRemoteDataSourceImpl : PaymentRemoteDataSource {
     override suspend fun createOrder(authToken: String, orderRequest: OrderRequest): Flow<OrderResponse?> = flow {
         try {
             val response = paymentService.createOrder("Bearer $authToken", orderRequest)
-            emit(response) // Emit the order response
+            emit(response)
         } catch (e: Exception) {
             Log.i("paymentTestLog", "createOrder: $e")
             emit(null)

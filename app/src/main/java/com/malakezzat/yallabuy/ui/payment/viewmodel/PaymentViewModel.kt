@@ -35,15 +35,15 @@ class PaymentViewModel(private val paymentRemoteDataSource: PaymentRemoteDataSou
     private val _payment = MutableStateFlow<PaymentResponse?>(null)
     val payment: StateFlow<PaymentResponse?> = _payment
 
-    fun fetchToken(apiKey: String) {
+    fun fetchToken() {
         viewModelScope.launch {
-            getAuthToken(apiKey)
+            getAuthToken()
         }
     }
 
-    fun getAuthToken(apiKey: String) {
+    fun getAuthToken() {
         viewModelScope.launch {
-            paymentRemoteDataSource.getAuthToken(apiKey).collect { token ->
+            paymentRemoteDataSource.getAuthToken().collect { token ->
                 if (token != null) {
                     _authToken.value = token
                 } else {

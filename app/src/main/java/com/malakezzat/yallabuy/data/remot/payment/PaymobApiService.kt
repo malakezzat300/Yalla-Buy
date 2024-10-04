@@ -23,7 +23,7 @@ interface PaymobApiService {
         get() = "ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2T1RrNU1ETXlMQ0p1WVcxbElqb2lhVzVwZEdsaGJDSjkuS3ppcEdTb0hUdGM5UE1pNC1OUDJWc0dFdFVaUlFXTUxsWFlGZjJsVFJHcFZYTTQwTzh3MFZJdWVpYndiWm44Z3JZVVBXSU40aEhDa3ltVW1OSi0zelE="
 
     @POST("auth/tokens")
-    suspend fun getAuthToken(@Body body: AuthRequest): AuthResponse
+    suspend fun getAuthToken(@Body body: AuthRequest = AuthRequest(token)): AuthResponse
 
     @POST("ecommerce/orders")
     suspend fun createOrder(@Header("Authorization") token: String, @Body body: OrderRequest): OrderResponse
