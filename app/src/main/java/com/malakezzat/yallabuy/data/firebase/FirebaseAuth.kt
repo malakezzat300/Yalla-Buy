@@ -21,8 +21,8 @@ import com.malakezzat.yallabuy.ui.Screen
 
 class FirebaseAuthun {
     private val mAuth = FirebaseAuth.getInstance()
-    fun signInWithEmailAndPassword(email: String, password: String, name: String) {
-
+    fun signInWithEmailAndPassword(email: String, password: String, name: String) : Boolean {
+        var isSuccess = false
         mAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -36,7 +36,9 @@ class FirebaseAuthun {
                                 user.sendEmailVerification()
                                     .addOnCompleteListener { verificationTask ->
                                         if (verificationTask.isSuccessful) {
+                                            isSuccess=true
                                             Log.i("UserIsSuccessfullyCreated", "username: $name")
+
                                         }
                                     }
                             } else {
@@ -61,6 +63,7 @@ class FirebaseAuthun {
                     }
                 }
             }
+        return isSuccess
     }
 
     fun logInWithEmailAndPassword(

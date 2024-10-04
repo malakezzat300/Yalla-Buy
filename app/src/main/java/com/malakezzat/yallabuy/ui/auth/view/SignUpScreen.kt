@@ -20,9 +20,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -59,6 +61,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -80,6 +83,7 @@ fun CreateAccountScreen(context : Context) {
     var pass by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+   // var showDialog by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -206,9 +210,10 @@ fun SignupScreen(viewModel: SignUpViewModel,
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
+    var isSuccess by remember { mutableStateOf(false) }
     var auth = FirebaseAuthun()
     val context = LocalContext.current
-
+    var showDialog by remember { mutableStateOf(false) }
     val googleSignInClient = GoogleSignIn.getClient(context, auth.getGoogleSignInOptions(context))
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -340,10 +345,14 @@ fun SignupScreen(viewModel: SignUpViewModel,
                 isLoading=true
                 if(email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || email.isEmpty()){
                     Toast.makeText(context,"complete empty fields please",Toast.LENGTH_LONG).show()
+                    isLoading=false
                 }else{
                     if(password == confirmPassword){
-                        auth.signInWithEmailAndPassword(email,password,fullName)
-                       // navController.navigate(Screen.HomeScreen.route)
+                         isSuccess = auth.signInWithEmailAndPassword(email,password,fullName)
+                        Log.i("TAG", "SignupScreen: isSuccess ${auth.signInWithEmailAndPassword(email,password,fullName)}")
+                      if(!isSuccess){
+                        showDialog = true
+                      }
                     }else{
                         isLoading=false
                         Toast.makeText(context,"password and confirm password are not the same",Toast.LENGTH_LONG).show()
@@ -395,7 +404,35 @@ fun SignupScreen(viewModel: SignUpViewModel,
 
         Spacer(modifier = Modifier.height(16.dp))
 
-
+        if (showDialog) {
+            isLoading=false
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showDialog = false
+                        navController.navigate(Screen.LogInScreen.route)
+                    }) {
+                        Text("OK", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    }
+                },
+                title = {
+                    Text(text = "Success", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                },
+                text = {
+                    Text("A verification email has been sent to your email \n please verify your email and login.", fontSize = 15.sp)
+                },
+                icon = {
+                    Icon(
+                        imageVector = Icons.Filled.CheckCircle,
+                        contentDescription = "Success Icon",
+                        tint = Color.Green,
+                        modifier = Modifier.size(40.dp) // Adjust icon size
+                    )
+                },
+                properties = DialogProperties(dismissOnBackPress = true)
+            )
+        }
 
     }
 }
@@ -568,4 +605,32 @@ fun SignupScreenPreview() {
 
 
     }
+}
+@Composable
+fun customAlert(){
+        var showDialog by remember { mutableStateOf(false) }
+
+
+        // Dialog implementation
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false }, // Action on dismiss
+                confirmButton = {
+                    TextButton(onClick = { showDialog = false }) {
+                        Text("OK")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDialog = false }) {
+                        Text("Cancel")
+                    }
+                },
+                title = {
+                    Text(text = "Dialog Title")
+                },
+                text = {
+                    Text("This is a simple dialog in Jetpack Compose.")
+                }
+            )
+        }
 }
