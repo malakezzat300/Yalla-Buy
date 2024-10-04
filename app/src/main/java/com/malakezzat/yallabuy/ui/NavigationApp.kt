@@ -13,10 +13,8 @@ import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModelFactory
 
 @Composable
 fun NavigationApp(
-
     homeScreenViewModelFactory: HomeScreenViewModelFactory,
     navController: NavHostController = rememberNavController()
-
 ) {
     NavHost(navController = navController, startDestination = Screen.HomeScreen.route){
         composable(Screen.HomeScreen.route) {
