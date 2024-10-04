@@ -28,7 +28,7 @@ fun NavigationApp(
     searchViewModelFactory: SearchViewModelFactory,
     navController: NavHostController = rememberNavController()
 ) {
-    NavHost(navController = navController, startDestination = Screen.SignUpScreen.route){
+    NavHost(navController = navController, startDestination = Screen.SearchScreen.route){
         composable(Screen.HomeScreen.route) {
             val viewModel: HomeScreenViewModel = viewModel(factory = homeScreenViewModelFactory)
             HomeScreen(viewModel = viewModel, navController)

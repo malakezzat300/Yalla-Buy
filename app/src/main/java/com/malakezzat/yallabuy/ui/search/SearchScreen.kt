@@ -24,6 +24,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,15 +40,24 @@ import com.malakezzat.yallabuy.model.Product
 fun SearchScreen(viewModel: SearchViewModel,
                  navController: NavController
 ) {
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    val filteredProducts by viewModel.filteredProducts.collectAsState()
+    var query by remember { mutableStateOf("") }
+
+
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+            .fillMaxWidth()
+            .padding(18.dp)
     ) {
+        Spacer(modifier = Modifier.height(50.dp))
         // Search bar
         TextField(
-            value = "",
-            onValueChange = {},
+            value = query,
+            onValueChange = {input->
+                query=input
+                    viewModel.onSearchQueryChanged(input)
+                            },
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text("Search") },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Icon") },
@@ -68,16 +78,19 @@ fun SearchScreen(viewModel: SearchViewModel,
 
         Spacer(modifier = Modifier.height(16.dp))
         // Recent Searches List
-        val recentSearches =
-            listOf("Smart watch", "Laptop", "Women bag", "Headphones", "Shoes", "Eye glasses", "Women bag", "Headphones", "Shoes", "Eye glasses", "Women bag", "Headphones", "Shoes", "Eye glasses")
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(8.dp)
-             ) {
-            items(recentSearches) { searchItem ->
-                RecentSearchItem(null)
+        if(searchQuery.isEmpty()){
+
+        }else{
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(8.dp)
+            ) {
+                items(filteredProducts) { searchItem ->
+                    RecentSearchItem(searchItem)
+                }
             }
         }
+         
     }
 }
 @Composable
