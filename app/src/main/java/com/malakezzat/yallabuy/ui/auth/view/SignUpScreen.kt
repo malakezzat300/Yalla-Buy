@@ -343,7 +343,7 @@ fun SignupScreen(viewModel: SignUpViewModel,
                 }else{
                     if(password == confirmPassword){
                         auth.signInWithEmailAndPassword(email,password,fullName)
-                        navController.navigate(Screen.HomeScreen.route)
+                       // navController.navigate(Screen.HomeScreen.route)
                     }else{
                         isLoading=false
                         Toast.makeText(context,"password and confirm password are not the same",Toast.LENGTH_LONG).show()
@@ -379,9 +379,6 @@ fun SignupScreen(viewModel: SignUpViewModel,
             onClick = {
                 val signInIntent = googleSignInClient.signInIntent
                 launcher.launch(signInIntent)
-//                auth.signInWithGoogle(context.getString(R.string.web_id), onSuccess = {user->
-//                Log.i("TAG", "SignupScreen:  ${user?.email}")
-//            }, onError = {})
                       },
             modifier = Modifier.fillMaxWidth()
 

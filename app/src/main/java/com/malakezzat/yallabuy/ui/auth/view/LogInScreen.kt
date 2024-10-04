@@ -1,5 +1,6 @@
 package com.malakezzat.yallabuy.ui.auth.view
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -40,10 +41,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 import com.malakezzat.yallabuy.data.firebase.FirebaseAuthun
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.auth.viewmodel.login.LogInViewModel
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun LogInScreen(viewModel: LogInViewModel,
                  navController: NavController
@@ -138,7 +141,32 @@ fun LogInScreen(viewModel: LogInViewModel,
                 }else{
                     isLoading=true
                         auth.logInWithEmailAndPassword(email,password, onSuccess = {
-                            navController.navigate(Screen.HomeScreen.route)
+                                val user = FirebaseAuth.getInstance().currentUser
+                                if (user != null) {
+                                    // Reload the user to ensure the latest data
+                                    user.reload().addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+                                            if (user.isEmailVerified) {
+                                                // Email is verified
+                                                println("Email is verified")
+                                                navController.navigate(Screen.HomeScreen.route)
+                                            } else {
+                                                isLoading=false
+                                                Toast.makeText(context,"your email is not verified", Toast.LENGTH_LONG).show()
+                                            }
+                                        } else {
+                                            // Handle reload error
+                                            isLoading=false
+                                            Toast.makeText(context,"login faild", Toast.LENGTH_LONG).show()
+                                            println("Failed to reload user: ${task.exception?.message}")
+                                        }
+                                    }
+                                } else {
+                                    // Handle user not logged in
+                                    println("User not logged in")
+                                }
+
+
                             Log.i("TAG", "SignupScreen: password and confirm password are not the same")
                         }, onError = {
                             isLoading=false

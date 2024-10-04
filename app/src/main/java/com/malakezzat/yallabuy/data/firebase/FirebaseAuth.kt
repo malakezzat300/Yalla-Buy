@@ -36,13 +36,13 @@ class FirebaseAuthun {
                                 user.sendEmailVerification()
                                     .addOnCompleteListener { verificationTask ->
                                         if (verificationTask.isSuccessful) {
-                                            Log.i("User Is Successfully Created", "username: $name")
+                                            Log.i("UserIsSuccessfullyCreated", "username: $name")
                                         }
                                     }
                             } else {
                                 Log.e(
                                     "CreateUser",
-                                    "Failed to update user profile: ${profileUpdateTask.exception?.message}"
+                                    "Failedtoupdateuserprofile: ${profileUpdateTask.exception?.message}"
                                 )
                             }
                         }
