@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Yalla Buy</string>
     <string name="web_id" translatable="false">382235296223-lioni0fc68fb8gqf4junhltdcfle6750.apps.googleusercontent.com</string>
+    <string name="web_client_id" translatable="false">150141969572-5qqhfaohrq5a479m26bvf5mel5ko4on0.apps.googleusercontent.com</string>
 </resources>
