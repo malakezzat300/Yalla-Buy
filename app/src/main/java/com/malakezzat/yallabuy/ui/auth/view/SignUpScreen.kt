@@ -346,7 +346,7 @@ fun SignupScreen(viewModel: SignUpViewModel,
                 if(email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || email.isEmpty()){
                     Toast.makeText(context,"complete empty fields please",Toast.LENGTH_LONG).show()
                     isLoading=false
-                    showDialog=true
+                    //showDialog=true
                 }else{
                     if(password == confirmPassword){
                          isSuccess = auth.signInWithEmailAndPassword(email,password,fullName)
