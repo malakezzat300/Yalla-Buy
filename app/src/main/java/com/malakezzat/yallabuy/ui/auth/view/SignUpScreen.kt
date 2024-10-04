@@ -202,6 +202,7 @@ fun SignupScreen(viewModel: SignUpViewModel,
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
     var auth = FirebaseAuthun()
     val context = LocalContext.current
     Column(
@@ -216,7 +217,7 @@ fun SignupScreen(viewModel: SignUpViewModel,
 
             ) {
             Text(text = "Signup",
-                fontSize = 30.sp,
+                fontSize = 35.sp,
                 color = Color.Black,
                 modifier = Modifier.padding(8.dp)
             )
@@ -325,13 +326,16 @@ fun SignupScreen(viewModel: SignUpViewModel,
         Button(
             onClick = {
               //  viewModel.signInWithEmailAndPassword(email,password,fullName)
+                isLoading=true
                 if(email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || email.isEmpty()){
-                    Toast.makeText(context,"complete empty fields please",Toast.LENGTH_LONG)
+                    Toast.makeText(context,"complete empty fields please",Toast.LENGTH_LONG).show()
                 }else{
                     if(password == confirmPassword){
                         auth.signInWithEmailAndPassword(email,password,fullName)
+                        navController.navigate(Screen.HomeScreen.route)
                     }else{
-                        Toast.makeText(context,"password and confirm password are not the same",Toast.LENGTH_LONG)
+                        isLoading=false
+                        Toast.makeText(context,"password and confirm password are not the same",Toast.LENGTH_LONG).show()
                         Log.i("TAG", "SignupScreen: password and confirm password are not the same")
                     }
                 }
@@ -349,7 +353,12 @@ fun SignupScreen(viewModel: SignUpViewModel,
                 .height(60.dp)
 
         ) {
-            Text(text = "Create Account")
+            if (isLoading) {
+                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+            } else {
+                Text(text = "Create Account",fontSize = 20.sp)
+            }
+
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -400,7 +409,7 @@ fun SignupScreenPreview() {
 
             ) {
             Text(text = "Signup",
-                fontSize = 30.sp,
+                fontSize = 35.sp,
                 color = Color.Black,
                 modifier = Modifier.padding(8.dp)
             )
@@ -522,7 +531,7 @@ fun SignupScreenPreview() {
                 .height(60.dp)
 
         ) {
-            Text(text = "Create Account")
+            Text(text = "Create Account", fontSize = 20.sp)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
