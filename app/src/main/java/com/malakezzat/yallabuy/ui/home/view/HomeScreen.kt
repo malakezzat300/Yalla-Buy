@@ -54,6 +54,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -85,6 +86,7 @@ fun HomeScreen(
             modifier = Modifier
                 .padding(it)
                 .verticalScroll(rememberScrollState())
+                .background(color = Color.White)
         ) {
             AdList()
             CategoriesSection()
@@ -185,28 +187,31 @@ fun CategoriesSection() {
             modifier = Modifier.padding(top = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(25) { CategoryItem("Electronics", Icons.Default.MailOutline)}
+            items(25) { CategoryItem()}
         }
     }
 }
-
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun CategoryItem(name: String, icon: ImageVector) {
+fun CategoryItem() {
     Column(modifier = Modifier
-        .padding(8.dp)
-        .clip(RoundedCornerShape(12.dp))
-        .background(Color(0xFFF7F7F7))
-        .border(BorderStroke(1.dp, Color(0xFFE0E0E0)))
-        .size(90.dp),
+        .clip(RoundedCornerShape(8.dp))
+        .border(BorderStroke(1.5.dp, Color(0xFFE0E0E0)))
+        .background(color = Color.White)
+        .size(100.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
-        Icon(Icons.Default.MailOutline, contentDescription = "name", modifier = Modifier.size(40.dp))
-        Text(text = "name",
+        Image(
+            painter = painterResource(id = R.drawable.mob),
+            contentDescription = "Wishlist",
+            modifier = Modifier.size(40.dp)
+        )
+        Text(text = "Fashion",
             style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
             modifier = Modifier.padding(top = 4.dp))
     }
 }
-//@Preview(showBackground = true, showSystemUi = true)
+/*//@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun CategoryItemtest() {
     Column(modifier = Modifier
@@ -222,16 +227,26 @@ fun CategoryItemtest() {
             style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
             modifier = Modifier.padding(top = 4.dp))
     }
-}
+}*/
 
-
+/*Text("All Products", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        ,modifier = Modifier.padding(26.dp)
+        )*/
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun LatestProductsSection() {
     Column(modifier = Modifier.padding(16.dp)) {
-        Text("All Products", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
-        ,modifier = Modifier.padding(26.dp)
-        )
+        Row (
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ){
+            Text("All Products", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                ,modifier = Modifier.padding(26.dp))
+            Text("SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
+                color = Color.Cyan
+            )
+        }
 
         Box(
             modifier = Modifier
@@ -253,14 +268,14 @@ fun LatestProductsSection() {
 }
 
 
-//@Preview(showBackground = true, showSystemUi = true)
+
 @Composable
 fun ProductCard(productName: String, currentPrice: String, originalPrice: String) {
     Box(
         modifier = Modifier
             .width(150.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(Color.White)
+            .background(Color(0xFFF7F7F7))
             .padding(14.dp)
     ) {
         // Background image of the product
@@ -295,14 +310,14 @@ fun ProductCard(productName: String, currentPrice: String, originalPrice: String
 }
 
 
-
-/*@Composable
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
 fun ProductCard() {
     Box(
         modifier = Modifier
             .width(150.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(Color.White)
+            .background(Color(0xFFE0E0E0))
             .padding(14.dp)
     ) {
         // Background image of the product
@@ -334,7 +349,7 @@ fun ProductCard() {
             Text("originalPrice", textDecoration = TextDecoration.LineThrough)
         }
     }
-}*/
+}
 
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
