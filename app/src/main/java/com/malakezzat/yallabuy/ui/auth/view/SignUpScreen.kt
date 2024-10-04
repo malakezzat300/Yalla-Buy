@@ -346,6 +346,7 @@ fun SignupScreen(viewModel: SignUpViewModel,
                 if(email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || email.isEmpty()){
                     Toast.makeText(context,"complete empty fields please",Toast.LENGTH_LONG).show()
                     isLoading=false
+                    showDialog=true
                 }else{
                     if(password == confirmPassword){
                          isSuccess = auth.signInWithEmailAndPassword(email,password,fullName)
@@ -413,24 +414,25 @@ fun SignupScreen(viewModel: SignUpViewModel,
                         showDialog = false
                         navController.navigate(Screen.LogInScreen.route)
                     }) {
-                        Text("OK", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        Text("OK", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Cyan)
                     }
                 },
                 title = {
                     Text(text = "Success", fontSize = 24.sp, fontWeight = FontWeight.Bold)
                 },
                 text = {
-                    Text("A verification email has been sent to your email \n please verify your email and login.", fontSize = 15.sp)
+                    Text("A verification email has been sent to your email. \nplease verify your email and login.", fontSize = 15.sp)
                 },
                 icon = {
                     Icon(
                         imageVector = Icons.Filled.CheckCircle,
                         contentDescription = "Success Icon",
-                        tint = Color.Green,
+                        tint = Color.Cyan,
                         modifier = Modifier.size(40.dp) // Adjust icon size
                     )
                 },
-                properties = DialogProperties(dismissOnBackPress = true)
+
+                properties = DialogProperties(dismissOnBackPress = true) , shape = RectangleShape, containerColor = Color.White
             )
         }
 
