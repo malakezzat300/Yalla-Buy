@@ -68,6 +68,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
@@ -78,6 +79,8 @@ fun HomeScreen(
     viewModel: HomeScreenViewModel,
     navController: NavController
 ){
+    val uiState by viewModel.productList.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     Scaffold(
         topBar = { CustomTopBar() },
         bottomBar = { BottomNavigationBar() }
@@ -242,12 +245,15 @@ fun CategoriesSection() {
         }
     }
 }
-//@Preview(showBackground = true, showSystemUi = true)
+
+
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun CategoryItem() {
     Column(modifier = Modifier
+        .padding(15.dp)
         .clip(RoundedCornerShape(8.dp))
-        .border(BorderStroke(1.5.dp, Color(0xFFE0E0E0)))
+        .border(BorderStroke(5.dp, Color(0xFFE0E0E0)))
         .background(color = Color.White)
         .size(100.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -361,7 +367,7 @@ fun ProductCard(productName: String, currentPrice: String, originalPrice: String
 }
 
 
-//@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ProductCard() {
     Box(
