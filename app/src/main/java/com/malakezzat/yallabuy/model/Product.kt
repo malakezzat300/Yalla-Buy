@@ -8,6 +8,7 @@ data class Product(
     val product_type: String,
     val tags: String,
     val images: List<Image> = listOf(),  // Assuming Image is a separate data class for images.
+    val image: Image,
     val variants: List<Variant> = listOf() // Add this for variants.
 )
 
