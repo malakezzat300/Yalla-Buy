@@ -21,7 +21,9 @@ class HomeScreenViewModel(private val repository: ProductsRepository):ViewModel(
     val productList: StateFlow<ApiState<List<Product>>> get() = _productList
     private val _categoriesList = MutableStateFlow<ApiState<List<CustomCollection>>>(ApiState.Loading)
     val categoriesList: StateFlow<ApiState<List<CustomCollection>>> get() = _categoriesList
-
+//
+private val _brandsList = MutableStateFlow<ApiState<List<String>>>(ApiState.Loading)
+    val brandsList: StateFlow<ApiState<List<String>>> get() = _brandsList
 
     init {
         getAllProducts()
@@ -40,7 +42,11 @@ class HomeScreenViewModel(private val repository: ProductsRepository):ViewModel(
                 }
                 .collect { productList ->
                     _productList.value = ApiState.Success(productList) // Set success state with data
+                    val brands = productList.map { it.vendor }.distinct()
+                    _brandsList.value = ApiState.Success(brands)
+
                     Log.i(TAG, "getAllProducts: ${productList.size}")
+                    Log.i(TAG, "Brands: $brands")
                 }
         }
     }
