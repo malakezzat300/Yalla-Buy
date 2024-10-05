@@ -53,10 +53,15 @@ import com.malakezzat.yallabuy.R
 import kotlinx.coroutines.launch
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.navigation.NavController
+import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ShoppingScreen() {
+fun ShoppingCartScreen(
+    viewModel: ShoppingCartViewModel,
+    navController: NavController,
+) {
     val bottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
     ModalBottomSheetLayout(
@@ -411,6 +416,6 @@ fun VoucherBottomSheet() {
 @Composable
 fun GreetingPreview() {
     YallaBuyTheme {
-        ShoppingScreen()
+
     }
 }
