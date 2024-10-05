@@ -70,7 +70,6 @@ fun SearchScreen(viewModel: SearchViewModel,
                             },
             placeholder = { Text("Search") },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Icon") },
-            trailingIcon = { Icon(Icons.Default.List, contentDescription = "Filter Icon") },
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier
                 .fillMaxWidth()
