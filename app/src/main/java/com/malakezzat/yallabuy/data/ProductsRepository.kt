@@ -8,5 +8,5 @@ import kotlinx.coroutines.flow.Flow
 interface ProductsRepository {
     suspend fun getAllProducts(): Flow<List<Product>>
 
-    suspend fun getCategories(): Flow<Category>
+    suspend fun getCategories(): Flow<List<CustomCollection>>
 }

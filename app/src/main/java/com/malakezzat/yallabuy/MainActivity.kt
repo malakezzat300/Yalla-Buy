@@ -48,6 +48,7 @@ class MainActivity : ComponentActivity() {
     }
     private val paymentViewModelFactory by lazy {
         PaymentViewModelFactory(paymentRemoteDataSource)
+    }
     private val searchViewModelFactory by lazy {
         SearchViewModelFactory(repo)
     }

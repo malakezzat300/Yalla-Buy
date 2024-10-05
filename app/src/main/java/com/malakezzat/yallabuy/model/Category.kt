@@ -3,25 +3,25 @@
 package com.malakezzat.yallabuy.model
 
 data class Category (
-    val customCollections: List<CustomCollection>
+    val custom_collections: List<CustomCollection>
 )
 
 data class CustomCollection (
-    val publishedScope: String,
-    val updatedAt: String,
-    val adminGraphqlAPIID: String,
+    val published_scope: String,
+    val updated_at: String,
+    val admin_graphql_api_id: String,
     val handle: String,
     val id: Long,
     val title: String,
-    val publishedAt: String,
-    val sortOrder: String,
+    val published_at: String,
+    val sort_order: String,
     val image: ImageCategory? = null,
-    val bodyHTML: String? = null
+    val body_html: String? = null
 )
 
 data class ImageCategory(
     val src: String,
     val width: Long,
-    val createdAt: String,
+    val created_at: String,
     val height: Long
 )
