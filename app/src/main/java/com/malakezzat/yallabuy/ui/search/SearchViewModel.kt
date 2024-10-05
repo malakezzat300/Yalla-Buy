@@ -23,6 +23,9 @@ class SearchViewModel(var repository : ProductsRepository) : ViewModel(){
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
 
+    private val _filterByPrice = MutableStateFlow(0f)
+    val filterByPrice = _filterByPrice.asStateFlow()
+
     val TAG = "searchViewModel"
 
     init {
@@ -45,7 +48,7 @@ class SearchViewModel(var repository : ProductsRepository) : ViewModel(){
                 }
         }
     }
-    val filteredProducts = searchQuery
+    var filteredProducts = searchQuery
         .debounce(300) // Delay to avoid querying on every character
         .combine(_searchProductsList) { query, productsState ->
             // Combine the search query and products list
@@ -56,7 +59,11 @@ class SearchViewModel(var repository : ProductsRepository) : ViewModel(){
                     } else {
                         // Filter products based on query
                         productsState.data.filter { product ->
-                            product.title.contains(query, ignoreCase = true)
+                           val matchQuery =  product.title.startsWith(query, ignoreCase = true)
+                            val matchPrice =  product.variants[0].price.toFloat()<= _filterByPrice.value
+                            Log.i("TAG", "filtrr: ")
+                            matchQuery && matchPrice
+
                         }
                     }
                 }
@@ -67,7 +74,9 @@ class SearchViewModel(var repository : ProductsRepository) : ViewModel(){
             SharingStarted.Lazily,
             emptyList() // Default empty list
         )
-    fun onSearchQueryChanged(query: String) {
+
+    fun onSearchQueryChanged(query: String,price : Float) {
         _searchQuery.value = query
+        _filterByPrice.value = price
     }
 }
