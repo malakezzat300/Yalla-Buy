@@ -187,20 +187,7 @@ fun AdList() {
 
 @Composable
 fun AdCard(painter : Painter) {
-    Card (
-        modifier = Modifier
-            .padding(24.dp)
-            .fillMaxWidth()
-            .height(200.dp),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(12.dp),
-    ) {
-        Image(
-            painter = painter,
-            contentDescription = "ad",
-        )
-
-    }
+    160
 
 }
 //@Preview(showBackground = true, showSystemUi = true)
