@@ -1,5 +1,6 @@
 package com.malakezzat.yallabuy.ui.home.view
 
+import android.util.Log
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -71,6 +72,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.malakezzat.yallabuy.R
+import com.malakezzat.yallabuy.model.CustomCollection
+import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
 import kotlinx.coroutines.delay
 
@@ -79,8 +82,14 @@ fun HomeScreen(
     viewModel: HomeScreenViewModel,
     navController: NavController
 ){
-    val uiState by viewModel.productList.collectAsStateWithLifecycle()
+    val productState by viewModel.productList.collectAsStateWithLifecycle()
+    val categoriesState by viewModel.categoriesList.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        Log.d("TAG", "HomeScreen: 1212")
+        viewModel.getAllProducts()
+        viewModel.getAllCategories()
+    }
     Scaffold(
         topBar = { CustomTopBar() },
         bottomBar = { BottomNavigationBar() }
@@ -98,35 +107,6 @@ fun HomeScreen(
     }
 
 }
-
-
-
-//@Preview(showBackground = true, showSystemUi = true)
-/*@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopBar() {
-    CenterAlignedTopAppBar(
-        title = {
-            Text("Yalla Buy", style = MaterialTheme.typography.titleLarge)
-        },
-        actions = {
-            IconButton(onClick = { *//* Search Action *//* }) {
-                Image(
-                    painter = painterResource(id = R.drawable.search_normal),
-                    contentDescription = "Search Icon",
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-        },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = Color.White,
-            titleContentColor = Color.Black,
-            actionIconContentColor = Color.Black
-        )
-    )
-}*/
-
-
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -225,6 +205,7 @@ fun AdCard(painter : Painter) {
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun CategoriesSection() {
+    //categories: List<CustomCollection>
     Column(modifier = Modifier.padding(16.dp)) {
         Row (
             modifier = Modifier.fillMaxWidth(),
@@ -268,30 +249,10 @@ fun CategoryItem() {
             modifier = Modifier.padding(top = 4.dp))
     }
 }
-/*//@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun CategoryItemtest() {
-    Column(modifier = Modifier
-        .padding(8.dp)
-        .clip(RoundedCornerShape(12.dp))
-        .background(Color(0xFFF7F7F7))
-        .border(BorderStroke(1.dp, Color(0xFFE0E0E0)))
-        .size(90.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center) {
-        Icon(Icons.Default.MailOutline, contentDescription = "name", modifier = Modifier.size(40.dp))
-        Text(text = "name",
-            style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
-            modifier = Modifier.padding(top = 4.dp))
-    }
-}*/
-
-/*Text("All Products", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
-        ,modifier = Modifier.padding(26.dp)
-        )*/
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun LatestProductsSection() {
+    //products: List<Product>
     Column(modifier = Modifier.padding(16.dp)) {
         Row (
             modifier = Modifier.fillMaxWidth(),

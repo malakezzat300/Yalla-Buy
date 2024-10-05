@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.malakezzat.yallabuy.data.ProductsRepository
 import com.malakezzat.yallabuy.data.remot.ApiState
+import com.malakezzat.yallabuy.model.Category
+import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.Product
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,10 +19,13 @@ class HomeScreenViewModel(private val repository: ProductsRepository):ViewModel(
     private val TAG = "HomeScreenViewModel"
     private val _productList = MutableStateFlow<ApiState<List<Product>>>(ApiState.Loading)
     val productList: StateFlow<ApiState<List<Product>>> get() = _productList
+    private val _categoriesList = MutableStateFlow<ApiState<Category>>(ApiState.Loading)
+    val categoriesList: StateFlow<ApiState<Category>> get() = _categoriesList
 
 
     init {
         getAllProducts()
+        getAllCategories()
     }
     // Fetch all products
     fun getAllProducts() {
@@ -36,6 +41,20 @@ class HomeScreenViewModel(private val repository: ProductsRepository):ViewModel(
                 .collect { productList ->
                     _productList.value = ApiState.Success(productList) // Set success state with data
                     Log.i(TAG, "getAllProducts: ${productList.size}")
+                }
+        }
+    }
+
+    fun getAllCategories(){
+        viewModelScope.launch {
+            repository.getCategories()
+                .onStart {
+                    _categoriesList.value = ApiState.Loading
+                }.catch { e->
+                    _categoriesList.value = ApiState.Error(e.message?:"Unknown error")
+                }.collect{categories->
+                    _categoriesList.value = ApiState.Success(categories)
+                    Log.i(TAG, "getAllProducts: ${categories}")
                 }
         }
     }
