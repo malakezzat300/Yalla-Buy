@@ -30,7 +30,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.Chip
+import androidx.compose.material.ChipDefaults
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
@@ -75,9 +78,10 @@ fun HomeScreen(
 ){
     val productState by viewModel.productList.collectAsStateWithLifecycle()
     val categoriesState by viewModel.categoriesList.collectAsStateWithLifecycle()
+    val brandsState by viewModel.brandsList.collectAsStateWithLifecycle()
     val context = LocalContext.current
     LaunchedEffect(Unit) {
-        Log.d(TAG, "${categoriesState.toString()}")
+        Log.d(TAG, categoriesState.toString())
         viewModel.getAllProducts()
         viewModel.getAllCategories()
     }
@@ -92,6 +96,32 @@ fun HomeScreen(
                 .background(color = Color.White)
         ){
             AdList()
+
+            when (brandsState) {
+                is ApiState.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                }
+                is ApiState.Success -> {
+                    val brands = (brandsState as ApiState.Success<List<String>>).data
+                    BrandsChips(brands)
+                }
+                is ApiState.Error -> {
+                    Text(text = "Error: ${(brandsState as ApiState.Error).message}", color = Color.Red)
+                }
+            }
+            when (categoriesState) {
+                is ApiState.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                }
+                is ApiState.Success -> {
+                    val categories = (categoriesState as ApiState.Success<List<CustomCollection>>).data
+                    CategoriesSection(categories)
+                    Log.d(TAG, "$categoriesState")
+                }
+                is ApiState.Error -> {
+                    Text(text = "Error: ${(categoriesState as ApiState.Error).message}", color = Color.Red)
+                }
+            }
             when (productState) {
                 is ApiState.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -105,32 +135,41 @@ fun HomeScreen(
                 }
             }
 
-            when (categoriesState) {
-                is ApiState.Loading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-                }
-                is ApiState.Success -> {
-                    val categories = (categoriesState as ApiState.Success<List<CustomCollection>>).data
-                    CategoriesSection(categories)
-                    Log.d(TAG, "${categoriesState.toString()}")
-                }
-                is ApiState.Error -> {
-                    Text(text = "Error: ${(categoriesState as ApiState.Error).message}", color = Color.Red)
+
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun BrandsChips(brands: List<String>) {
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text("Brands", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
+        LazyRow(
+            modifier = Modifier.padding(top = 8.dp)
+        ) {
+            itemsIndexed(brands) { index, brand ->
+                var isSelected by remember { mutableStateOf(false) }
+
+                Chip(
+                    onClick = {
+                        isSelected = !isSelected
+                    },
+                    modifier = Modifier.padding(4.dp),
+                    colors = ChipDefaults.chipColors(
+                        backgroundColor = if (isSelected) Color.LightGray else Color.Cyan
+                    )
+                ) {
+                    Text(text = brand, style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium)
+                    , color = Color.White
+                    )
                 }
             }
         }
     }
 }
 
-
-/*{
-    AdList()
-    CategoriesSection()
-    LatestProductsSection()
-}
-}
-
-}*/
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -351,7 +390,7 @@ fun ProductCard(product: Product) {
             Text(product.title, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
             Text(product.vendor, color = Color.Green)
             val price = product.variants.first().price
-            Text("Price: $${price}", textDecoration = TextDecoration.LineThrough)
+            Text("Price: $${price}")
         }
     }
 }
