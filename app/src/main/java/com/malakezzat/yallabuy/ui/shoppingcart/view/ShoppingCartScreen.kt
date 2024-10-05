@@ -2,6 +2,7 @@ package com.malakezzat.yallabuy.ui.shoppingcart.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -27,6 +33,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,79 +50,105 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
 import com.malakezzat.yallabuy.R
+import kotlinx.coroutines.launch
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ShoppingScreen() {
-    //val list = emptyList<String>()
-    val list = listOf("1","2")
-    if (list.isNotEmpty()) {
-        Scaffold(
-            topBar = { CustomTopBar() },
-            content = { paddingValues ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                ) {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .align(Alignment.TopCenter)
-                            .padding(bottom = 230.dp)
-                    ) {
-                        items(list.size) {
-                            ShoppingItem()
+    val bottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+
+    ModalBottomSheetLayout(
+        sheetState = bottomSheetState,
+        sheetContent = {
+            VoucherBottomSheet()
+        },
+        content = {
+            val list = listOf("1", "2")
+            if (list.isNotEmpty()) {
+                Scaffold(
+                    topBar = { CustomTopBar(bottomSheetState) },
+                    content = { paddingValues ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(paddingValues)
+                        ) {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .align(Alignment.TopCenter)
+                                    .padding(bottom = 230.dp)
+                            ) {
+                                items(list.size) {
+                                    ShoppingItem()
+                                }
+                            }
+
+                            ShoppingView(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .align(Alignment.BottomCenter)
+                                    .padding(16.dp)
+                            )
                         }
                     }
-
-                    ShoppingView(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.White)
-                            .align(Alignment.BottomCenter)
-                            .padding(16.dp)
-                    )
-                }
+                )
+            } else {
+                ShoppingEmpty()
             }
-        )
-    } else {
-        ShoppingEmpty()
-    }
+        }
+    )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun CustomTopBar() {
+fun CustomTopBar(sheetState: ModalBottomSheetState) {
+    val coroutineScope = rememberCoroutineScope()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 38.dp,start = 10.dp, end = 10.dp, bottom = 10.dp)
-        ,
+            .padding(top = 38.dp, start = 10.dp, end = 10.dp, bottom = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Spacer( modifier = Modifier.padding(2.dp))
+            Spacer(modifier = Modifier.padding(2.dp))
             IconButton(
                 modifier = Modifier.size(30.dp),
-                onClick = { /* decrease action */ }
+                onClick = { /* Decrease action */ }
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_back),
-                    contentDescription = "back",
+                    contentDescription = "back"
                 )
             }
 
-            Spacer( modifier = Modifier.padding(6.dp))
+            Spacer(modifier = Modifier.padding(6.dp))
             Text(
                 text = "My Cart",
-                style = TextStyle(
-                    fontSize = 20.sp,
-                ),
+                style = TextStyle(fontSize = 20.sp),
                 modifier = Modifier.padding(start = 4.dp)
             )
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Voucher Code", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.clickable {
+                coroutineScope.launch {
+                    sheetState.show()
+                }
+            }
+        ) {
+            Text(
+                text = "Voucher Code",
+                style = TextStyle(
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium
+                ),
                 color = Color.Cyan
             )
         }
@@ -155,7 +190,7 @@ fun ShoppingItem(){
         ) {
             Column {
                 Text(
-                    text = "Loop Silicone Strong Magnetic Watch Band",  // First Text
+                    text = "Loop Silicone Strong Magnetic Watch Band",
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(top = 4.dp,bottom = 4.dp)
                 )
@@ -277,8 +312,6 @@ fun ShoppingView(
         }
     }
 }
-
-
 @Composable
 fun ShoppingEmpty(){
     Column(
@@ -325,6 +358,51 @@ fun ShoppingEmpty(){
                 color = Color.White,
                 fontSize = 16.sp
             )
+        }
+    }
+}
+
+@Composable
+fun VoucherBottomSheet() {
+    var voucherCode by remember { mutableStateOf("") }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(16.dp)
+    ) {
+        Column {
+            Text(
+                text = "Voucher Code",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            OutlinedTextField(
+                value = voucherCode,
+                onValueChange = { voucherCode = it },
+                label = { Text("Enter voucher code") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            )
+
+            Button(
+                onClick = { /* Action for button click */ },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Text(
+                    text = "Apply Voucher",
+                    color = Color.White,
+                    fontSize = 16.sp
+                )
+            }
         }
     }
 }
