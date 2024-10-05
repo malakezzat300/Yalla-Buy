@@ -6,7 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.malakezzat.yallabuy.data.ProductsRepository
 import com.malakezzat.yallabuy.data.remot.ApiState
 import com.malakezzat.yallabuy.model.CustomCollection
+import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.DraftOrderResponse
+import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Product
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -16,45 +20,105 @@ import kotlinx.coroutines.launch
 class ShoppingCartViewModel(private val repository: ProductsRepository) : ViewModel() {
 
     private val TAG = "ShoppingCartViewModel"
-    private val _productList = MutableStateFlow<ApiState<List<Product>>>(ApiState.Loading)
-    val productList: StateFlow<ApiState<List<Product>>> get() = _productList
-    private val _categoriesList = MutableStateFlow<ApiState<List<CustomCollection>>>(ApiState.Loading)
-    val categoriesList: StateFlow<ApiState<List<CustomCollection>>> get() = _categoriesList
 
+    private val _draftOrders = MutableStateFlow<ApiState<DraftOrdersResponse>>(ApiState.Loading)
+    val draftOrders : StateFlow<ApiState<DraftOrdersResponse>> get() = _draftOrders
+
+    private val _singleDraftOrders = MutableStateFlow<ApiState<DraftOrderResponse>>(ApiState.Loading)
+    val singleDraftOrders : StateFlow<ApiState<DraftOrderResponse>> get() = _singleDraftOrders
 
     init {
-        getAllProducts()
-        getAllCategories()
+        fetchAllDraftOrders()
     }
-    // Fetch all products
-    fun getAllProducts() {
+
+    private fun fetchAllDraftOrders() {
         viewModelScope.launch {
-            repository.getAllProducts()
+            repository.getAllDraftOrders()
                 .onStart {
-                    _productList.value = ApiState.Loading // Set loading state
+                    _draftOrders.value = ApiState.Loading
                 }
                 .catch { e ->
-                    _productList.value = ApiState.Error(e.message ?: "Unknown error")
-                    // _errorMessage.value = e.message // Set error message
+                    _draftOrders.value = ApiState.Error(e.message ?: "Unknown error")
                 }
-                .collect { productList ->
-                    _productList.value = ApiState.Success(productList) // Set success state with data
-                    Log.i(TAG, "getAllProducts: ${productList.size}")
+                .collect { response ->
+                    _draftOrders.value = ApiState.Success(response)
                 }
         }
     }
 
-    fun getAllCategories(){
+    fun getDraftOrder(draftOrderId: Long) {
         viewModelScope.launch {
-            repository.getCategories()
+            repository.getDraftOrder(draftOrderId)
                 .onStart {
-                    _categoriesList.value = ApiState.Loading
-                }.catch { e->
-                    _categoriesList.value = ApiState.Error(e.message?:"Unknown error")
-                }.collect{categories->
-                    _categoriesList.value = ApiState.Success(categories)
-                    Log.i(TAG, "getAllCategories: ${categories.get(0).title}")
+                    _singleDraftOrders.value = ApiState.Loading
+                }
+                .catch { e ->
+                    _singleDraftOrders.value = ApiState.Error(e.message ?: "Unknown error")
+                }
+                .collect { draftOrderResponse ->
+                    _singleDraftOrders.value = ApiState.Success(draftOrderResponse)
                 }
         }
     }
+
+    fun createDraftOrder(draftOrder: DraftOrder) {
+        viewModelScope.launch {
+            repository.createDraftOrder(draftOrder)
+                .onStart {
+                    _singleDraftOrders.value = ApiState.Loading
+                }
+                .catch { e ->
+                    _singleDraftOrders.value = ApiState.Error(e.message ?: "Failed to create draft order")
+                }
+                .collect { response ->
+                    _singleDraftOrders.value = ApiState.Success(response)
+                    fetchAllDraftOrders()
+                }
+        }
+    }
+
+    fun updateDraftOrder(draftOrderId: Long, draftOrder: DraftOrder) {
+        viewModelScope.launch {
+            repository.updateDraftOrder(draftOrderId, draftOrder)
+                .onStart {
+                    _singleDraftOrders.value = ApiState.Loading
+                }
+                .catch { e ->
+                    _singleDraftOrders.value = ApiState.Error(e.message ?: "Failed to update draft order")
+                }
+                .collect { response ->
+                    _singleDraftOrders.value = ApiState.Success(response)
+                    fetchAllDraftOrders()
+                }
+        }
+    }
+
+    fun deleteDraftOrder(draftOrderId: Long) {
+        viewModelScope.launch {
+            try {
+                repository.deleteDraftOrder(draftOrderId)
+                fetchAllDraftOrders()
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to delete draft order: ${e.message}")
+            }
+        }
+    }
+
+    fun finalizeDraftOrder(draftOrderId: Long) {
+        viewModelScope.launch {
+            repository.finalizeDraftOrder(draftOrderId)
+                .onStart {
+                    _singleDraftOrders.value = ApiState.Loading
+                }
+                .catch { e ->
+                    _singleDraftOrders.value = ApiState.Error(e.message ?: "Failed to finalize draft order")
+                }
+                .collect { response ->
+                    _singleDraftOrders.value = ApiState.Success(response)
+                    fetchAllDraftOrders()
+                }
+        }
+    }
+
+
 }

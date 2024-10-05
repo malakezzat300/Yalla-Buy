@@ -3,6 +3,9 @@ package com.malakezzat.yallabuy.data.remot
 import android.util.Log
 import com.malakezzat.yallabuy.model.Category
 import com.malakezzat.yallabuy.model.CustomCollection
+import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.DraftOrderResponse
+import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Product
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -39,4 +42,52 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         Log.e(TAG, "Error fetching Categories", e)
         throw e
     }
+
+    override suspend fun getAllDraftOrders(): Flow<DraftOrdersResponse> = flow {
+        val response = productService.getAllDraftOrders()
+        emit(response)
+    }.catch { e ->
+        Log.e(TAG, "Error fetching Categories", e)
+        throw e
+    }
+
+    override suspend fun getDraftOrder(draftOrderId: Long): Flow<DraftOrderResponse> = flow {
+        val response = productService.getDraftOrder(draftOrderId)
+        emit(response)
+    }.catch { e ->
+        Log.e(TAG, "Error fetching Categories", e)
+        throw e
+    }
+
+    override suspend fun createDraftOrder(draftOrder: DraftOrder): Flow<DraftOrderResponse> = flow {
+        val response = productService.createDraftOrder(draftOrder)
+        emit(response)
+    }.catch { e ->
+        Log.e(TAG, "Error fetching Categories", e)
+        throw e
+    }
+
+    override suspend fun updateDraftOrder(
+        draftOrderId: Long,
+        draftOrder: DraftOrder
+    ): Flow<DraftOrderResponse> = flow {
+        val response = productService.updateDraftOrder(draftOrderId,draftOrder)
+        emit(response)
+    }.catch { e ->
+        Log.e(TAG, "Error fetching Categories", e)
+        throw e
+    }
+
+    override suspend fun deleteDraftOrder(draftOrderId: Long) {
+        productService.deleteDraftOrder(draftOrderId)
+    }
+
+    override suspend fun finalizeDraftOrder(draftOrderId: Long): Flow<DraftOrderResponse> = flow {
+        val response = productService.finalizeDraftOrder(draftOrderId)
+        emit(response)
+    }.catch { e ->
+        Log.e(TAG, "Error fetching Categories", e)
+        throw e
+    }
+
 }
