@@ -19,8 +19,8 @@ class HomeScreenViewModel(private val repository: ProductsRepository):ViewModel(
     private val TAG = "HomeScreenViewModel"
     private val _productList = MutableStateFlow<ApiState<List<Product>>>(ApiState.Loading)
     val productList: StateFlow<ApiState<List<Product>>> get() = _productList
-    private val _categoriesList = MutableStateFlow<ApiState<Category>>(ApiState.Loading)
-    val categoriesList: StateFlow<ApiState<Category>> get() = _categoriesList
+    private val _categoriesList = MutableStateFlow<ApiState<List<CustomCollection>>>(ApiState.Loading)
+    val categoriesList: StateFlow<ApiState<List<CustomCollection>>> get() = _categoriesList
 
 
     init {
@@ -54,7 +54,7 @@ class HomeScreenViewModel(private val repository: ProductsRepository):ViewModel(
                     _categoriesList.value = ApiState.Error(e.message?:"Unknown error")
                 }.collect{categories->
                     _categoriesList.value = ApiState.Success(categories)
-                    Log.i(TAG, "getAllProducts: ${categories}")
+                    Log.i(TAG, "getAllCategories: ${categories.get(0).title}")
                 }
         }
     }

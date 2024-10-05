@@ -32,7 +32,7 @@ class ProductsRepositoryImpl private constructor(
         return productsRemoteDataSource.getAllProducts()
     }
 
-    override suspend fun getCategories(): Flow<Category> {
+    override suspend fun getCategories(): Flow<List<CustomCollection>> {
         return productsRemoteDataSource.getCategories()
     }
 }

@@ -19,34 +19,23 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Scaffold
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MailOutline
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -56,13 +45,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -72,12 +58,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.malakezzat.yallabuy.R
+import com.malakezzat.yallabuy.data.remot.ApiState
+import com.malakezzat.yallabuy.model.Category
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
 import kotlinx.coroutines.delay
 
+private val TAG = "HomeScreen"
 @Composable
 fun HomeScreen(
     viewModel: HomeScreenViewModel,
@@ -87,7 +77,7 @@ fun HomeScreen(
     val categoriesState by viewModel.categoriesList.collectAsStateWithLifecycle()
     val context = LocalContext.current
     LaunchedEffect(Unit) {
-        Log.d("TAG", "HomeScreen: 1212")
+        Log.d(TAG, "${categoriesState.toString()}")
         viewModel.getAllProducts()
         viewModel.getAllCategories()
     }
@@ -100,14 +90,47 @@ fun HomeScreen(
                 .padding(it)
                 .verticalScroll(rememberScrollState())
                 .background(color = Color.White)
-        ) {
+        ){
             AdList()
-            CategoriesSection()
-            LatestProductsSection()
+            when (productState) {
+                is ApiState.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                }
+                is ApiState.Success -> {
+                    val products = (productState as ApiState.Success<List<Product>>).data
+                    LatestProductsSection(products)
+                }
+                is ApiState.Error -> {
+                    Text(text = "Error: ${(productState as ApiState.Error).message}", color = Color.Red)
+                }
+            }
+
+            when (categoriesState) {
+                is ApiState.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                }
+                is ApiState.Success -> {
+                    val categories = (categoriesState as ApiState.Success<List<CustomCollection>>).data
+                    CategoriesSection(categories)
+                    Log.d(TAG, "${categoriesState.toString()}")
+                }
+                is ApiState.Error -> {
+                    Text(text = "Error: ${(categoriesState as ApiState.Error).message}", color = Color.Red)
+                }
+            }
         }
     }
-
 }
+
+
+/*{
+    AdList()
+    CategoriesSection()
+    LatestProductsSection()
+}
+}
+
+}*/
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -187,13 +210,27 @@ fun AdList() {
 
 @Composable
 fun AdCard(painter : Painter) {
-    160
+    Card (
+        modifier = Modifier
+            .padding(24.dp)
+            .fillMaxWidth()
+            .height(200.dp),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(12.dp),
+    ) {
+        Image(
+            painter = painter,
+            contentDescription = "ad",
+        )
+
+    }
 
 }
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun CategoriesSection() {
+fun CategoriesSection(categories: List<CustomCollection>) {
     //categories: List<CustomCollection>
+    Log.d(TAG, "3. ${categories}")
     Column(modifier = Modifier.padding(16.dp)) {
         Row (
             modifier = Modifier.fillMaxWidth(),
@@ -205,20 +242,21 @@ fun CategoriesSection() {
                 color = Color.Cyan
             )
         }
-
         LazyRow(
             modifier = Modifier.padding(top = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(25) { CategoryItem()}
+            itemsIndexed(categories) { index,category->
+                CategoryItem(category)}
         }
     }
 }
 
 
-@Preview(showBackground = true, showSystemUi = true)
+//@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun CategoryItem() {
+fun CategoryItem(category: CustomCollection) {
+    Log.d(TAG, "4. ${category}")
     Column(modifier = Modifier
         .padding(15.dp)
         .clip(RoundedCornerShape(8.dp))
@@ -228,19 +266,19 @@ fun CategoryItem() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
         Image(
-            painter = painterResource(id = R.drawable.mob),
-            contentDescription = "Wishlist",
+            painter = rememberAsyncImagePainter(category.image?.src),
+            contentDescription = "category item",
             modifier = Modifier.size(40.dp)
         )
-        Text(text = "Fashion",
+        Text(text = category.title,
             style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
             modifier = Modifier.padding(top = 4.dp))
     }
 }
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun LatestProductsSection() {
-    //products: List<Product>
+fun LatestProductsSection(products: List<Product>) {
+    //
     Column(modifier = Modifier.padding(16.dp)) {
         Row (
             modifier = Modifier.fillMaxWidth(),
@@ -265,8 +303,8 @@ fun LatestProductsSection() {
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(15) { index ->
-                    ProductCard("Product ${index + 1}", "$${(index + 1) * 10}.00", "$${(index + 1) * 15}.00")
+                itemsIndexed(products) { _,product ->
+                    ProductCard(product = product)
                 }
             }
         }
@@ -276,7 +314,7 @@ fun LatestProductsSection() {
 
 
 @Composable
-fun ProductCard(productName: String, currentPrice: String, originalPrice: String) {
+fun ProductCard(product: Product) {
     Box(
         modifier = Modifier
             .width(150.dp)
@@ -285,14 +323,16 @@ fun ProductCard(productName: String, currentPrice: String, originalPrice: String
             .padding(14.dp)
     ) {
         // Background image of the product
-        Image(
-            painter = painterResource(id = R.drawable.rectangle9),
-            contentDescription = productName,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp),
-            contentScale = ContentScale.Crop
-        )
+        product.images.firstOrNull()?.let { image ->
+            Image(
+                painter = rememberAsyncImagePainter(image.src),
+                contentDescription = "Product Image",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp),
+                contentScale = ContentScale.Crop
+            )
+        }
 
         // Wishlist icon positioned at the top right corner
         Image(
@@ -308,9 +348,10 @@ fun ProductCard(productName: String, currentPrice: String, originalPrice: String
         Column(
             modifier = Modifier.padding(top = 110.dp) // Ensure text does not overlap with the image
         ) {
-            Text(productName, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
-            Text(currentPrice, color = Color.Green)
-            Text(originalPrice, textDecoration = TextDecoration.LineThrough)
+            Text(product.title, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
+            Text(product.vendor, color = Color.Green)
+            val price = product.variants.first().price
+            Text("Price: $${price}", textDecoration = TextDecoration.LineThrough)
         }
     }
 }
@@ -356,7 +397,6 @@ fun ProductCard() {
         }
     }
 }
-
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun BottomNavigationBar() {
