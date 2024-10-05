@@ -17,10 +17,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
 import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
 
 @Composable
-fun PaymentScreen(onPaymentSuccess: () -> Unit) {
+fun PaymentScreen(onPaymentSuccess: () -> Unit,
+                  viewModel: PaymentViewModel,
+                  navController: NavController,
+                  paymentKey : String?
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -54,8 +60,6 @@ fun PaymentScreen(onPaymentSuccess: () -> Unit) {
 @Composable
 fun GreetingPreview() {
     YallaBuyTheme {
-        PaymentScreen(){
-            Log.i("paymentTest", "GreetingPreview: done")
-        }
+
     }
 }

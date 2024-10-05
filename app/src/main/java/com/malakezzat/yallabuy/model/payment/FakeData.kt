@@ -21,4 +21,27 @@ object FakeData{
         currency = "EGP",
         items = listOf(Item(name = "Product", amount_cents = 100, quantity = 1))
     )
+
+    val paymentKeyRequest = PaymentKeyRequest(
+        1000,
+        "EGP",
+        " ",
+        BillingData(
+            "7",
+            "test@gmail,com",
+            "2",
+            "firstName",
+            "street",
+            "building",
+            "0123456789",
+            "shipping",
+            "71511",
+            "assiut",
+            "egypt",
+            "lastName",
+            "assiut"
+        ),
+        123456,
+        "lockOrder")
+
 }

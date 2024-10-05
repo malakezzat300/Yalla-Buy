@@ -5,10 +5,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.navigation.NavHostController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.FirebaseApp
+import com.malakezzat.paymenttest2.PaymentRemoteDataSourceImpl
 import com.malakezzat.yallabuy.data.ProductsRepository
 import com.malakezzat.yallabuy.data.ProductsRepositoryImpl
 import com.malakezzat.yallabuy.data.remot.ProductService
@@ -19,6 +21,7 @@ import com.malakezzat.yallabuy.ui.NavigationApp
 import com.malakezzat.yallabuy.ui.auth.viewmodel.SignUpViewModelFactory
 import com.malakezzat.yallabuy.ui.auth.viewmodel.login.LogInViewModelFactory
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModelFactory
+import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModelFactory
 import com.malakezzat.yallabuy.ui.search.SearchViewModelFactory
 import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
 
@@ -31,6 +34,9 @@ class MainActivity : ComponentActivity() {
             GlobalSharedPreferenceDataSourceImp(this.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE))
         )
     }
+    private val paymentRemoteDataSource by lazy {
+        PaymentRemoteDataSourceImpl()
+    }
     private val homeScreenViewModelFactory by lazy {
         HomeScreenViewModelFactory(repo)
     }
@@ -40,6 +46,8 @@ class MainActivity : ComponentActivity() {
     private val logInViewModelFactory by lazy {
         LogInViewModelFactory(repo)
     }
+    private val paymentViewModelFactory by lazy {
+        PaymentViewModelFactory(paymentRemoteDataSource)
     private val searchViewModelFactory by lazy {
         SearchViewModelFactory(repo)
     }
@@ -55,6 +63,7 @@ class MainActivity : ComponentActivity() {
                 homeScreenViewModelFactory,
                 signUpViewModelFactory,
                 logInViewModelFactory,
+                paymentViewModelFactory,
                 searchViewModelFactory
             )
         }

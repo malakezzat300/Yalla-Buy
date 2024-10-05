@@ -21,12 +21,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.malakezzat.paymenttest2.model.FakeData
+import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
 
 
 @Composable
-fun OrderScreen(viewModel: PaymentViewModel) {
+fun OrderScreen(viewModel: PaymentViewModel,
+                navController: NavController) {
     var amount by remember { mutableLongStateOf(0L) }
     var email by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
@@ -36,7 +39,7 @@ fun OrderScreen(viewModel: PaymentViewModel) {
     val errorMessage by viewModel.errorMessage.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.fetchToken("ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2T1RrNU1ETXlMQ0p1WVcxbElqb2lhVzVwZEdsaGJDSjkuS3ppcEdTb0hUdGM5UE1pNC1OUDJWc0dFdFVaUlFXTUxsWFlGZjJsVFJHcFZYTTQwTzh3MFZJdWVpYndiWm44Z3JZVVBXSU40aEhDa3ltVW1OSi0zelE=")
+        viewModel.fetchToken()
     }
 
     Column(
@@ -52,6 +55,7 @@ fun OrderScreen(viewModel: PaymentViewModel) {
         Button(onClick = {
             isLoading = true
 
+            //make order with data
             authToken?.let { token ->
                 val order = FakeData.orderRequest.apply { this.auth_token = token  }
                 viewModel.createOrder(token,order)
@@ -70,8 +74,8 @@ fun OrderScreen(viewModel: PaymentViewModel) {
         }
 
         if (orderResponse != null) {
-            Text("Order Created: ${orderResponse!!.id}", color = Color.Green)
-
+            Text("Order Created: ${orderResponse?.id}", color = Color.Green)
+            navController.navigate("checkout_screen/${orderResponse?.id}")
             isLoading = false
         }
     }

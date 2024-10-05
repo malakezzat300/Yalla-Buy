@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -186,20 +187,7 @@ fun AdList() {
 
 @Composable
 fun AdCard(painter : Painter) {
-    Card (
-        modifier = Modifier
-            .padding(24.dp)
-            .fillMaxWidth()
-            .height(200.dp),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(12.dp),
-    ) {
-        Image(
-            painter = painter,
-            contentDescription = "ad",
-        )
-
-    }
+    160
 
 }
 //@Preview(showBackground = true, showSystemUi = true)
@@ -375,7 +363,7 @@ fun BottomNavigationBar() {
     BottomNavigation(
         backgroundColor = Color.White,
         contentColor = Color.Black,
-        modifier = Modifier.padding(bottom = 8.dp)
+        modifier = Modifier.navigationBarsPadding()
     ) {
         BottomNavigationItem(
             icon = {
