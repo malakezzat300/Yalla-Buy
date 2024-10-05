@@ -1,6 +1,7 @@
 package com.malakezzat.yallabuy.ui
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -23,6 +24,9 @@ import com.malakezzat.yallabuy.ui.payment.view.OrderScreen
 import com.malakezzat.yallabuy.ui.payment.view.PaymentScreen
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModelFactory
+import com.malakezzat.yallabuy.ui.search.SearchScreen
+import com.malakezzat.yallabuy.ui.search.SearchViewModel
+import com.malakezzat.yallabuy.ui.search.SearchViewModelFactory
 
 @Composable
 fun NavigationApp(
@@ -30,9 +34,12 @@ fun NavigationApp(
     signUpViewModelFactory: SignUpViewModelFactory,
     logInViewModelFactory: LogInViewModelFactory,
     paymentViewModelFactory: PaymentViewModelFactory,
+    searchViewModelFactory: SearchViewModelFactory,
     navController: NavHostController = rememberNavController()
 ) {
+
     NavHost(navController = navController, startDestination = Screen.HomeScreen.route){
+
         composable(Screen.HomeScreen.route) {
             val viewModel: HomeScreenViewModel = viewModel(factory = homeScreenViewModelFactory)
             HomeScreen(viewModel = viewModel, navController)
@@ -69,6 +76,10 @@ fun NavigationApp(
                 paymentKey = paymentKey
             )
         }
+      composable(Screen.SearchScreen.route) {
+          val viewModel : SearchViewModel = viewModel(factory = searchViewModelFactory)
+            SearchScreen(viewModel,navController)
+      }
     }
 
 
