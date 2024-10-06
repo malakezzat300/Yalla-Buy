@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.malakezzat.yallabuy.ui.auth.view.LogInScreen
@@ -46,9 +47,22 @@ fun NavigationApp(
     productInfoViewModelFactory: ProductInfoViewModelFactory,
     navController: NavHostController = rememberNavController()
 ) {
-        // Using Scaffold to manage layout
-        Scaffold(
-            bottomBar = {
+    val navBackStackEntry = navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry.value?.destination?.route
+
+    // List of routes where the bottom navigation should be hidden
+    val bottomNavHiddenRoutes = listOf(
+        Screen.SplashScreen.route,
+        Screen.LogInScreen.route,
+        Screen.SignUpScreen.route,
+        Screen.SearchScreen.route
+    )
+
+    // Using Scaffold to manage layout
+    Scaffold(
+        bottomBar = {
+            // Show bottom navigation only if the current route is not in the hidden routes
+            if (currentRoute !in bottomNavHiddenRoutes) {
                 BottomNavigationBar(navController)
             }
         ) { paddingValues ->
@@ -110,9 +124,11 @@ fun NavigationApp(
                     val viewModel: ProductInfoViewModel = viewModel(factory = productInfoViewModelFactory)
                     ProductInfoScreen(productId = productId, viewModel = viewModel, navController = navController)
                 }
+
             }
         }
     }
+}
 
 
 
