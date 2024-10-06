@@ -66,12 +66,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.rememberAsyncImagePainter
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remot.ApiState
 import com.malakezzat.yallabuy.model.Category
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.Product
+import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -93,7 +95,7 @@ fun HomeScreen(
     }
     Scaffold(
         topBar = { CustomTopBar() },
-        bottomBar = { BottomNavigationBar() }
+      //  bottomBar = { BottomNavigationBar(navController) }
     ) {
         Column(
             modifier = Modifier
@@ -533,7 +535,10 @@ fun ProductCard() {
 }
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun BottomNavigationBar() {
+fun BottomNavigationBar(navController: NavController) {
+    val navBackStackEntry = navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry.value?.destination?.route
+
     BottomNavigation(
         backgroundColor = Color.White,
         contentColor = Color.Black,
@@ -548,52 +553,56 @@ fun BottomNavigationBar() {
                 )
             },
             label = { Text("Home", style = TextStyle(fontSize = 12.sp)) },
-            selected = true,
-            onClick = { /* Home Action */ }
+            selected = currentRoute == Screen.HomeScreen.route,
+            onClick = { navController.navigate(Screen.HomeScreen.route){ launchSingleTop = true }  }
         )
         BottomNavigationItem(
-            icon = { Image(
-                painter = painterResource(id = R.drawable.category_2),
-                contentDescription = "categories",
-                modifier = Modifier.size(24.dp)
-            )
-    },
-            label = { Text("categories", style = TextStyle(fontSize = 11.5.sp)) },
-            selected = true,
-            onClick = { /* Home Action */ }
+            icon = {
+                Image(
+                    painter = painterResource(id = R.drawable.category_2),
+                    contentDescription = "Categories",
+                    modifier = Modifier.size(24.dp)
+                )
+            },
+            label = { Text("Categories", style = TextStyle(fontSize = 11.5.sp)) },
+            selected = false /*currentRoute == Screen.CategoriesScreen.route*/,
+            onClick = { /*navController.navigate(Screen.CategoriesScreen.route)*/ }
         )
         BottomNavigationItem(
-            icon = { Image(
-                painter = painterResource(id = R.drawable.shopping_cart),
-                contentDescription = "Home",
-                modifier = Modifier.size(24.dp)
-            )
+            icon = {
+                Image(
+                    painter = painterResource(id = R.drawable.shopping_cart),
+                    contentDescription = "My Cart",
+                    modifier = Modifier.size(24.dp)
+                )
             },
             label = { Text("My Cart", style = TextStyle(fontSize = 12.sp)) },
-            selected = false,
-            onClick = { /* My Cart Action */ }
+            selected = currentRoute == Screen.ShoppingScreen.route,
+            onClick = { navController.navigate(Screen.ShoppingScreen.route){ launchSingleTop = true }  }
         )
         BottomNavigationItem(
-            icon = { Image(
-                painter = painterResource(id = R.drawable.heart),
-                contentDescription = "Home",
-                modifier = Modifier.size(24.dp)
-            )
+            icon = {
+                Image(
+                    painter = painterResource(id = R.drawable.heart),
+                    contentDescription = "Wishlist",
+                    modifier = Modifier.size(24.dp)
+                )
             },
             label = { Text("Wishlist", style = TextStyle(fontSize = 12.sp)) },
-            selected = false,
-            onClick = { /* Wishlist Action */ }
+            selected = false /*currentRoute == Screen.WishlistScreen.route*/,
+            onClick = { /*navController.navigate(Screen.WishlistScreen.route)*/ }
         )
         BottomNavigationItem(
-            icon = { Image(
-                painter = painterResource(id = R.drawable.profile),
-                contentDescription = "Home",
-                modifier = Modifier.size(24.dp)
-            )
+            icon = {
+                Image(
+                    painter = painterResource(id = R.drawable.profile),
+                    contentDescription = "Profile",
+                    modifier = Modifier.size(24.dp)
+                )
             },
             label = { Text("Profile", style = TextStyle(fontSize = 12.sp)) },
-            selected = false,
-            onClick = { /* Profile Action */ }
+            selected = false /*currentRoute == Screen.ProfileScreen.route*/,
+            onClick = { /*navController.navigate(Screen.ProfileScreen.route)*/ }
         )
     }
 }
