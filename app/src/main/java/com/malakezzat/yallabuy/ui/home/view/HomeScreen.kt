@@ -82,11 +82,12 @@ import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
 import kotlinx.coroutines.delay
 
 private val TAG = "HomeScreen"
+
 @Composable
 fun HomeScreen(
     viewModel: HomeScreenViewModel,
-    navController: NavController
-){
+    navController: NavController,
+) {
     val productState by viewModel.productList.collectAsStateWithLifecycle()
     val categoriesState by viewModel.categoriesList.collectAsStateWithLifecycle()
     val brandsState by viewModel.brandsList.collectAsStateWithLifecycle()
@@ -98,51 +99,68 @@ fun HomeScreen(
     }
     Scaffold(
         topBar = { CustomTopBar(navController) },
-      //  bottomBar = { BottomNavigationBar(navController) }
+        containerColor = Color.White,
+        //  bottomBar = { BottomNavigationBar(navController) }
     ) {
         Column(
             modifier = Modifier
                 .padding(it)
                 .verticalScroll(rememberScrollState())
                 .background(color = Color.White)
-        ){
+        ) {
             AdList(viewModel)
 
             when (brandsState) {
                 is ApiState.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
+
                 is ApiState.Success -> {
                     val brands = (brandsState as ApiState.Success<List<SmartCollection>>).data
                     BrandsList(brands)
                 }
+
                 is ApiState.Error -> {
-                    Text(text = "Error: ${(brandsState as ApiState.Error).message}", color = Color.Red)
+                    Text(
+                        text = "Error: ${(brandsState as ApiState.Error).message}",
+                        color = Color.Red
+                    )
                 }
             }
             when (categoriesState) {
                 is ApiState.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
+
                 is ApiState.Success -> {
-                    val categories = (categoriesState as ApiState.Success<List<CustomCollection>>).data
+                    val categories =
+                        (categoriesState as ApiState.Success<List<CustomCollection>>).data
                     CategoriesSection(categories)
                     Log.d(TAG, "$categoriesState")
                 }
+
                 is ApiState.Error -> {
-                    Text(text = "Error: ${(categoriesState as ApiState.Error).message}", color = Color.Red)
+                    Text(
+                        text = "Error: ${(categoriesState as ApiState.Error).message}",
+                        color = Color.Red
+                    )
                 }
             }
             when (productState) {
                 is ApiState.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
+
                 is ApiState.Success -> {
                     val products = (productState as ApiState.Success<List<Product>>).data
-                    LatestProductsSection(products,navController)
+                    LatestProductsSection(products, navController)
                 }
+
                 is ApiState.Error -> {
-                    Text(text = "Error: ${(productState as ApiState.Error).message}", color = Color.Red)
+                    Text(
+                        text = "Error: ${(productState as ApiState.Error).message}",
+                        color = Color.Red
+                    )
                 }
             }
 
@@ -202,7 +220,8 @@ fun CustomTopBar(navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 38.dp, start = 10.dp, end = 10.dp, bottom = 10.dp),
+            .padding(top = 12.dp, start = 10.dp, end = 10.dp, bottom = 10.dp)
+            .background(Color.White),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -222,24 +241,16 @@ fun CustomTopBar(navController: NavController) {
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = {navController.navigate(Screen.SearchScreen.route)}) {
+            IconButton(onClick = { navController.navigate(Screen.SearchScreen.route) }) {
                 Image(
                     painter = painterResource(id = R.drawable.search_normal),
                     contentDescription = "Search Icon",
                     modifier = Modifier.size(24.dp)
                 )
             }
-            Image(
-                painter = painterResource(id = R.drawable.rectangle1),
-                contentDescription = "User Profile",
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(RoundedCornerShape(18.dp))
-            )
         }
     }
 }
-
 
 
 @Composable
@@ -254,8 +265,8 @@ fun AdList(viewModel: HomeScreenViewModel) {
     val priceRuleList by viewModel.priceRules.collectAsState()
     val discountCodeList by viewModel.discountCodes.collectAsState()
 
-    if(fetchDone) {
-        repeat(3){
+    if (fetchDone) {
+        repeat(3) {
             for (item in priceRuleList) {
                 item.id?.let { viewModel.fetchDiscountCodes(it) }
                 fetchDone = false
@@ -263,21 +274,16 @@ fun AdList(viewModel: HomeScreenViewModel) {
         }
     }
 
-    if(discountCodeList.isNotEmpty()){
-        for(item in discountCodeList) {
+    if (discountCodeList.isNotEmpty()) {
+        for (item in discountCodeList) {
             discountCodeIds.add(item.code)
         }
     }
 
 
-
-
     //val discountCode by viewModel.discountCodes.collectAsState()
 
     // Log list sizes for debugging
-
-
-
 
 
     LazyRow(state = scrollState) {
@@ -288,9 +294,9 @@ fun AdList(viewModel: HomeScreenViewModel) {
         item {
             AdCard(painterResource(id = R.drawable.ad2))
         }
-        item{
-            if(discountCodeIds.isNotEmpty()){
-                for(item in discountCodeIds) {
+        item {
+            if (discountCodeIds.isNotEmpty()) {
+                for (item in discountCodeIds) {
                     CouponsCard(item)
                 }
             }
@@ -327,8 +333,8 @@ fun AdList(viewModel: HomeScreenViewModel) {
 
 
 @Composable
-fun AdCard(painter : Painter) {
-    Card (
+fun AdCard(painter: Painter) {
+    Card(
         modifier = Modifier
             .padding(24.dp)
             .fillMaxWidth()
@@ -348,7 +354,7 @@ fun AdCard(painter : Painter) {
 @Composable
 fun CouponsCard(code: String?) {
     val discount = code?.takeLast(2)
-    val painter = when(discount) {
+    val painter = when (discount) {
         "10" -> painterResource(R.drawable.coupon10)
         "30" -> painterResource(R.drawable.coupon30)
         "50" -> painterResource(R.drawable.coupon50)
@@ -368,7 +374,8 @@ fun CouponsCard(code: String?) {
         onClick = {
             code?.let {
                 clipboardManager.setText(AnnotatedString(it))
-                Toast.makeText(context, "Code: $code copied to clipboard", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Code: $code copied to clipboard", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     ) {
@@ -385,13 +392,14 @@ fun CategoriesSection(categories: List<CustomCollection>) {
     //categories: List<CustomCollection>
     Log.d(TAG, "3. ${categories}")
     Column(modifier = Modifier.padding(16.dp)) {
-        Row (
+        Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
-        ){
+        ) {
             Text("Categories", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
-            Text("SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
+            Text(
+                "SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
                 color = Color.Cyan
             )
         }
@@ -399,8 +407,9 @@ fun CategoriesSection(categories: List<CustomCollection>) {
             modifier = Modifier.padding(top = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            itemsIndexed(categories) { index,category->
-                CategoryItem(category)}
+            itemsIndexed(categories) { index, category ->
+                CategoryItem(category)
+            }
         }
     }
 }
@@ -428,9 +437,9 @@ fun CategoryItem(category: CustomCollection) {
             Image(
                 painter = rememberAsyncImagePainter(category.image?.src),
                 contentDescription = "category item",
-                modifier = Modifier.size(40.dp)
-                    .fillMaxSize()
-                ,
+                modifier = Modifier
+                    .size(40.dp)
+                    .fillMaxSize(),
                 contentScale = ContentScale.FillWidth
             )
             Text(
@@ -444,17 +453,21 @@ fun CategoryItem(category: CustomCollection) {
 
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun LatestProductsSection(products: List<Product>,navController: NavController) {
+fun LatestProductsSection(products: List<Product>, navController: NavController) {
     //
     Column(modifier = Modifier.padding(16.dp)) {
-        Row (
+        Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
-        ){
-            Text("All Products", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                ,modifier = Modifier.padding(26.dp))
-            Text("SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
+        ) {
+            Text(
+                "All Products",
+                style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
+                modifier = Modifier.padding(26.dp)
+            )
+            Text(
+                "SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
                 color = Color.Cyan
             )
         }
@@ -470,7 +483,7 @@ fun LatestProductsSection(products: List<Product>,navController: NavController) 
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                itemsIndexed(products) { _,product ->
+                itemsIndexed(products) { _, product ->
                     ProductCard(product = product, navController)
                 }
             }
@@ -479,9 +492,8 @@ fun LatestProductsSection(products: List<Product>,navController: NavController) 
 }
 
 
-
 @Composable
-fun ProductCard(product: Product,navController: NavController) {
+fun ProductCard(product: Product, navController: NavController) {
     Box(
         modifier = Modifier
             .width(150.dp)
@@ -567,6 +579,7 @@ fun ProductCard() {
         }
     }
 }
+
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun BottomNavigationBar(navController: NavController) {
@@ -606,7 +619,7 @@ fun BottomNavigationBar(navController: NavController) {
                 )
             },
             label = { Text("Categories", style = TextStyle(fontSize = 11.5.sp)) },
-            selected =false /*currentRoute == Screen.CategoriesScreen.route*/,
+            selected = false /*currentRoute == Screen.CategoriesScreen.route*/,
             onClick = {
                 /*if (currentRoute != Screen.CategoriesScreen.route) {
                     navController.popBackStack(Screen.CategoriesScreen.route, inclusive = false)
@@ -644,7 +657,7 @@ fun BottomNavigationBar(navController: NavController) {
                 )
             },
             label = { Text("Wishlist", style = TextStyle(fontSize = 12.sp)) },
-            selected =false /*currentRoute == Screen.WishlistScreen.route*/,
+            selected = false /*currentRoute == Screen.WishlistScreen.route*/,
             onClick = {
                 /*if (currentRoute != Screen.WishlistScreen.route) {
                     navController.popBackStack(Screen.WishlistScreen.route, inclusive = false)
@@ -663,7 +676,7 @@ fun BottomNavigationBar(navController: NavController) {
                 )
             },
             label = { Text("Profile", style = TextStyle(fontSize = 12.sp)) },
-            selected =false /*currentRoute == Screen.ProfileScreen.route*/,
+            selected = false /*currentRoute == Screen.ProfileScreen.route*/,
             onClick = {
                 /*if (currentRoute != Screen.ProfileScreen.route) {
                     navController.popBackStack(Screen.ProfileScreen.route, inclusive = false)
