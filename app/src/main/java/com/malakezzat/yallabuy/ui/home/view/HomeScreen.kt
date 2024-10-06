@@ -8,6 +8,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -134,7 +135,7 @@ fun HomeScreen(
                 }
                 is ApiState.Success -> {
                     val products = (productState as ApiState.Success<List<Product>>).data
-                    LatestProductsSection(products)
+                    LatestProductsSection(products,navController)
                 }
                 is ApiState.Error -> {
                     Text(text = "Error: ${(productState as ApiState.Error).message}", color = Color.Red)
@@ -411,7 +412,7 @@ fun CategoryItem(category: CustomCollection) {
 }
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun LatestProductsSection(products: List<Product>) {
+fun LatestProductsSection(products: List<Product>,navController: NavController) {
     //
     Column(modifier = Modifier.padding(16.dp)) {
         Row (
@@ -438,7 +439,7 @@ fun LatestProductsSection(products: List<Product>) {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 itemsIndexed(products) { _,product ->
-                    ProductCard(product = product)
+                    ProductCard(product = product, navController)
                 }
             }
         }
@@ -448,13 +449,16 @@ fun LatestProductsSection(products: List<Product>) {
 
 
 @Composable
-fun ProductCard(product: Product) {
+fun ProductCard(product: Product,navController: NavController) {
     Box(
         modifier = Modifier
             .width(150.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(Color(0xFFF7F7F7))
             .padding(14.dp)
+            .clickable {
+                navController.navigate("${Screen.ProductInfScreen.route}/${product.id}")
+            }
     ) {
         // Background image of the product
         product.images.firstOrNull()?.let { image ->
