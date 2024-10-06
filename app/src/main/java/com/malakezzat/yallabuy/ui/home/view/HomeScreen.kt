@@ -8,6 +8,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -65,6 +66,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.rememberAsyncImagePainter
 import com.malakezzat.yallabuy.R
@@ -91,7 +93,7 @@ fun HomeScreen(
         viewModel.getAllCategories()
     }
     Scaffold(
-        topBar = { CustomTopBar() },
+        topBar = { CustomTopBar(navController) },
       //  bottomBar = { BottomNavigationBar(navController) }
     ) {
         Column(
@@ -133,7 +135,7 @@ fun HomeScreen(
                 }
                 is ApiState.Success -> {
                     val products = (productState as ApiState.Success<List<Product>>).data
-                    LatestProductsSection(products)
+                    LatestProductsSection(products,navController)
                 }
                 is ApiState.Error -> {
                     Text(text = "Error: ${(productState as ApiState.Error).message}", color = Color.Red)
@@ -176,9 +178,9 @@ fun BrandsChips(brands: List<String>) {
 }
 
 
-@Preview(showBackground = true, showSystemUi = true)
+//@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun CustomTopBar() {
+fun CustomTopBar(navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -202,7 +204,7 @@ fun CustomTopBar() {
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { /* Search Action */ }) {
+            IconButton(onClick = {navController.navigate(Screen.SearchScreen.route)}) {
                 Image(
                     painter = painterResource(id = R.drawable.search_normal),
                     contentDescription = "Search Icon",
@@ -390,27 +392,41 @@ fun CategoriesSection(categories: List<CustomCollection>) {
 @Composable
 fun CategoryItem(category: CustomCollection) {
     Log.d(TAG, "4. ${category}")
-    Column(modifier = Modifier
-        .padding(15.dp)
-        .clip(RoundedCornerShape(8.dp))
-        .border(BorderStroke(5.dp, Color(0xFFE0E0E0)))
-        .background(color = Color.White)
-        .size(100.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center) {
-        Image(
-            painter = rememberAsyncImagePainter(category.image?.src),
-            contentDescription = "category item",
-            modifier = Modifier.size(40.dp)
-        )
-        Text(text = category.title,
-            style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
-            modifier = Modifier.padding(top = 4.dp))
+    Card(
+        modifier = Modifier
+            .padding(15.dp)
+            .size(100.dp),
+        shape = RoundedCornerShape(28.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        border = BorderStroke(1.dp, Color(0xFFE0E0E0))
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = rememberAsyncImagePainter(category.image?.src),
+                contentDescription = "category item",
+                modifier = Modifier.size(40.dp)
+                    .fillMaxSize()
+                ,
+                contentScale = ContentScale.FillWidth
+            )
+            Text(
+                text = category.title,
+                style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
     }
 }
+
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun LatestProductsSection(products: List<Product>) {
+fun LatestProductsSection(products: List<Product>,navController: NavController) {
     //
     Column(modifier = Modifier.padding(16.dp)) {
         Row (
@@ -437,7 +453,7 @@ fun LatestProductsSection(products: List<Product>) {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 itemsIndexed(products) { _,product ->
-                    ProductCard(product = product)
+                    ProductCard(product = product, navController)
                 }
             }
         }
@@ -447,13 +463,16 @@ fun LatestProductsSection(products: List<Product>) {
 
 
 @Composable
-fun ProductCard(product: Product) {
+fun ProductCard(product: Product,navController: NavController) {
     Box(
         modifier = Modifier
             .width(150.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(Color(0xFFF7F7F7))
             .padding(14.dp)
+            .clickable {
+                navController.navigate("${Screen.ProductInfScreen.route}/${product.id}")
+            }
     ) {
         // Background image of the product
         product.images.firstOrNull()?.let { image ->
@@ -551,7 +570,14 @@ fun BottomNavigationBar(navController: NavController) {
             },
             label = { Text("Home", style = TextStyle(fontSize = 12.sp)) },
             selected = currentRoute == Screen.HomeScreen.route,
-            onClick = { navController.navigate(Screen.HomeScreen.route){ launchSingleTop = true }  }
+            onClick = {
+                if (currentRoute != Screen.HomeScreen.route) {
+                    navController.popBackStack(Screen.HomeScreen.route, inclusive = false)
+                    navController.navigate(Screen.HomeScreen.route) {
+                        launchSingleTop = true
+                    }
+                }
+            }
         )
         BottomNavigationItem(
             icon = {
@@ -562,8 +588,15 @@ fun BottomNavigationBar(navController: NavController) {
                 )
             },
             label = { Text("Categories", style = TextStyle(fontSize = 11.5.sp)) },
-            selected = false /*currentRoute == Screen.CategoriesScreen.route*/,
-            onClick = { /*navController.navigate(Screen.CategoriesScreen.route)*/ }
+            selected =false /*currentRoute == Screen.CategoriesScreen.route*/,
+            onClick = {
+                /*if (currentRoute != Screen.CategoriesScreen.route) {
+                    navController.popBackStack(Screen.CategoriesScreen.route, inclusive = false)
+                    navController.navigate(Screen.CategoriesScreen.route) {
+                        launchSingleTop = true
+                    }
+                }*/
+            }
         )
         BottomNavigationItem(
             icon = {
@@ -575,7 +608,14 @@ fun BottomNavigationBar(navController: NavController) {
             },
             label = { Text("My Cart", style = TextStyle(fontSize = 12.sp)) },
             selected = currentRoute == Screen.ShoppingScreen.route,
-            onClick = { navController.navigate(Screen.ShoppingScreen.route){ launchSingleTop = true }  }
+            onClick = {
+                if (currentRoute != Screen.ShoppingScreen.route) {
+                    navController.popBackStack(Screen.ShoppingScreen.route, inclusive = false)
+                    navController.navigate(Screen.ShoppingScreen.route) {
+                        launchSingleTop = true
+                    }
+                }
+            }
         )
         BottomNavigationItem(
             icon = {
@@ -586,8 +626,15 @@ fun BottomNavigationBar(navController: NavController) {
                 )
             },
             label = { Text("Wishlist", style = TextStyle(fontSize = 12.sp)) },
-            selected = false /*currentRoute == Screen.WishlistScreen.route*/,
-            onClick = { /*navController.navigate(Screen.WishlistScreen.route)*/ }
+            selected =false /*currentRoute == Screen.WishlistScreen.route*/,
+            onClick = {
+                /*if (currentRoute != Screen.WishlistScreen.route) {
+                    navController.popBackStack(Screen.WishlistScreen.route, inclusive = false)
+                    navController.navigate(Screen.WishlistScreen.route) {
+                        launchSingleTop = true
+                    }
+                }*/
+            }
         )
         BottomNavigationItem(
             icon = {
@@ -598,8 +645,15 @@ fun BottomNavigationBar(navController: NavController) {
                 )
             },
             label = { Text("Profile", style = TextStyle(fontSize = 12.sp)) },
-            selected = false /*currentRoute == Screen.ProfileScreen.route*/,
-            onClick = { /*navController.navigate(Screen.ProfileScreen.route)*/ }
+            selected =false /*currentRoute == Screen.ProfileScreen.route*/,
+            onClick = {
+                /*if (currentRoute != Screen.ProfileScreen.route) {
+                    navController.popBackStack(Screen.ProfileScreen.route, inclusive = false)
+                    navController.navigate(Screen.ProfileScreen.route) {
+                        launchSingleTop = true
+                    }
+                }*/
+            }
         )
     }
 }

@@ -7,6 +7,7 @@ import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Product
+import com.malakezzat.yallabuy.model.ProductResponse
 import kotlinx.coroutines.flow.Flow
 
 interface ProductsRepository {
@@ -24,4 +25,5 @@ interface ProductsRepository {
     suspend fun deleteDraftOrder(draftOrderId: Long)
     suspend fun finalizeDraftOrder(draftOrderId: Long): Flow<DraftOrderResponse>
 
+    suspend fun getProductById(productId: Long): Flow<ProductResponse>
 }

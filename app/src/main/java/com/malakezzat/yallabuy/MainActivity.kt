@@ -38,6 +38,7 @@ import com.malakezzat.yallabuy.ui.auth.viewmodel.SignUpViewModelFactory
 import com.malakezzat.yallabuy.ui.auth.viewmodel.login.LogInViewModelFactory
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModelFactory
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModelFactory
+import com.malakezzat.yallabuy.ui.product_info.ProductInfoViewModelFactory
 import com.malakezzat.yallabuy.ui.search.SearchViewModelFactory
 import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModelFactory
 import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
@@ -73,6 +74,9 @@ class MainActivity : ComponentActivity() {
     private val shoppingCartViewModelFactory by lazy {
         ShoppingCartViewModelFactory(repo)
     }
+    private val productInfoViewModelFactory by lazy {
+        ProductInfoViewModelFactory(repo)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -87,7 +91,8 @@ class MainActivity : ComponentActivity() {
                 logInViewModelFactory,
                 paymentViewModelFactory,
                 searchViewModelFactory,
-                shoppingCartViewModelFactory
+                shoppingCartViewModelFactory,
+                productInfoViewModelFactory
             )
         }
         }
