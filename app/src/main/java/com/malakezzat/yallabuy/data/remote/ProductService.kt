@@ -5,6 +5,8 @@ import com.malakezzat.yallabuy.data.remote.coupons.DiscountCodeResponse
 import com.malakezzat.yallabuy.data.remote.coupons.priceRuleResponse
 import com.malakezzat.yallabuy.model.Category
 import com.malakezzat.yallabuy.model.CustomCollection
+import com.malakezzat.yallabuy.model.CustomerRequest
+import com.malakezzat.yallabuy.model.CustomerResponse
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
@@ -60,4 +62,9 @@ interface ProductService {
 
     @GET("products/{id}.json")
     suspend fun getProductById(@Path("id") productId: Long): ProductResponse
+
+    @POST("customers.json")
+    suspend fun createCustomer(
+        @Body customerRequest: CustomerRequest
+    ): CustomerResponse
 }
