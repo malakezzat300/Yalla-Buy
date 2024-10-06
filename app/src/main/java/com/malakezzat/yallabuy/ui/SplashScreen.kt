@@ -21,7 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-
+import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
@@ -46,7 +46,11 @@ fun SplashScreen(navController: NavController) {
 
     LaunchedEffect(Unit) {
         kotlinx.coroutines.delay(5000)
+        if(FirebaseAuth.getInstance().currentUser != null){
+            navController.navigate((Screen.HomeScreen.route))
+        }else{
         navController.navigate(Screen.LogInScreen.route)
+        }
     }
 }
 

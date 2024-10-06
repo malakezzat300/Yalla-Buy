@@ -25,6 +25,9 @@ import com.malakezzat.yallabuy.ui.payment.view.OrderScreen
 import com.malakezzat.yallabuy.ui.payment.view.PaymentScreen
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModelFactory
+import com.malakezzat.yallabuy.ui.product_info.ProductInfoScreen
+import com.malakezzat.yallabuy.ui.product_info.ProductInfoViewModel
+import com.malakezzat.yallabuy.ui.product_info.ProductInfoViewModelFactory
 import com.malakezzat.yallabuy.ui.search.SearchScreen
 import com.malakezzat.yallabuy.ui.search.SearchViewModel
 import com.malakezzat.yallabuy.ui.search.SearchViewModelFactory
@@ -40,6 +43,7 @@ fun NavigationApp(
     paymentViewModelFactory: PaymentViewModelFactory,
     searchViewModelFactory: SearchViewModelFactory,
     shoppingCartViewModelFactory: ShoppingCartViewModelFactory,
+    productInfoViewModelFactory: ProductInfoViewModelFactory,
     navController: NavHostController = rememberNavController()
 ) {
         // Using Scaffold to manage layout
@@ -95,6 +99,16 @@ fun NavigationApp(
                 composable(Screen.ShoppingScreen.route) {
                     val viewModel: ShoppingCartViewModel = viewModel(factory = shoppingCartViewModelFactory)
                     ShoppingCartScreen(viewModel, navController)
+                }
+                composable(
+                    route = "${Screen.ProductInfScreen.route}/{productId}",
+                    arguments = listOf(navArgument("productId") {
+                        type = NavType.LongType
+                    })
+                ) { backStackEntry ->
+                    val productId = backStackEntry.arguments?.getLong("productId") ?: 0L
+                    val viewModel: ProductInfoViewModel = viewModel(factory = productInfoViewModelFactory)
+                    ProductInfoScreen(productId = productId, viewModel = viewModel, navController = navController)
                 }
             }
         }
