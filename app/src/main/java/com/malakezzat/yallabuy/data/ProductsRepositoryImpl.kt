@@ -50,6 +50,7 @@ class ProductsRepositoryImpl private constructor(
 
     override fun getDiscountCodes(priceRuleId: Long): Flow<List<DiscountCode>> {
         return couponsRemoteDataSource.getDiscountCodes(priceRuleId)
+    }
 
     override suspend fun getAllDraftOrders(): Flow<DraftOrdersResponse> {
         return productsRemoteDataSource.getAllDraftOrders()

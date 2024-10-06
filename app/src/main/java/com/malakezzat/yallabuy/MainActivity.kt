@@ -29,8 +29,8 @@ import com.malakezzat.paymenttest2.PaymentRemoteDataSourceImpl
 import com.malakezzat.yallabuy.data.ProductsRepository
 import com.malakezzat.yallabuy.data.ProductsRepositoryImpl
 import com.malakezzat.yallabuy.data.remot.ProductService
-import com.malakezzat.yallabuy.data.remot.ProductsRemoteDataSourceImpl
-import com.malakezzat.yallabuy.data.remot.RetrofitHelper
+import com.malakezzat.yallabuy.data.remote.ProductsRemoteDataSourceImpl
+import com.malakezzat.yallabuy.data.remote.RetrofitHelper
 import com.malakezzat.yallabuy.data.sharedpref.GlobalSharedPreferenceDataSourceImp
 import com.malakezzat.yallabuy.ui.NavigationApp
 import com.malakezzat.yallabuy.ui.Screen

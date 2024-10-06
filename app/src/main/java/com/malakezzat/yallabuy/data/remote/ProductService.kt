@@ -1,8 +1,8 @@
 package com.malakezzat.yallabuy.data.remot
 
 
-import com.malakezzat.yallabuy.data.remot.coupons.DiscountCodeResponse
-import com.malakezzat.yallabuy.data.remot.coupons.priceRuleResponse
+import com.malakezzat.yallabuy.data.remote.coupons.DiscountCodeResponse
+import com.malakezzat.yallabuy.data.remote.coupons.priceRuleResponse
 import com.malakezzat.yallabuy.model.Category
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.DraftOrder
