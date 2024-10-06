@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.navigation.NavHostController
+import com.example.yallabuyadmin.coupons.model.CouponsRemoteDataSource
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -31,7 +32,8 @@ class MainActivity : ComponentActivity() {
         ProductsRepositoryImpl.getInstance(
             ProductsRemoteDataSourceImpl.
             getInstance( RetrofitHelper.getInstance().create(ProductService::class.java)),
-            GlobalSharedPreferenceDataSourceImp(this.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE))
+            GlobalSharedPreferenceDataSourceImp(this.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)),
+            CouponsRemoteDataSource(RetrofitHelper.getInstance().create(ProductService::class.java))
         )
     }
     private val paymentRemoteDataSource by lazy {

@@ -1,6 +1,7 @@
 package com.malakezzat.yallabuy.ui.home.view
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -36,11 +37,13 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DismissibleNavigationDrawer
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,8 +54,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -68,6 +73,7 @@ import com.malakezzat.yallabuy.model.Category
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 
 private val TAG = "HomeScreen"
@@ -95,7 +101,7 @@ fun HomeScreen(
                 .verticalScroll(rememberScrollState())
                 .background(color = Color.White)
         ){
-            AdList()
+            AdList(viewModel)
 
             when (brandsState) {
                 is ApiState.Loading -> {
@@ -218,22 +224,75 @@ fun CustomTopBar() {
 
 
 @Composable
-fun AdList() {
+fun AdList(viewModel: HomeScreenViewModel) {
     val context = LocalContext.current
     val scrollState = rememberLazyListState()
     var scrollDirection by remember { mutableStateOf(1) }
+    val priceRuleIds by remember { mutableStateOf(mutableSetOf<Long?>()) }
+    val discountCodeIds by remember { mutableStateOf(mutableSetOf<String?>()) }
+    var fetchDone by remember { mutableStateOf(true) }
 
-    LazyRow(state = scrollState) {
-        items(10){
-            AdCard(painterResource(id = R.drawable.ad1))
-            AdCard(painterResource(id = R.drawable.ad2))
+    val priceRuleList by viewModel.priceRules.collectAsState()
+    val discountCodeList by viewModel.discountCodes.collectAsState()
+
+    if(fetchDone) {
+        repeat(3){
+            for (item in priceRuleList) {
+                item.id?.let { viewModel.fetchDiscountCodes(it) }
+                fetchDone = false
+            }
         }
     }
 
+    if(discountCodeList.isNotEmpty()){
+        for(item in discountCodeList) {
+            discountCodeIds.add(item.code)
+        }
+    }
+
+
+
+
+    //val discountCode by viewModel.discountCodes.collectAsState()
+
+    // Log list sizes for debugging
+
+
+
+
+
+    LazyRow(state = scrollState) {
+        // Static ads first
+        item {
+            AdCard(painterResource(id = R.drawable.ad1))
+        }
+        item {
+            AdCard(painterResource(id = R.drawable.ad2))
+        }
+        item{
+            if(discountCodeIds.isNotEmpty()){
+                for(item in discountCodeIds) {
+                    CouponsCard(item)
+                }
+            }
+        }
+//        items(filteredDiscountCodes.size) { index ->
+//            Log.i("couponsTest", "LazyRow: discount code at index $index : ${filteredDiscountCodes[index]}")
+//            CouponsCard(filteredDiscountCodes[index])
+//        }
+    }
+
+//    // Fetch discount codes for each price rule
+//    for (item in priceRuleList) {
+//        Log.i("couponsTest", "LazyRow: item :${item.id}")
+//        item.id?.let { viewModel.fetchDiscountCodes(it) }
+//    }
+
     LaunchedEffect(Unit) {
+        viewModel.fetchPriceRules()
         delay(2000)
         val needToScrollItems = 20 - scrollState.layoutInfo.visibleItemsInfo.size + 1
-        val scrollWidth = needToScrollItems * ( context.resources.displayMetrics.widthPixels )
+        val scrollWidth = needToScrollItems * context.resources.displayMetrics.widthPixels
         while (true) {
             scrollState.animateScrollBy(
                 value = (scrollDirection * scrollWidth).toFloat(),
@@ -246,6 +305,7 @@ fun AdList() {
         }
     }
 }
+
 
 @Composable
 fun AdCard(painter : Painter) {
@@ -265,6 +325,41 @@ fun AdCard(painter : Painter) {
     }
 
 }
+
+@Composable
+fun CouponsCard(code: String?) {
+    val discount = code?.takeLast(2)
+    val painter = when(discount) {
+        "10" -> painterResource(R.drawable.coupon10)
+        "30" -> painterResource(R.drawable.coupon30)
+        "50" -> painterResource(R.drawable.coupon50)
+        else -> painterResource(R.drawable.ad1)
+    }
+
+    val clipboardManager = LocalClipboardManager.current
+    val context = LocalContext.current
+
+    Card(
+        modifier = Modifier
+            .padding(24.dp)
+            .fillMaxWidth()
+            .height(200.dp),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(12.dp),
+        onClick = {
+            code?.let {
+                clipboardManager.setText(AnnotatedString(it))
+                Toast.makeText(context, "Code: $code copied to clipboard", Toast.LENGTH_SHORT).show()
+            }
+        }
+    ) {
+        Image(
+            painter = painter,
+            contentDescription = "Coupon",
+        )
+    }
+}
+
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun CategoriesSection(categories: List<CustomCollection>) {
