@@ -180,7 +180,6 @@ fun CheckoutScreen(
             this.order_id = orderId.toString()
         }
         viewModel.fetchPaymentKey(paymentKeyRequest)
-        viewModel.paymentKey.value
 
         Button(
             onClick = {

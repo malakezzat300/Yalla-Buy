@@ -1,7 +1,7 @@
-package com.malakezzat.yallabuy.data.remot
+package com.malakezzat.yallabuy.data.remote
 
 import android.util.Log
-import com.malakezzat.yallabuy.model.Category
+import com.malakezzat.yallabuy.data.remot.ProductService
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderResponse
@@ -10,7 +10,6 @@ import com.malakezzat.yallabuy.model.Product
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 
 class ProductsRemoteDataSourceImpl (var productService: ProductService):
     ProductsRemoteDataSource {

@@ -1,4 +1,4 @@
-package com.malakezzat.yallabuy.data.remot
+package com.malakezzat.yallabuy.data.remote
 
 import okhttp3.Credentials
 import okhttp3.OkHttpClient

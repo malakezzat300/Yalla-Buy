@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.malakezzat.yallabuy.data.ProductsRepository
-import com.malakezzat.yallabuy.data.remot.ApiState
+import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.Product
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

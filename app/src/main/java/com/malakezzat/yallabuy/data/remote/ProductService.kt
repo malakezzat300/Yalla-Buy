@@ -1,5 +1,8 @@
 package com.malakezzat.yallabuy.data.remot
 
+
+import com.malakezzat.yallabuy.data.remote.coupons.DiscountCodeResponse
+import com.malakezzat.yallabuy.data.remote.coupons.priceRuleResponse
 import com.malakezzat.yallabuy.model.Category
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.DraftOrder
@@ -25,6 +28,15 @@ interface ProductService {
     @GET("custom_collections.json")
     suspend fun getCategories(): Category
 
+
+    @GET("price_rules.json")
+    suspend fun getPriceRules(): priceRuleResponse
+
+    @GET("price_rules/{price_rule_id}/discount_codes.json")
+    suspend fun getDiscountCodes(
+        @Path("price_rule_id") priceRuleId: Long
+    ): DiscountCodeResponse
+
     @GET("draft_orders.json")
     suspend fun getAllDraftOrders(): DraftOrdersResponse
 
@@ -45,4 +57,5 @@ interface ProductService {
 
     @POST("draft_orders/{draft_order_id}/complete.json")
     suspend fun finalizeDraftOrder(@Path("draft_order_id") draftOrderId: Long): DraftOrderResponse
+
 }

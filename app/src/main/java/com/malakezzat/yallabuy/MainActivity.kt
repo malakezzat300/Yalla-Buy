@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.example.yallabuyadmin.coupons.model.CouponsRemoteDataSource
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -28,8 +29,8 @@ import com.malakezzat.paymenttest2.PaymentRemoteDataSourceImpl
 import com.malakezzat.yallabuy.data.ProductsRepository
 import com.malakezzat.yallabuy.data.ProductsRepositoryImpl
 import com.malakezzat.yallabuy.data.remot.ProductService
-import com.malakezzat.yallabuy.data.remot.ProductsRemoteDataSourceImpl
-import com.malakezzat.yallabuy.data.remot.RetrofitHelper
+import com.malakezzat.yallabuy.data.remote.ProductsRemoteDataSourceImpl
+import com.malakezzat.yallabuy.data.remote.RetrofitHelper
 import com.malakezzat.yallabuy.data.sharedpref.GlobalSharedPreferenceDataSourceImp
 import com.malakezzat.yallabuy.ui.NavigationApp
 import com.malakezzat.yallabuy.ui.Screen
@@ -47,7 +48,8 @@ class MainActivity : ComponentActivity() {
         ProductsRepositoryImpl.getInstance(
             ProductsRemoteDataSourceImpl.
             getInstance( RetrofitHelper.getInstance().create(ProductService::class.java)),
-            GlobalSharedPreferenceDataSourceImp(this.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE))
+            GlobalSharedPreferenceDataSourceImp(this.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)),
+            CouponsRemoteDataSource(RetrofitHelper.getInstance().create(ProductService::class.java))
         )
     }
     private val paymentRemoteDataSource by lazy {

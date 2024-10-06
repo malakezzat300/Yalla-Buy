@@ -1,6 +1,5 @@
-package com.malakezzat.yallabuy.data.remot
+package com.malakezzat.yallabuy.data.remote
 
-import com.malakezzat.yallabuy.model.Category
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderResponse

@@ -4,13 +4,13 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.malakezzat.yallabuy.data.ProductsRepository
-import com.malakezzat.yallabuy.data.remot.ApiState
-import com.malakezzat.yallabuy.model.Category
+import com.malakezzat.yallabuy.data.remote.ApiState
+import com.malakezzat.yallabuy.data.remote.coupons.DiscountCode
+import com.malakezzat.yallabuy.data.remote.coupons.PriceRule
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.Product
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -25,10 +25,20 @@ class HomeScreenViewModel(private val repository: ProductsRepository):ViewModel(
 private val _brandsList = MutableStateFlow<ApiState<List<String>>>(ApiState.Loading)
     val brandsList: StateFlow<ApiState<List<String>>> get() = _brandsList
 
+    private val _discountCodes = MutableStateFlow<List<DiscountCode>>(emptyList())
+    val discountCodes: StateFlow<List<DiscountCode>> get() = _discountCodes
+
+    private var priceRuleId: Long? = null
+
+    private val _priceRules = MutableStateFlow<List<PriceRule>>(emptyList())
+    val priceRules: StateFlow<List<PriceRule>> get() = _priceRules
+
     init {
         getAllProducts()
         getAllCategories()
+        fetchPriceRules()
     }
+
     // Fetch all products
     fun getAllProducts() {
         viewModelScope.launch {
@@ -62,6 +72,22 @@ private val _brandsList = MutableStateFlow<ApiState<List<String>>>(ApiState.Load
                     _categoriesList.value = ApiState.Success(categories)
                     Log.i(TAG, "getAllCategories: ${categories.get(0).title}")
                 }
+        }
+    }
+
+    fun fetchPriceRules() {
+        viewModelScope.launch {
+            repository.getPriceRules().collect { rules ->
+                _priceRules.value = rules
+            }
+        }
+    }
+
+    fun fetchDiscountCodes(priceRuleId: Long) {
+        viewModelScope.launch {
+            repository.getDiscountCodes(priceRuleId).collect { discountCodes ->
+                _discountCodes.value = discountCodes
+            }
         }
     }
 }

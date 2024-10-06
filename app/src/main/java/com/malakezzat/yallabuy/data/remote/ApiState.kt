@@ -1,4 +1,4 @@
-package com.malakezzat.yallabuy.data.remot
+package com.malakezzat.yallabuy.data.remote
 
 sealed class ApiState<out T> {
     object Loading : ApiState<Nothing>()
