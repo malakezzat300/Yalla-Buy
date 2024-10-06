@@ -8,6 +8,7 @@ import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.ProductResponse
+import com.malakezzat.yallabuy.model.SmartCollection
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -43,11 +44,19 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         throw e
     }
 
+    override suspend fun getBrands(): Flow<List<SmartCollection>> = flow{
+        val response = productService.getBrands().smart_collections
+        emit(response)
+    }.catch {e->
+        Log.e(TAG, "Error fetching Brands", e)
+        throw e
+    }
+
     override suspend fun getAllDraftOrders(): Flow<DraftOrdersResponse> = flow {
         val response = productService.getAllDraftOrders()
         emit(response)
     }.catch { e ->
-        Log.e(TAG, "Error fetching Categories", e)
+        Log.e(TAG, "Error fetching AllDraftOrders", e)
         throw e
     }
 
@@ -55,7 +64,7 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         val response = productService.getDraftOrder(draftOrderId)
         emit(response)
     }.catch { e ->
-        Log.e(TAG, "Error fetching Categories", e)
+        Log.e(TAG, "Error fetching DraftOrder", e)
         throw e
     }
 
@@ -63,7 +72,7 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         val response = productService.createDraftOrder(draftOrder)
         emit(response)
     }.catch { e ->
-        Log.e(TAG, "Error fetching Categories", e)
+        Log.e(TAG, "Error create DraftOrder", e)
         throw e
     }
 
@@ -74,7 +83,7 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         val response = productService.updateDraftOrder(draftOrderId,draftOrder)
         emit(response)
     }.catch { e ->
-        Log.e(TAG, "Error fetching Categories", e)
+        Log.e(TAG, "Error update DraftOrder", e)
         throw e
     }
 
@@ -86,7 +95,7 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         val response = productService.finalizeDraftOrder(draftOrderId)
         emit(response)
     }.catch { e ->
-        Log.e(TAG, "Error fetching Categories", e)
+        Log.e(TAG, "Error finalize DraftOrder", e)
         throw e
     }
     override suspend fun getProductById(id : Long) : Flow<ProductResponse> = flow{

@@ -73,6 +73,7 @@ import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.Product
+import com.malakezzat.yallabuy.model.SmartCollection
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
 import kotlinx.coroutines.delay
@@ -109,7 +110,7 @@ fun HomeScreen(
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
                 is ApiState.Success -> {
-                    val brands = (brandsState as ApiState.Success<List<String>>).data
+                    val brands = (brandsState as ApiState.Success<List<SmartCollection>>).data
                     BrandsChips(brands)
                 }
                 is ApiState.Error -> {
@@ -150,7 +151,7 @@ fun HomeScreen(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun BrandsChips(brands: List<String>) {
+fun BrandsChips(brands: List<SmartCollection>) {
     Column(modifier = Modifier.padding(16.dp)) {
         Text("Brands", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
         LazyRow(
@@ -168,7 +169,7 @@ fun BrandsChips(brands: List<String>) {
                         backgroundColor = if (isSelected) Color.LightGray else Color.Cyan
                     )
                 ) {
-                    Text(text = brand, style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium)
+                    Text(text = brand.title, style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium)
                     , color = Color.White
                     )
                 }

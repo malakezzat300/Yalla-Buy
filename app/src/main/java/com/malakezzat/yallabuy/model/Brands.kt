@@ -2,8 +2,8 @@
 
 package com.malakezzat.yallabuy.model
 
-data class SmartCollections (
-    val smartCollections: List<SmartCollection>
+data class Brands (
+    val smart_collections: List<SmartCollection>
 )
 
 data class SmartCollection (
