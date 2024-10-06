@@ -1,14 +1,20 @@
-package com.malakezzat.yallabuy.data.remote
+package com.malakezzat.yallabuy.data.remot
 
 
-import com.malakezzat.yallabuy.data.remote.coupons.DiscountCodeResponse
-import com.malakezzat.yallabuy.data.remote.coupons.priceRuleResponse
+import com.malakezzat.yallabuy.data.remot.coupons.DiscountCodeResponse
+import com.malakezzat.yallabuy.data.remot.coupons.priceRuleResponse
 import com.malakezzat.yallabuy.model.Category
+import com.malakezzat.yallabuy.model.CustomCollection
+import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.DraftOrderResponse
+import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.ProductResponse
 import com.malakezzat.yallabuy.model.ProductsResponse
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface ProductService {
@@ -22,6 +28,7 @@ interface ProductService {
     @GET("custom_collections.json")
     suspend fun getCategories(): Category
 
+
     @GET("price_rules.json")
     suspend fun getPriceRules(): priceRuleResponse
 
@@ -29,4 +36,26 @@ interface ProductService {
     suspend fun getDiscountCodes(
         @Path("price_rule_id") priceRuleId: Long
     ): DiscountCodeResponse
+
+    @GET("draft_orders.json")
+    suspend fun getAllDraftOrders(): DraftOrdersResponse
+
+    @GET("draft_orders/{draft_order_id}.json")
+    suspend fun getDraftOrder(@Path("draft_order_id") draftOrderId: Long): DraftOrderResponse
+
+    @POST("draft_orders.json")
+    suspend fun createDraftOrder(@Body draftOrder: DraftOrder): DraftOrderResponse
+
+    @PUT("draft_orders/{draft_order_id}.json")
+    suspend fun updateDraftOrder(
+        @Path("draft_order_id") draftOrderId: Long,
+        @Body draftOrder: DraftOrder
+    ): DraftOrderResponse
+
+    @DELETE("draft_orders/{draft_order_id}.json")
+    suspend fun deleteDraftOrder(@Path("draft_order_id") draftOrderId: Long)
+
+    @POST("draft_orders/{draft_order_id}/complete.json")
+    suspend fun finalizeDraftOrder(@Path("draft_order_id") draftOrderId: Long): DraftOrderResponse
+
 }

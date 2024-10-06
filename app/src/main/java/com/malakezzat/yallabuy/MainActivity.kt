@@ -5,21 +5,41 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.yallabuyadmin.coupons.model.CouponsRemoteDataSource
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.FirebaseApp
 import com.malakezzat.paymenttest2.PaymentRemoteDataSourceImpl
+import com.malakezzat.yallabuy.data.ProductsRepository
 import com.malakezzat.yallabuy.data.ProductsRepositoryImpl
-import com.malakezzat.yallabuy.data.remote.ProductService
-import com.malakezzat.yallabuy.data.remote.ProductsRemoteDataSourceImpl
-import com.malakezzat.yallabuy.data.remote.RetrofitHelper
+import com.malakezzat.yallabuy.data.remot.ProductService
+import com.malakezzat.yallabuy.data.remot.ProductsRemoteDataSourceImpl
+import com.malakezzat.yallabuy.data.remot.RetrofitHelper
 import com.malakezzat.yallabuy.data.sharedpref.GlobalSharedPreferenceDataSourceImp
 import com.malakezzat.yallabuy.ui.NavigationApp
+import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.auth.viewmodel.SignUpViewModelFactory
 import com.malakezzat.yallabuy.ui.auth.viewmodel.login.LogInViewModelFactory
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModelFactory
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModelFactory
 import com.malakezzat.yallabuy.ui.search.SearchViewModelFactory
+import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModelFactory
 import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
 
 class MainActivity : ComponentActivity() {
@@ -50,6 +70,9 @@ class MainActivity : ComponentActivity() {
     private val searchViewModelFactory by lazy {
         SearchViewModelFactory(repo)
     }
+    private val shoppingCartViewModelFactory by lazy {
+        ShoppingCartViewModelFactory(repo)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -63,7 +86,8 @@ class MainActivity : ComponentActivity() {
                 signUpViewModelFactory,
                 logInViewModelFactory,
                 paymentViewModelFactory,
-                searchViewModelFactory
+                searchViewModelFactory,
+                shoppingCartViewModelFactory
             )
         }
         }
