@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -60,6 +61,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -69,6 +71,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.CustomCollection
@@ -111,7 +114,7 @@ fun HomeScreen(
                 }
                 is ApiState.Success -> {
                     val brands = (brandsState as ApiState.Success<List<SmartCollection>>).data
-                    BrandsChips(brands)
+                    BrandsList(brands)
                 }
                 is ApiState.Error -> {
                     Text(text = "Error: ${(brandsState as ApiState.Error).message}", color = Color.Red)
@@ -149,9 +152,8 @@ fun HomeScreen(
 }
 
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun BrandsChips(brands: List<SmartCollection>) {
+fun BrandsList(brands: List<SmartCollection>) {
     Column(modifier = Modifier.padding(16.dp)) {
         Text("Brands", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
         LazyRow(
@@ -160,18 +162,33 @@ fun BrandsChips(brands: List<SmartCollection>) {
             itemsIndexed(brands) { index, brand ->
                 var isSelected by remember { mutableStateOf(false) }
 
-                Chip(
-                    onClick = {
-                        isSelected = !isSelected
-                    },
-                    modifier = Modifier.padding(4.dp),
-                    colors = ChipDefaults.chipColors(
-                        backgroundColor = if (isSelected) Color.LightGray else Color.Cyan
-                    )
+                Card(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .width(100.dp), // Adjust width as needed
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
-                    Text(text = brand.title, style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium)
-                    , color = Color.White
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .clickable { isSelected = !isSelected }
+                            .padding(8.dp) // Padding inside the card
+                    ) {
+                        Image(
+                            painter = rememberImagePainter(brand.image.src),
+                            contentDescription = brand.title,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f) // Make the image square
+                        )
+                        /*Text(
+                            text = brand.title,
+                            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
+                            color = Color.Black,
+                            textAlign = TextAlign.Center
+                        )*/
+                    }
                 }
             }
         }
