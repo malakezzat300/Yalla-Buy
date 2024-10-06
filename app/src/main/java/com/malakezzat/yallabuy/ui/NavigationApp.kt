@@ -65,6 +65,7 @@ fun NavigationApp(
             if (currentRoute !in bottomNavHiddenRoutes) {
                 BottomNavigationBar(navController)
             }
+        }
         ) { paddingValues ->
             NavHost(navController = navController, startDestination = Screen.SplashScreen.route, Modifier.padding(paddingValues)) {
                 composable(Screen.SplashScreen.route) {
@@ -128,7 +129,7 @@ fun NavigationApp(
             }
         }
     }
-}
+
 
 
 
