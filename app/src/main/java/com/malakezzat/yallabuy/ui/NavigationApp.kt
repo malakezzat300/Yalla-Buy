@@ -48,7 +48,10 @@ fun NavigationApp(
                 BottomNavigationBar(navController)
             }
         ) { paddingValues ->
-            NavHost(navController = navController, startDestination = Screen.HomeScreen.route, Modifier.padding(paddingValues)) {
+            NavHost(navController = navController, startDestination = Screen.SplashScreen.route, Modifier.padding(paddingValues)) {
+                composable(Screen.SplashScreen.route) {
+                    SplashScreen(navController)
+                }
                 composable(Screen.HomeScreen.route) {
                     val viewModel: HomeScreenViewModel = viewModel(factory = homeScreenViewModelFactory)
                     HomeScreen(viewModel = viewModel, navController)

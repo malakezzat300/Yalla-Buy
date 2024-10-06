@@ -18,13 +18,14 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.malakezzat.yallabuy.R
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+
 
 
 @Composable
-fun SplashScreen(onTimeout: () -> Unit) {
+fun SplashScreen(navController: NavController) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.splash))
     val progress by animateLottieCompositionAsState(composition)
 
@@ -44,13 +45,13 @@ fun SplashScreen(onTimeout: () -> Unit) {
     }
 
     LaunchedEffect(Unit) {
-        kotlinx.coroutines.delay(2000)
-        onTimeout()
+        kotlinx.coroutines.delay(5000)
+        navController.navigate(Screen.LogInScreen.route)
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun SplashScreenPreview() {
-    SplashScreen(onTimeout = {})
+    SplashScreen(navController = rememberNavController())
 }
