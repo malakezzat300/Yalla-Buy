@@ -9,6 +9,7 @@ import com.malakezzat.yallabuy.data.remote.coupons.DiscountCode
 import com.malakezzat.yallabuy.data.remote.coupons.PriceRule
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.Product
+import com.malakezzat.yallabuy.model.SmartCollection
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -22,8 +23,8 @@ class HomeScreenViewModel(private val repository: ProductsRepository):ViewModel(
     private val _categoriesList = MutableStateFlow<ApiState<List<CustomCollection>>>(ApiState.Loading)
     val categoriesList: StateFlow<ApiState<List<CustomCollection>>> get() = _categoriesList
 //
-private val _brandsList = MutableStateFlow<ApiState<List<String>>>(ApiState.Loading)
-    val brandsList: StateFlow<ApiState<List<String>>> get() = _brandsList
+private val _brandsList = MutableStateFlow<ApiState<List<SmartCollection>>>(ApiState.Loading)
+    val brandsList: StateFlow<ApiState<List<SmartCollection>>> get() = _brandsList
 
     private val _discountCodes = MutableStateFlow<List<DiscountCode>>(emptyList())
     val discountCodes: StateFlow<List<DiscountCode>> get() = _discountCodes
@@ -37,6 +38,7 @@ private val _brandsList = MutableStateFlow<ApiState<List<String>>>(ApiState.Load
         getAllProducts()
         getAllCategories()
         fetchPriceRules()
+        getBrands()
     }
 
     // Fetch all products
@@ -52,11 +54,11 @@ private val _brandsList = MutableStateFlow<ApiState<List<String>>>(ApiState.Load
                 }
                 .collect { productList ->
                     _productList.value = ApiState.Success(productList) // Set success state with data
-                    val brands = productList.map { it.vendor }.distinct()
-                    _brandsList.value = ApiState.Success(brands)
+                    //val brands = productList.map { it.vendor }.distinct()
+                   // _brandsList.value = ApiState.Success(brands)
 
                     Log.i(TAG, "getAllProducts: ${productList.size}")
-                    Log.i(TAG, "Brands: $brands")
+                   // Log.i(TAG, "Brands: $brands")
                 }
         }
     }
@@ -72,6 +74,20 @@ private val _brandsList = MutableStateFlow<ApiState<List<String>>>(ApiState.Load
                     val filteredCategories = categories.drop(1)
                     _categoriesList.value = ApiState.Success(filteredCategories)
                     Log.i(TAG, "getAllCategories: ${categories.get(0).title}")
+                }
+        }
+    }
+
+    fun getBrands(){
+        viewModelScope.launch {
+            repository.getBrands()
+                .onStart {
+                    _brandsList.value = ApiState.Loading
+                }.catch { e->
+                    _brandsList.value = ApiState.Error(e.message?:"Unknown error")
+                }.collect{brands->
+                    _brandsList.value = ApiState.Success(brands)
+                    Log.i(TAG, "getBrands: ${brands.size}")
                 }
         }
     }

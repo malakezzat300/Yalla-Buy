@@ -13,7 +13,9 @@ import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -60,6 +62,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -69,20 +72,23 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.Product
+import com.malakezzat.yallabuy.model.SmartCollection
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
 import kotlinx.coroutines.delay
 
 private val TAG = "HomeScreen"
+
 @Composable
 fun HomeScreen(
     viewModel: HomeScreenViewModel,
-    navController: NavController
-){
+    navController: NavController,
+) {
     val productState by viewModel.productList.collectAsStateWithLifecycle()
     val categoriesState by viewModel.categoriesList.collectAsStateWithLifecycle()
     val brandsState by viewModel.brandsList.collectAsStateWithLifecycle()
@@ -94,51 +100,68 @@ fun HomeScreen(
     }
     Scaffold(
         topBar = { CustomTopBar(navController) },
-      //  bottomBar = { BottomNavigationBar(navController) }
+        containerColor = Color.White,
+        //  bottomBar = { BottomNavigationBar(navController) }
     ) {
         Column(
             modifier = Modifier
                 .padding(it)
                 .verticalScroll(rememberScrollState())
                 .background(color = Color.White)
-        ){
+        ) {
             AdList(viewModel)
 
             when (brandsState) {
                 is ApiState.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
+
                 is ApiState.Success -> {
-                    val brands = (brandsState as ApiState.Success<List<String>>).data
-                    BrandsChips(brands)
+                    val brands = (brandsState as ApiState.Success<List<SmartCollection>>).data
+                    BrandsList(brands)
                 }
+
                 is ApiState.Error -> {
-                    Text(text = "Error: ${(brandsState as ApiState.Error).message}", color = Color.Red)
+                    Text(
+                        text = "Error: ${(brandsState as ApiState.Error).message}",
+                        color = Color.Red
+                    )
                 }
             }
             when (categoriesState) {
                 is ApiState.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
+
                 is ApiState.Success -> {
-                    val categories = (categoriesState as ApiState.Success<List<CustomCollection>>).data
+                    val categories =
+                        (categoriesState as ApiState.Success<List<CustomCollection>>).data
                     CategoriesSection(categories)
                     Log.d(TAG, "$categoriesState")
                 }
+
                 is ApiState.Error -> {
-                    Text(text = "Error: ${(categoriesState as ApiState.Error).message}", color = Color.Red)
+                    Text(
+                        text = "Error: ${(categoriesState as ApiState.Error).message}",
+                        color = Color.Red
+                    )
                 }
             }
             when (productState) {
                 is ApiState.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
+
                 is ApiState.Success -> {
                     val products = (productState as ApiState.Success<List<Product>>).data
-                    LatestProductsSection(products,navController)
+                    LatestProductsSection(products, navController)
                 }
+
                 is ApiState.Error -> {
-                    Text(text = "Error: ${(productState as ApiState.Error).message}", color = Color.Red)
+                    Text(
+                        text = "Error: ${(productState as ApiState.Error).message}",
+                        color = Color.Red
+                    )
                 }
             }
 
@@ -148,29 +171,53 @@ fun HomeScreen(
 }
 
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun BrandsChips(brands: List<String>) {
+fun BrandsList(brands: List<SmartCollection>) {
     Column(modifier = Modifier.padding(16.dp)) {
-        Text("Brands", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text("Brands", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
+            Text(
+                "SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
+                color = Color.Cyan
+            )
+        }
         LazyRow(
             modifier = Modifier.padding(top = 8.dp)
         ) {
             itemsIndexed(brands) { index, brand ->
                 var isSelected by remember { mutableStateOf(false) }
 
-                Chip(
-                    onClick = {
-                        isSelected = !isSelected
-                    },
-                    modifier = Modifier.padding(4.dp),
-                    colors = ChipDefaults.chipColors(
-                        backgroundColor = if (isSelected) Color.LightGray else Color.Cyan
-                    )
+                Card(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .width(100.dp), // Adjust width as needed
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
-                    Text(text = brand, style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium)
-                    , color = Color.White
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .clickable { isSelected = !isSelected }
+                            .padding(8.dp) // Padding inside the card
+                    ) {
+                        Image(
+                            painter = rememberImagePainter(brand.image.src),
+                            contentDescription = brand.title,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f) // Make the image square
+                        )
+                        /*Text(
+                            text = brand.title,
+                            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
+                            color = Color.Black,
+                            textAlign = TextAlign.Center
+                        )*/
+                    }
                 }
             }
         }
@@ -184,7 +231,8 @@ fun CustomTopBar(navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 38.dp, start = 10.dp, end = 10.dp, bottom = 10.dp),
+            .padding(top = 12.dp, start = 10.dp, end = 10.dp, bottom = 10.dp)
+            .background(Color.White),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -204,24 +252,16 @@ fun CustomTopBar(navController: NavController) {
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = {navController.navigate(Screen.SearchScreen.route)}) {
+            IconButton(onClick = { navController.navigate(Screen.SearchScreen.route) }) {
                 Image(
                     painter = painterResource(id = R.drawable.search_normal),
                     contentDescription = "Search Icon",
                     modifier = Modifier.size(24.dp)
                 )
             }
-            Image(
-                painter = painterResource(id = R.drawable.rectangle1),
-                contentDescription = "User Profile",
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(RoundedCornerShape(18.dp))
-            )
         }
     }
 }
-
 
 
 @Composable
@@ -236,8 +276,8 @@ fun AdList(viewModel: HomeScreenViewModel) {
     val priceRuleList by viewModel.priceRules.collectAsState()
     val discountCodeList by viewModel.discountCodes.collectAsState()
 
-    if(fetchDone) {
-        repeat(3){
+    if (fetchDone) {
+        repeat(3) {
             for (item in priceRuleList) {
                 item.id?.let { viewModel.fetchDiscountCodes(it) }
                 fetchDone = false
@@ -245,21 +285,16 @@ fun AdList(viewModel: HomeScreenViewModel) {
         }
     }
 
-    if(discountCodeList.isNotEmpty()){
-        for(item in discountCodeList) {
+    if (discountCodeList.isNotEmpty()) {
+        for (item in discountCodeList) {
             discountCodeIds.add(item.code)
         }
     }
 
 
-
-
     //val discountCode by viewModel.discountCodes.collectAsState()
 
     // Log list sizes for debugging
-
-
-
 
 
     LazyRow(state = scrollState) {
@@ -270,9 +305,9 @@ fun AdList(viewModel: HomeScreenViewModel) {
         item {
             AdCard(painterResource(id = R.drawable.ad2))
         }
-        item{
-            if(discountCodeIds.isNotEmpty()){
-                for(item in discountCodeIds) {
+        item {
+            if (discountCodeIds.isNotEmpty()) {
+                for (item in discountCodeIds) {
                     CouponsCard(item)
                 }
             }
@@ -309,8 +344,8 @@ fun AdList(viewModel: HomeScreenViewModel) {
 
 
 @Composable
-fun AdCard(painter : Painter) {
-    Card (
+fun AdCard(painter: Painter) {
+    Card(
         modifier = Modifier
             .padding(24.dp)
             .fillMaxWidth()
@@ -330,7 +365,7 @@ fun AdCard(painter : Painter) {
 @Composable
 fun CouponsCard(code: String?) {
     val discount = code?.takeLast(2)
-    val painter = when(discount) {
+    val painter = when (discount) {
         "10" -> painterResource(R.drawable.coupon10)
         "30" -> painterResource(R.drawable.coupon30)
         "50" -> painterResource(R.drawable.coupon50)
@@ -350,7 +385,8 @@ fun CouponsCard(code: String?) {
         onClick = {
             code?.let {
                 clipboardManager.setText(AnnotatedString(it))
-                Toast.makeText(context, "Code: $code copied to clipboard", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Code: $code copied to clipboard", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     ) {
@@ -367,22 +403,20 @@ fun CategoriesSection(categories: List<CustomCollection>) {
     //categories: List<CustomCollection>
     Log.d(TAG, "3. ${categories}")
     Column(modifier = Modifier.padding(16.dp)) {
-        Row (
+        Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
-        ){
+        ) {
             Text("Categories", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
-            Text("SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
-                color = Color.Cyan
-            )
         }
         LazyRow(
             modifier = Modifier.padding(top = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            itemsIndexed(categories) { index,category->
-                CategoryItem(category)}
+            itemsIndexed(categories) { index, category ->
+                CategoryItem(category)
+            }
         }
     }
 }
@@ -394,49 +428,53 @@ fun CategoryItem(category: CustomCollection) {
     Log.d(TAG, "4. ${category}")
     Card(
         modifier = Modifier
-            .padding(15.dp)
-            .size(100.dp),
+            .size(200.dp),
         shape = RoundedCornerShape(28.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         border = BorderStroke(1.dp, Color(0xFFE0E0E0))
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Image(
                 painter = rememberAsyncImagePainter(category.image?.src),
                 contentDescription = "category item",
-                modifier = Modifier.size(40.dp)
-                    .fillMaxSize()
-                ,
-                contentScale = ContentScale.FillWidth
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .clip(RoundedCornerShape(28.dp)),
+                contentScale = ContentScale.Crop
             )
             Text(
                 text = category.title,
                 style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
-                modifier = Modifier.padding(top = 4.dp)
+                modifier = Modifier.padding(top = 10.dp, bottom = 10.dp)
             )
         }
     }
 }
 
+
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun LatestProductsSection(products: List<Product>,navController: NavController) {
+fun LatestProductsSection(products: List<Product>, navController: NavController) {
     //
     Column(modifier = Modifier.padding(16.dp)) {
-        Row (
+        Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
-        ){
-            Text("All Products", style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                ,modifier = Modifier.padding(26.dp))
-            Text("SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
+        ) {
+            Text(
+                "All Products",
+                style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
+                modifier = Modifier.padding(26.dp)
+            )
+            Text(
+                "SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
                 color = Color.Cyan
             )
         }
@@ -449,10 +487,12 @@ fun LatestProductsSection(products: List<Product>,navController: NavController) 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+                contentPadding = PaddingValues(0.dp)
+
             ) {
-                itemsIndexed(products) { _,product ->
+                itemsIndexed(products) { _, product ->
                     ProductCard(product = product, navController)
                 }
             }
@@ -461,52 +501,58 @@ fun LatestProductsSection(products: List<Product>,navController: NavController) 
 }
 
 
-
 @Composable
-fun ProductCard(product: Product,navController: NavController) {
-    Box(
+fun ProductCard(product: Product, navController: NavController) {
+    Card(
         modifier = Modifier
             .width(150.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFFF7F7F7))
-            .padding(14.dp)
             .clickable {
                 navController.navigate("${Screen.ProductInfScreen.route}/${product.id}")
-            }
+            },
+        shape = RoundedCornerShape(30.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+
     ) {
-        // Background image of the product
-        product.images.firstOrNull()?.let { image ->
+        Box {
+            // Background image of the product
+            product.images.firstOrNull()?.let { image ->
+                Image(
+                    painter = rememberAsyncImagePainter(image.src),
+                    contentDescription = "Product Image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .clip(RoundedCornerShape(30.dp)), // Clip the image to match the card shape
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            // Wishlist icon positioned at the top right corner
             Image(
-                painter = rememberAsyncImagePainter(image.src),
-                contentDescription = "Product Image",
+                painter = painterResource(id = R.drawable.wishlist),
+                contentDescription = "wishlist",
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp),
-                contentScale = ContentScale.Crop
+                    .size(40.dp)
+                    .align(Alignment.TopEnd)
+                    .padding(5.dp)
             )
-        }
 
-        // Wishlist icon positioned at the top right corner
-        Image(
-            painter = painterResource(id = R.drawable.wishlist),
-            contentDescription = "wishlist",
-            modifier = Modifier
-                .size(40.dp) // Adjust size as needed
-                .align(Alignment.TopEnd) // Align the image to the top end corner
-                .padding(5.dp) // Add padding around the image
-        )
-
-        // Column for product details
-        Column(
-            modifier = Modifier.padding(top = 110.dp) // Ensure text does not overlap with the image
-        ) {
-            Text(product.title, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
-            Text(product.vendor, color = Color.Green)
-            val price = product.variants.first().price
-            Text("Price: $${price}")
+            // Column for product details
+            Column(
+                modifier = Modifier
+                    .padding(top = 110.dp) // Ensure text does not overlap with the image
+                    .padding(10.dp) // Add some padding around the text
+            ) {
+                Text(product.title, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
+                Text(product.vendor, color = Color.Green)
+                val price = product.variants.first().price
+                Text("Price: $${price}")
+            }
         }
     }
 }
+
 
 
 @Preview(showBackground = true, showSystemUi = true)
@@ -549,6 +595,7 @@ fun ProductCard() {
         }
     }
 }
+
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun BottomNavigationBar(navController: NavController) {
@@ -588,7 +635,7 @@ fun BottomNavigationBar(navController: NavController) {
                 )
             },
             label = { Text("Categories", style = TextStyle(fontSize = 11.5.sp)) },
-            selected =false /*currentRoute == Screen.CategoriesScreen.route*/,
+            selected = false /*currentRoute == Screen.CategoriesScreen.route*/,
             onClick = {
                 /*if (currentRoute != Screen.CategoriesScreen.route) {
                     navController.popBackStack(Screen.CategoriesScreen.route, inclusive = false)
@@ -626,7 +673,7 @@ fun BottomNavigationBar(navController: NavController) {
                 )
             },
             label = { Text("Wishlist", style = TextStyle(fontSize = 12.sp)) },
-            selected =false /*currentRoute == Screen.WishlistScreen.route*/,
+            selected = false /*currentRoute == Screen.WishlistScreen.route*/,
             onClick = {
                 /*if (currentRoute != Screen.WishlistScreen.route) {
                     navController.popBackStack(Screen.WishlistScreen.route, inclusive = false)
@@ -645,7 +692,7 @@ fun BottomNavigationBar(navController: NavController) {
                 )
             },
             label = { Text("Profile", style = TextStyle(fontSize = 12.sp)) },
-            selected =false /*currentRoute == Screen.ProfileScreen.route*/,
+            selected = false /*currentRoute == Screen.ProfileScreen.route*/,
             onClick = {
                 /*if (currentRoute != Screen.ProfileScreen.route) {
                     navController.popBackStack(Screen.ProfileScreen.route, inclusive = false)

@@ -3,8 +3,8 @@ package com.malakezzat.yallabuy.data.remot
 
 import com.malakezzat.yallabuy.data.remote.coupons.DiscountCodeResponse
 import com.malakezzat.yallabuy.data.remote.coupons.priceRuleResponse
+import com.malakezzat.yallabuy.model.Brands
 import com.malakezzat.yallabuy.model.Category
-import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
@@ -28,6 +28,8 @@ interface ProductService {
     @GET("custom_collections.json")
     suspend fun getCategories(): Category
 
+    @GET("smart_collections.json")
+    suspend fun getBrands(): Brands
 
     @GET("price_rules.json")
     suspend fun getPriceRules(): priceRuleResponse

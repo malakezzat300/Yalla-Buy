@@ -11,6 +11,7 @@ import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.ProductResponse
+import com.malakezzat.yallabuy.model.SmartCollection
 import kotlinx.coroutines.flow.Flow
 
 class ProductsRepositoryImpl private constructor(
@@ -42,6 +43,10 @@ class ProductsRepositoryImpl private constructor(
 
     override suspend fun getCategories(): Flow<List<CustomCollection>> {
         return productsRemoteDataSource.getCategories()
+    }
+
+    override suspend fun getBrands(): Flow<List<SmartCollection>> {
+        return productsRemoteDataSource.getBrands()
     }
 
 
