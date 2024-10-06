@@ -26,6 +26,9 @@ import com.malakezzat.yallabuy.ui.payment.view.OrderScreen
 import com.malakezzat.yallabuy.ui.payment.view.PaymentScreen
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModelFactory
+import com.malakezzat.yallabuy.ui.product_info.ProductInfoScreen
+import com.malakezzat.yallabuy.ui.product_info.ProductInfoViewModel
+import com.malakezzat.yallabuy.ui.product_info.ProductInfoViewModelFactory
 import com.malakezzat.yallabuy.ui.search.SearchScreen
 import com.malakezzat.yallabuy.ui.search.SearchViewModel
 import com.malakezzat.yallabuy.ui.search.SearchViewModelFactory
@@ -41,6 +44,7 @@ fun NavigationApp(
     paymentViewModelFactory: PaymentViewModelFactory,
     searchViewModelFactory: SearchViewModelFactory,
     shoppingCartViewModelFactory: ShoppingCartViewModelFactory,
+    productInfoViewModelFactory: ProductInfoViewModelFactory,
     navController: NavHostController = rememberNavController()
 ) {
     val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -61,55 +65,66 @@ fun NavigationApp(
             if (currentRoute !in bottomNavHiddenRoutes) {
                 BottomNavigationBar(navController)
             }
-        }
-    ) { paddingValues ->
-        NavHost(navController = navController, startDestination = Screen.SplashScreen.route, Modifier.padding(paddingValues)) {
-            composable(Screen.SplashScreen.route) {
-                SplashScreen(navController)
-            }
-            composable(Screen.HomeScreen.route) {
-                val viewModel: HomeScreenViewModel = viewModel(factory = homeScreenViewModelFactory)
-                HomeScreen(viewModel = viewModel, navController)
-            }
-            composable(Screen.SignUpScreen.route) {
-                val viewModel: SignUpViewModel = viewModel(factory = signUpViewModelFactory)
-                SignupScreen(viewModel, navController)
-            }
-            composable(Screen.LogInScreen.route) {
-                val viewModel: LogInViewModel = viewModel(factory = logInViewModelFactory)
-                LogInScreen(viewModel, navController)
-            }
-            composable(Screen.OrderScreen.route) {
-                val viewModel: PaymentViewModel = viewModel(factory = paymentViewModelFactory)
-                OrderScreen(viewModel, navController)
-            }
-            composable(
-                route = Screen.CheckoutScreen.route,
-                arguments = listOf(navArgument("orderId") { type = NavType.StringType })
-            ) { backStackEntry ->
-                val orderId = backStackEntry.arguments?.getString("orderId")
-                val viewModel: PaymentViewModel = viewModel(factory = paymentViewModelFactory)
-                CheckoutView(viewModel, navController, orderId)
-            }
-            composable(
-                route = Screen.PaymentScreen.route,
-                arguments = listOf(navArgument("paymentKey") { type = NavType.StringType })
-            ) { backStackEntry ->
-                val paymentKey = backStackEntry.arguments?.getString("paymentKey")
-                PaymentScreen(
-                    onPaymentSuccess = { /* Handle success */ },
-                    viewModel = viewModel(factory = paymentViewModelFactory),
-                    navController = navController,
-                    paymentKey = paymentKey
-                )
-            }
-            composable(Screen.SearchScreen.route) {
-                val viewModel: SearchViewModel = viewModel(factory = searchViewModelFactory)
-                SearchScreen(viewModel, navController)
-            }
-            composable(Screen.ShoppingScreen.route) {
-                val viewModel: ShoppingCartViewModel = viewModel(factory = shoppingCartViewModelFactory)
-                ShoppingCartScreen(viewModel, navController)
+        ) { paddingValues ->
+            NavHost(navController = navController, startDestination = Screen.SplashScreen.route, Modifier.padding(paddingValues)) {
+                composable(Screen.SplashScreen.route) {
+                    SplashScreen(navController)
+                }
+                composable(Screen.HomeScreen.route) {
+                    val viewModel: HomeScreenViewModel = viewModel(factory = homeScreenViewModelFactory)
+                    HomeScreen(viewModel = viewModel, navController)
+                }
+                composable(Screen.SignUpScreen.route) {
+                    val viewModel: SignUpViewModel = viewModel(factory = signUpViewModelFactory)
+                    SignupScreen(viewModel, navController)
+                }
+                composable(Screen.LogInScreen.route) {
+                    val viewModel: LogInViewModel = viewModel(factory = logInViewModelFactory)
+                    LogInScreen(viewModel, navController)
+                }
+                composable(Screen.OrderScreen.route) {
+                    val viewModel: PaymentViewModel = viewModel(factory = paymentViewModelFactory)
+                    OrderScreen(viewModel, navController)
+                }
+                composable(
+                    route = Screen.CheckoutScreen.route,
+                    arguments = listOf(navArgument("orderId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val orderId = backStackEntry.arguments?.getString("orderId")
+                    val viewModel: PaymentViewModel = viewModel(factory = paymentViewModelFactory)
+                    CheckoutView(viewModel, navController, orderId)
+                }
+                composable(
+                    route = Screen.PaymentScreen.route,
+                    arguments = listOf(navArgument("paymentKey") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val paymentKey = backStackEntry.arguments?.getString("paymentKey")
+                    PaymentScreen(
+                        onPaymentSuccess = { /* Handle success */ },
+                        viewModel = viewModel(factory = paymentViewModelFactory),
+                        navController = navController,
+                        paymentKey = paymentKey
+                    )
+                }
+                composable(Screen.SearchScreen.route) {
+                    val viewModel: SearchViewModel = viewModel(factory = searchViewModelFactory)
+                    SearchScreen(viewModel, navController)
+                }
+                composable(Screen.ShoppingScreen.route) {
+                    val viewModel: ShoppingCartViewModel = viewModel(factory = shoppingCartViewModelFactory)
+                    ShoppingCartScreen(viewModel, navController)
+                }
+                composable(
+                    route = "${Screen.ProductInfScreen.route}/{productId}",
+                    arguments = listOf(navArgument("productId") {
+                        type = NavType.LongType
+                    })
+                ) { backStackEntry ->
+                    val productId = backStackEntry.arguments?.getLong("productId") ?: 0L
+                    val viewModel: ProductInfoViewModel = viewModel(factory = productInfoViewModelFactory)
+                    ProductInfoScreen(productId = productId, viewModel = viewModel, navController = navController)
+                }
+
             }
         }
     }

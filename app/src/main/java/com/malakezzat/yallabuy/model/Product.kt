@@ -1,5 +1,6 @@
 package com.malakezzat.yallabuy.model
 
+
 data class Product(
     val id: Long? = null,
     val title: String,

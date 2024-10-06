@@ -5,6 +5,7 @@ import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Product
+import com.malakezzat.yallabuy.model.ProductResponse
 import kotlinx.coroutines.flow.Flow
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -24,4 +25,5 @@ interface ProductsRemoteDataSource {
     suspend fun updateDraftOrder(draftOrderId: Long,draftOrder: DraftOrder): Flow<DraftOrderResponse>
     suspend fun deleteDraftOrder(draftOrderId: Long)
     suspend fun finalizeDraftOrder(draftOrderId: Long): Flow<DraftOrderResponse>
+    suspend fun getProductById(id: Long) : Flow<ProductResponse>
 }

@@ -7,6 +7,7 @@ import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Product
+import com.malakezzat.yallabuy.model.ProductResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -88,5 +89,11 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         Log.e(TAG, "Error fetching Categories", e)
         throw e
     }
-
+    override suspend fun getProductById(id : Long) : Flow<ProductResponse> = flow{
+        val response = productService.getProductById(id)
+        emit(response)
+    }.catch { e ->
+        Log.e(TAG, "Error fetching Product by id", e)
+        throw e
+    }
 }

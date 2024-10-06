@@ -10,6 +10,7 @@ import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Product
+import com.malakezzat.yallabuy.model.ProductResponse
 import kotlinx.coroutines.flow.Flow
 
 class ProductsRepositoryImpl private constructor(
@@ -77,5 +78,8 @@ class ProductsRepositoryImpl private constructor(
 
     override suspend fun finalizeDraftOrder(draftOrderId: Long): Flow<DraftOrderResponse> {
         return finalizeDraftOrder(draftOrderId)
+    }
+    override suspend fun getProductById(productId: Long): Flow<ProductResponse> {
+        return productsRemoteDataSource.getProductById(productId)
     }
 }

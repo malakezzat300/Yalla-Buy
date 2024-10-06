@@ -58,4 +58,6 @@ interface ProductService {
     @POST("draft_orders/{draft_order_id}/complete.json")
     suspend fun finalizeDraftOrder(@Path("draft_order_id") draftOrderId: Long): DraftOrderResponse
 
+    @GET("products/{id}.json")
+    suspend fun getProductById(@Path("id") productId: Long): ProductResponse
 }
