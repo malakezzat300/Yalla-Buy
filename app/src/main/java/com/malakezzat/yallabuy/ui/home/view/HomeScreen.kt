@@ -392,24 +392,38 @@ fun CategoriesSection(categories: List<CustomCollection>) {
 @Composable
 fun CategoryItem(category: CustomCollection) {
     Log.d(TAG, "4. ${category}")
-    Column(modifier = Modifier
-        .padding(15.dp)
-        .clip(RoundedCornerShape(8.dp))
-        .border(BorderStroke(5.dp, Color(0xFFE0E0E0)))
-        .background(color = Color.White)
-        .size(100.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center) {
-        Image(
-            painter = rememberAsyncImagePainter(category.image?.src),
-            contentDescription = "category item",
-            modifier = Modifier.size(40.dp)
-        )
-        Text(text = category.title,
-            style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
-            modifier = Modifier.padding(top = 4.dp))
+    Card(
+        modifier = Modifier
+            .padding(15.dp)
+            .size(100.dp),
+        shape = RoundedCornerShape(28.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        border = BorderStroke(1.dp, Color(0xFFE0E0E0))
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = rememberAsyncImagePainter(category.image?.src),
+                contentDescription = "category item",
+                modifier = Modifier.size(40.dp)
+                    .fillMaxSize()
+                ,
+                contentScale = ContentScale.FillWidth
+            )
+            Text(
+                text = category.title,
+                style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
     }
 }
+
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun LatestProductsSection(products: List<Product>,navController: NavController) {
