@@ -349,11 +349,18 @@ fun SignupScreen(viewModel: SignUpViewModel,
                     //showDialog=true
                 }else{
                     if(password == confirmPassword){
-                         isSuccess = auth.signInWithEmailAndPassword(email,password,fullName)
-                        Log.i("TAG", "SignupScreen: isSuccess ${auth.signInWithEmailAndPassword(email,password,fullName)}")
-                      if(!isSuccess){
-                        showDialog = true
-                      }
+                        isLoading = true
+//                         isSuccess = auth.signInWithEmailAndPassword(email,password,fullName)
+                        auth.signInWithEmailAndPassword(email,password,fullName, onSuccess = {
+                            showDialog = true
+                        }, onError = {m->
+                            Toast.makeText(context,m,Toast.LENGTH_LONG).show()
+                            isLoading=false
+                        })
+                       // Log.i("TAG", "SignupScreen: isSuccess ${auth.signInWithEmailAndPassword(email,password,fullName)}")
+//                      if(!isSuccess){
+//                        showDialog = true
+//                      }
                     }else{
                         isLoading=false
                         Toast.makeText(context,"password and confirm password are not the same",Toast.LENGTH_LONG).show()

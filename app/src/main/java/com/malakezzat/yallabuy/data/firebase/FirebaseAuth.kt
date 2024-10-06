@@ -21,8 +21,58 @@ import com.malakezzat.yallabuy.ui.Screen
 
 class FirebaseAuthun {
     private val mAuth = FirebaseAuth.getInstance()
-    fun signInWithEmailAndPassword(email: String, password: String, name: String) : Boolean {
-        var isSuccess = false
+//    fun signInWithEmailAndPassword(email: String, password: String, name: String) : Boolean {
+//        var isSuccess = false
+//        mAuth.createUserWithEmailAndPassword(email, password)
+//            .addOnCompleteListener { task ->
+//                if (task.isSuccessful) {
+//                    val user = mAuth.currentUser
+//                    val profileUpdates = UserProfileChangeRequest.Builder()
+//                        .setDisplayName(name)
+//                        .build()
+//                    user?.updateProfile(profileUpdates)
+//                        ?.addOnCompleteListener { profileUpdateTask ->
+//                            if (profileUpdateTask.isSuccessful) {
+//                                user.sendEmailVerification()
+//                                    .addOnCompleteListener { verificationTask ->
+//                                        if (verificationTask.isSuccessful) {
+//                                            isSuccess=true
+//                                            Log.i("UserIsSuccessfullyCreated", "username: $name")
+//
+//                                        }
+//                                    }
+//                            } else {
+//                                Log.e(
+//                                    "CreateUser",
+//                                    "Failedtoupdateuserprofile: ${profileUpdateTask.exception?.message}"
+//                                )
+//                            }
+//                        }
+//
+//                } else {
+//                    try {
+//                        throw task.exception!!
+//                    } catch (e: FirebaseAuthWeakPasswordException) {
+//                        Log.e("CreateUser", "Weak password.")
+//                    } catch (e: FirebaseAuthInvalidCredentialsException) {
+//                        Log.e("CreateUser", "Invalid email.")
+//                    } catch (e: FirebaseAuthUserCollisionException) {
+//                        Log.e("CreateUser", "User already exists.")
+//                    } catch (e: Exception) {
+//                        Log.e("CreateUser", "Error: ${e.message}")
+//                    }
+//                }
+//            }
+//        return isSuccess
+//    }
+
+    fun signInWithEmailAndPassword(
+        email: String,
+        password: String,
+        name: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
         mAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -30,42 +80,42 @@ class FirebaseAuthun {
                     val profileUpdates = UserProfileChangeRequest.Builder()
                         .setDisplayName(name)
                         .build()
+
                     user?.updateProfile(profileUpdates)
                         ?.addOnCompleteListener { profileUpdateTask ->
                             if (profileUpdateTask.isSuccessful) {
                                 user.sendEmailVerification()
                                     .addOnCompleteListener { verificationTask ->
                                         if (verificationTask.isSuccessful) {
-                                            isSuccess=true
-                                            Log.i("UserIsSuccessfullyCreated", "username: $name")
-
+                                            Log.i("UserCreated", "User successfully created with name: $name")
+                                            onSuccess()
+                                        } else {
+                                            onError("Failed to send verification email.")
                                         }
                                     }
                             } else {
-                                Log.e(
-                                    "CreateUser",
-                                    "Failedtoupdateuserprofile: ${profileUpdateTask.exception?.message}"
-                                )
+                                onError("Failed to update user profile: ${profileUpdateTask.exception?.message}")
                             }
                         }
-
                 } else {
                     try {
                         throw task.exception!!
                     } catch (e: FirebaseAuthWeakPasswordException) {
-                        Log.e("CreateUser", "Weak password.")
+                        Log.e("SignIn", "Weak password.")
+                        onError("Weak password.")
                     } catch (e: FirebaseAuthInvalidCredentialsException) {
-                        Log.e("CreateUser", "Invalid email.")
+                        Log.e("SignIn", "Invalid email.")
+                        onError("Invalid email.")
                     } catch (e: FirebaseAuthUserCollisionException) {
-                        Log.e("CreateUser", "User already exists.")
+                        Log.e("SignIn", "User already exists.")
+                        onError("User already exists.")
                     } catch (e: Exception) {
-                        Log.e("CreateUser", "Error: ${e.message}")
+                        Log.e("SignIn", "Error: ${e.message}")
+                        onError("Error: ${e.message}")
                     }
                 }
             }
-        return isSuccess
     }
-
     fun logInWithEmailAndPassword(
         email: String,
         password: String,
