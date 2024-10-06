@@ -43,7 +43,7 @@ class PaymentRemoteDataSourceImpl : PaymentRemoteDataSource {
             val response = paymentService.getPaymentKey(paymentKeyRequest)
             response.token
         } catch (e: Exception) {
-            Log.i("paymentTestLog", "createOrder: $e")
+            Log.i("paymentTestLog", "getPaymentKey: $e")
             null
         }
     }

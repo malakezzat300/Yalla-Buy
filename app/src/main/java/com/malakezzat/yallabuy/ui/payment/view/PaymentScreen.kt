@@ -13,6 +13,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,6 +31,8 @@ fun PaymentScreen(onPaymentSuccess: () -> Unit,
                   navController: NavController,
                   paymentKey : String?
 ) {
+    var cardNumber by remember { mutableStateOf("") }
+    Log.i("paymentTest", "PaymentScreen: $paymentKey")
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -37,9 +43,9 @@ fun PaymentScreen(onPaymentSuccess: () -> Unit,
         Text(text = "Enter Payment Details", style = MaterialTheme.typography.headlineLarge)
 
         OutlinedTextField(
-            value = "",
+            value = cardNumber,
             onValueChange = {
-
+                cardNumber = it
             },
             label = { Text("Card Number") },
             modifier = Modifier.fillMaxWidth()

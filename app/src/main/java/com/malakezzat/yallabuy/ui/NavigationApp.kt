@@ -67,6 +67,7 @@ fun NavigationApp(
             }
         }
         ) { paddingValues ->
+
             NavHost(navController = navController, startDestination = Screen.SplashScreen.route, Modifier.padding(paddingValues)) {
                 composable(Screen.SplashScreen.route) {
                     SplashScreen(navController)
@@ -91,7 +92,7 @@ fun NavigationApp(
                     route = Screen.CheckoutScreen.route,
                     arguments = listOf(navArgument("orderId") { type = NavType.StringType })
                 ) { backStackEntry ->
-                    val orderId = backStackEntry.arguments?.getString("orderId")
+                    val orderId = backStackEntry.arguments?.getString("orderId") ?: return@composable
                     val viewModel: PaymentViewModel = viewModel(factory = paymentViewModelFactory)
                     CheckoutView(viewModel, navController, orderId)
                 }
