@@ -17,6 +17,7 @@ import retrofit2.http.Path
 
 interface ProductsRemoteDataSource {
     suspend fun getAllProducts(): Flow<List<Product>>
+    suspend fun getProductsByCategory(id:Long): Flow<List<Product>>
     suspend fun getCategories(): Flow<List<CustomCollection>>
     suspend fun getBrands(): Flow<List<SmartCollection>>
 

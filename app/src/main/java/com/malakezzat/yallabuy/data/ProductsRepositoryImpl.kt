@@ -41,6 +41,10 @@ class ProductsRepositoryImpl private constructor(
         return productsRemoteDataSource.getAllProducts()
     }
 
+    override suspend fun getProductsByCategory(id: Long): Flow<List<Product>> {
+        return productsRemoteDataSource.getProductsByCategory(id)
+    }
+
     override suspend fun getCategories(): Flow<List<CustomCollection>> {
         return productsRemoteDataSource.getCategories()
     }
