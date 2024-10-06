@@ -1,4 +1,4 @@
-package com.malakezzat.yallabuy.data.remot.coupons
+package com.malakezzat.yallabuy.data.remote.coupons
 
 data class PriceRule(
     val id: Long? = null,

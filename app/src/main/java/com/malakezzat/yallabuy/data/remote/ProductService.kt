@@ -1,10 +1,9 @@
-package com.malakezzat.yallabuy.data.remot
+package com.malakezzat.yallabuy.data.remote
 
 
-import com.malakezzat.yallabuy.data.remot.coupons.DiscountCodeResponse
-import com.malakezzat.yallabuy.data.remot.coupons.priceRuleResponse
+import com.malakezzat.yallabuy.data.remote.coupons.DiscountCodeResponse
+import com.malakezzat.yallabuy.data.remote.coupons.priceRuleResponse
 import com.malakezzat.yallabuy.model.Category
-import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.ProductResponse
 import com.malakezzat.yallabuy.model.ProductsResponse
 import retrofit2.http.Body

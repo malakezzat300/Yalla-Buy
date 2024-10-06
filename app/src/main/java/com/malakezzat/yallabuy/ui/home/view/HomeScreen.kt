@@ -37,7 +37,6 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DismissibleNavigationDrawer
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -68,12 +67,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.malakezzat.yallabuy.R
-import com.malakezzat.yallabuy.data.remot.ApiState
-import com.malakezzat.yallabuy.model.Category
+import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 
 private val TAG = "HomeScreen"

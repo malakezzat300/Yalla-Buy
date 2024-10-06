@@ -1,11 +1,8 @@
 package com.example.yallabuyadmin.coupons.model
 
-import android.util.Log
-import com.malakezzat.yallabuy.data.remot.ProductService
-import com.malakezzat.yallabuy.data.remot.coupons.DiscountCode
-import com.malakezzat.yallabuy.data.remot.coupons.DiscountCodeResponse
-import com.malakezzat.yallabuy.data.remot.coupons.PriceRule
-import com.malakezzat.yallabuy.data.remot.coupons.priceRuleResponse
+import com.malakezzat.yallabuy.data.remote.ProductService
+import com.malakezzat.yallabuy.data.remote.coupons.DiscountCode
+import com.malakezzat.yallabuy.data.remote.coupons.PriceRule
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
