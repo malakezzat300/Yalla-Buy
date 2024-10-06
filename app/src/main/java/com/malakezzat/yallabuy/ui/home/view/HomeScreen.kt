@@ -82,7 +82,7 @@ import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
 import kotlinx.coroutines.delay
 
-private val TAG = "HomeScreen"
+val TAG = "HomeScreen"
 
 @Composable
 fun HomeScreen(
@@ -635,14 +635,14 @@ fun BottomNavigationBar(navController: NavController) {
                 )
             },
             label = { Text("Categories", style = TextStyle(fontSize = 11.5.sp)) },
-            selected = false /*currentRoute == Screen.CategoriesScreen.route*/,
+            selected = currentRoute == Screen.CategoriesScreen.route,
             onClick = {
-                /*if (currentRoute != Screen.CategoriesScreen.route) {
+                if (currentRoute != Screen.CategoriesScreen.route) {
                     navController.popBackStack(Screen.CategoriesScreen.route, inclusive = false)
                     navController.navigate(Screen.CategoriesScreen.route) {
                         launchSingleTop = true
                     }
-                }*/
+                }
             }
         )
         BottomNavigationItem(
