@@ -48,7 +48,8 @@ fun NavigationApp(
                 BottomNavigationBar(navController)
             }
         ) { paddingValues ->
-            NavHost(navController = navController, startDestination = Screen.HomeScreen.route, Modifier.padding(paddingValues)) {
+            //Screen.CheckoutScreen.route.replace("{orderId}", "test")
+            NavHost(navController = navController, startDestination = Screen.OrderScreen.route, Modifier.padding(paddingValues)) {
                 composable(Screen.HomeScreen.route) {
                     val viewModel: HomeScreenViewModel = viewModel(factory = homeScreenViewModelFactory)
                     HomeScreen(viewModel = viewModel, navController)
@@ -69,7 +70,7 @@ fun NavigationApp(
                     route = Screen.CheckoutScreen.route,
                     arguments = listOf(navArgument("orderId") { type = NavType.StringType })
                 ) { backStackEntry ->
-                    val orderId = backStackEntry.arguments?.getString("orderId")
+                    val orderId = backStackEntry.arguments?.getString("orderId") ?: return@composable
                     val viewModel: PaymentViewModel = viewModel(factory = paymentViewModelFactory)
                     CheckoutView(viewModel, navController, orderId)
                 }
