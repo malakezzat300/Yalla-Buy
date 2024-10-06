@@ -17,6 +17,9 @@ import com.malakezzat.yallabuy.ui.auth.viewmodel.SignUpViewModel
 import com.malakezzat.yallabuy.ui.auth.viewmodel.SignUpViewModelFactory
 import com.malakezzat.yallabuy.ui.auth.viewmodel.login.LogInViewModel
 import com.malakezzat.yallabuy.ui.auth.viewmodel.login.LogInViewModelFactory
+import com.malakezzat.yallabuy.ui.categories.view.CategoriesScreen
+import com.malakezzat.yallabuy.ui.categories.viewmodel.CategoriesViewModel
+import com.malakezzat.yallabuy.ui.categories.viewmodel.CategoriesViewModelFactory
 import com.malakezzat.yallabuy.ui.home.view.BottomNavigationBar
 import com.malakezzat.yallabuy.ui.home.view.HomeScreen
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
@@ -45,6 +48,7 @@ fun NavigationApp(
     searchViewModelFactory: SearchViewModelFactory,
     shoppingCartViewModelFactory: ShoppingCartViewModelFactory,
     productInfoViewModelFactory: ProductInfoViewModelFactory,
+    categoriesViewModelFactory: CategoriesViewModelFactory,
     navController: NavHostController = rememberNavController()
 ) {
     val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -68,13 +72,17 @@ fun NavigationApp(
         }
         ) { paddingValues ->
 
-            NavHost(navController = navController, startDestination = Screen.SplashScreen.route, Modifier.padding(paddingValues)) {
+            NavHost(navController = navController, startDestination = Screen.HomeScreen.route, Modifier.padding(paddingValues)) {
                 composable(Screen.SplashScreen.route) {
                     SplashScreen(navController)
                 }
                 composable(Screen.HomeScreen.route) {
                     val viewModel: HomeScreenViewModel = viewModel(factory = homeScreenViewModelFactory)
                     HomeScreen(viewModel = viewModel, navController)
+                }
+                composable(Screen.CategoriesScreen.route) {
+                    val viewModel: CategoriesViewModel = viewModel(factory = categoriesViewModelFactory)
+                    CategoriesScreen(viewModel = viewModel, navController)
                 }
                 composable(Screen.SignUpScreen.route) {
                     val viewModel: SignUpViewModel = viewModel(factory = signUpViewModelFactory)
