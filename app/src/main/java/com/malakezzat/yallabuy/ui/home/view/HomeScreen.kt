@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.rememberAsyncImagePainter
 import com.malakezzat.yallabuy.R
@@ -91,7 +92,7 @@ fun HomeScreen(
         viewModel.getAllCategories()
     }
     Scaffold(
-        topBar = { CustomTopBar() },
+        topBar = { CustomTopBar(navController) },
       //  bottomBar = { BottomNavigationBar(navController) }
     ) {
         Column(
@@ -176,9 +177,9 @@ fun BrandsChips(brands: List<String>) {
 }
 
 
-@Preview(showBackground = true, showSystemUi = true)
+//@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun CustomTopBar() {
+fun CustomTopBar(navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -202,7 +203,7 @@ fun CustomTopBar() {
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { /* Search Action */ }) {
+            IconButton(onClick = {navController.navigate(Screen.SearchScreen.route)}) {
                 Image(
                     painter = painterResource(id = R.drawable.search_normal),
                     contentDescription = "Search Icon",
@@ -551,7 +552,14 @@ fun BottomNavigationBar(navController: NavController) {
             },
             label = { Text("Home", style = TextStyle(fontSize = 12.sp)) },
             selected = currentRoute == Screen.HomeScreen.route,
-            onClick = { navController.navigate(Screen.HomeScreen.route){ launchSingleTop = true }  }
+            onClick = {
+                if (currentRoute != Screen.HomeScreen.route) {
+                    navController.popBackStack(Screen.HomeScreen.route, inclusive = false)
+                    navController.navigate(Screen.HomeScreen.route) {
+                        launchSingleTop = true
+                    }
+                }
+            }
         )
         BottomNavigationItem(
             icon = {
@@ -562,8 +570,15 @@ fun BottomNavigationBar(navController: NavController) {
                 )
             },
             label = { Text("Categories", style = TextStyle(fontSize = 11.5.sp)) },
-            selected = false /*currentRoute == Screen.CategoriesScreen.route*/,
-            onClick = { /*navController.navigate(Screen.CategoriesScreen.route)*/ }
+            selected =false /*currentRoute == Screen.CategoriesScreen.route*/,
+            onClick = {
+                /*if (currentRoute != Screen.CategoriesScreen.route) {
+                    navController.popBackStack(Screen.CategoriesScreen.route, inclusive = false)
+                    navController.navigate(Screen.CategoriesScreen.route) {
+                        launchSingleTop = true
+                    }
+                }*/
+            }
         )
         BottomNavigationItem(
             icon = {
@@ -575,7 +590,14 @@ fun BottomNavigationBar(navController: NavController) {
             },
             label = { Text("My Cart", style = TextStyle(fontSize = 12.sp)) },
             selected = currentRoute == Screen.ShoppingScreen.route,
-            onClick = { navController.navigate(Screen.ShoppingScreen.route){ launchSingleTop = true }  }
+            onClick = {
+                if (currentRoute != Screen.ShoppingScreen.route) {
+                    navController.popBackStack(Screen.ShoppingScreen.route, inclusive = false)
+                    navController.navigate(Screen.ShoppingScreen.route) {
+                        launchSingleTop = true
+                    }
+                }
+            }
         )
         BottomNavigationItem(
             icon = {
@@ -586,8 +608,15 @@ fun BottomNavigationBar(navController: NavController) {
                 )
             },
             label = { Text("Wishlist", style = TextStyle(fontSize = 12.sp)) },
-            selected = false /*currentRoute == Screen.WishlistScreen.route*/,
-            onClick = { /*navController.navigate(Screen.WishlistScreen.route)*/ }
+            selected =false /*currentRoute == Screen.WishlistScreen.route*/,
+            onClick = {
+                /*if (currentRoute != Screen.WishlistScreen.route) {
+                    navController.popBackStack(Screen.WishlistScreen.route, inclusive = false)
+                    navController.navigate(Screen.WishlistScreen.route) {
+                        launchSingleTop = true
+                    }
+                }*/
+            }
         )
         BottomNavigationItem(
             icon = {
@@ -598,8 +627,15 @@ fun BottomNavigationBar(navController: NavController) {
                 )
             },
             label = { Text("Profile", style = TextStyle(fontSize = 12.sp)) },
-            selected = false /*currentRoute == Screen.ProfileScreen.route*/,
-            onClick = { /*navController.navigate(Screen.ProfileScreen.route)*/ }
+            selected =false /*currentRoute == Screen.ProfileScreen.route*/,
+            onClick = {
+                /*if (currentRoute != Screen.ProfileScreen.route) {
+                    navController.popBackStack(Screen.ProfileScreen.route, inclusive = false)
+                    navController.navigate(Screen.ProfileScreen.route) {
+                        launchSingleTop = true
+                    }
+                }*/
+            }
         )
     }
 }
