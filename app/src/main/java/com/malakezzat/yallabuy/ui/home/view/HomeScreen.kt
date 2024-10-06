@@ -13,6 +13,7 @@ import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -173,7 +174,17 @@ fun HomeScreen(
 @Composable
 fun BrandsList(brands: List<SmartCollection>) {
     Column(modifier = Modifier.padding(16.dp)) {
-        Text("Brands", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text("Brands", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
+            Text(
+                "SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
+                color = Color.Cyan
+            )
+        }
         LazyRow(
             modifier = Modifier.padding(top = 8.dp)
         ) {
@@ -398,10 +409,6 @@ fun CategoriesSection(categories: List<CustomCollection>) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text("Categories", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
-            Text(
-                "SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
-                color = Color.Cyan
-            )
         }
         LazyRow(
             modifier = Modifier.padding(top = 8.dp),
@@ -421,16 +428,14 @@ fun CategoryItem(category: CustomCollection) {
     Log.d(TAG, "4. ${category}")
     Card(
         modifier = Modifier
-            .padding(15.dp)
-            .size(100.dp),
+            .size(200.dp),
         shape = RoundedCornerShape(28.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         border = BorderStroke(1.dp, Color(0xFFE0E0E0))
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -438,18 +443,20 @@ fun CategoryItem(category: CustomCollection) {
                 painter = rememberAsyncImagePainter(category.image?.src),
                 contentDescription = "category item",
                 modifier = Modifier
-                    .size(40.dp)
-                    .fillMaxSize(),
-                contentScale = ContentScale.FillWidth
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .clip(RoundedCornerShape(28.dp)),
+                contentScale = ContentScale.Crop
             )
             Text(
                 text = category.title,
                 style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
-                modifier = Modifier.padding(top = 4.dp)
+                modifier = Modifier.padding(top = 10.dp, bottom = 10.dp)
             )
         }
     }
 }
+
 
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -480,8 +487,10 @@ fun LatestProductsSection(products: List<Product>, navController: NavController)
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+                contentPadding = PaddingValues(0.dp)
+
             ) {
                 itemsIndexed(products) { _, product ->
                     ProductCard(product = product, navController)
@@ -494,49 +503,56 @@ fun LatestProductsSection(products: List<Product>, navController: NavController)
 
 @Composable
 fun ProductCard(product: Product, navController: NavController) {
-    Box(
+    Card(
         modifier = Modifier
             .width(150.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFFF7F7F7))
-            .padding(14.dp)
             .clickable {
                 navController.navigate("${Screen.ProductInfScreen.route}/${product.id}")
-            }
+            },
+        shape = RoundedCornerShape(30.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+
     ) {
-        // Background image of the product
-        product.images.firstOrNull()?.let { image ->
+        Box {
+            // Background image of the product
+            product.images.firstOrNull()?.let { image ->
+                Image(
+                    painter = rememberAsyncImagePainter(image.src),
+                    contentDescription = "Product Image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .clip(RoundedCornerShape(30.dp)), // Clip the image to match the card shape
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            // Wishlist icon positioned at the top right corner
             Image(
-                painter = rememberAsyncImagePainter(image.src),
-                contentDescription = "Product Image",
+                painter = painterResource(id = R.drawable.wishlist),
+                contentDescription = "wishlist",
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp),
-                contentScale = ContentScale.Crop
+                    .size(40.dp)
+                    .align(Alignment.TopEnd)
+                    .padding(5.dp)
             )
-        }
 
-        // Wishlist icon positioned at the top right corner
-        Image(
-            painter = painterResource(id = R.drawable.wishlist),
-            contentDescription = "wishlist",
-            modifier = Modifier
-                .size(40.dp) // Adjust size as needed
-                .align(Alignment.TopEnd) // Align the image to the top end corner
-                .padding(5.dp) // Add padding around the image
-        )
-
-        // Column for product details
-        Column(
-            modifier = Modifier.padding(top = 110.dp) // Ensure text does not overlap with the image
-        ) {
-            Text(product.title, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
-            Text(product.vendor, color = Color.Green)
-            val price = product.variants.first().price
-            Text("Price: $${price}")
+            // Column for product details
+            Column(
+                modifier = Modifier
+                    .padding(top = 110.dp) // Ensure text does not overlap with the image
+                    .padding(10.dp) // Add some padding around the text
+            ) {
+                Text(product.title, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
+                Text(product.vendor, color = Color.Green)
+                val price = product.variants.first().price
+                Text("Price: $${price}")
+            }
         }
     }
 }
+
 
 
 @Preview(showBackground = true, showSystemUi = true)
