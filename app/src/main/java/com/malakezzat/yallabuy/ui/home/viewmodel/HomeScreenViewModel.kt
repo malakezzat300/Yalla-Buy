@@ -69,7 +69,8 @@ private val _brandsList = MutableStateFlow<ApiState<List<String>>>(ApiState.Load
                 }.catch { e->
                     _categoriesList.value = ApiState.Error(e.message?:"Unknown error")
                 }.collect{categories->
-                    _categoriesList.value = ApiState.Success(categories)
+                    val filteredCategories = categories.drop(1)
+                    _categoriesList.value = ApiState.Success(filteredCategories)
                     Log.i(TAG, "getAllCategories: ${categories.get(0).title}")
                 }
         }
