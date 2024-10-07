@@ -1,5 +1,6 @@
 package com.malakezzat.yallabuy.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -39,6 +40,9 @@ import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollecti
 import com.malakezzat.yallabuy.ui.search.SearchScreen
 import com.malakezzat.yallabuy.ui.search.SearchViewModel
 import com.malakezzat.yallabuy.ui.search.SearchViewModelFactory
+import com.malakezzat.yallabuy.ui.settings.view.AddressScreen
+import com.malakezzat.yallabuy.ui.settings.view.MapScreen
+import com.malakezzat.yallabuy.ui.settings.view.SettingsScreen
 import com.malakezzat.yallabuy.ui.shoppingcart.view.ShoppingCartScreen
 import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModel
 import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModelFactory
@@ -64,7 +68,9 @@ fun NavigationApp(
         Screen.SplashScreen.route,
         Screen.LogInScreen.route,
         Screen.SignUpScreen.route,
-        Screen.SearchScreen.route
+        Screen.SearchScreen.route,
+//        Screen.AddressScreen.route,
+//        Screen.MapScreen.route
     )
 
     // Using Scaffold to manage layout
@@ -77,7 +83,7 @@ fun NavigationApp(
         }
         ) { paddingValues ->
 
-            NavHost(navController = navController, startDestination = Screen.SplashScreen.route, Modifier.padding(paddingValues)) {
+            NavHost(navController = navController, startDestination = Screen.HomeScreen.route, Modifier.padding(paddingValues)) {
                 composable(Screen.SplashScreen.route) {
                     SplashScreen(navController)
                 }
@@ -151,7 +157,32 @@ fun NavigationApp(
                     val viewModel: ProductInfoViewModel = viewModel(factory = productInfoViewModelFactory)
                     ProductInfoScreen(productId = productId, viewModel = viewModel, navController = navController)
                 }
-
+                composable( route = Screen.SettingsScreen.route
+                ) {
+                    val viewModel: ProductInfoViewModel = viewModel(factory = productInfoViewModelFactory)
+                    SettingsScreen(navController)
+                }
+                composable(
+                    route = Screen.AddressScreen.route,
+                    arguments = listOf(
+                        navArgument("address") { type = NavType.StringType }
+                    )
+                    ) { backStackEntry ->
+                    val address = backStackEntry.arguments?.getString("address") ?: " "
+                    val viewModel: ShoppingCartViewModel = viewModel(factory = shoppingCartViewModelFactory)
+                    AddressScreen(navController,address)
+                }
+                composable(
+                    route = Screen.MapScreen.route,
+                    arguments = listOf(
+                        navArgument("latitude") { type = NavType.FloatType },
+                        navArgument("longitude") { type = NavType.FloatType }
+                    )
+                ) { backStackEntry ->
+                    val latitude = backStackEntry.arguments?.getDouble("latitude") ?: 0.0
+                    val longitude = backStackEntry.arguments?.getDouble("longitude") ?: 0.0
+                    MapScreen(navController,latitude = latitude, longitude = longitude)
+                }
             }
         }
     }

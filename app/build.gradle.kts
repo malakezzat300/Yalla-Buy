@@ -63,6 +63,8 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.espresso.core)
     implementation(libs.firebase.auth)
+    implementation(libs.play.services.location)
+    implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -111,5 +113,8 @@ dependencies {
     //lottie
     implementation ("com.airbnb.android:lottie:5.0.3")
     implementation ("com.airbnb.android:lottie-compose:5.0.3")
+
+    //map
+    implementation ("org.osmdroid:osmdroid-android:6.1.11")
 
 }
