@@ -430,7 +430,7 @@ fun CategoryItem(category: CustomCollection,navController: NavController) {
         modifier = Modifier
             .size(200.dp)
             .clickable {
-                navController.navigate("${Screen.ProductsByCategoryScreen.route}/${category.id}")
+                navController.navigate("${Screen.ProductsByCategoryScreen.route}/${category.id.toString()}/${category.body_html}")
             },
         shape = RoundedCornerShape(28.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),

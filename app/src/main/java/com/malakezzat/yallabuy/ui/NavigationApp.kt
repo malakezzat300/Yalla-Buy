@@ -33,8 +33,8 @@ import com.malakezzat.yallabuy.ui.product_info.ProductInfoScreen
 import com.malakezzat.yallabuy.ui.product_info.ProductInfoViewModel
 import com.malakezzat.yallabuy.ui.product_info.ProductInfoViewModelFactory
 import com.malakezzat.yallabuy.ui.productbycategory.view.ProductsByCategoryScreen
-import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCategoryViewModel
-import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCategoryViewModelFactory
+import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollectionIdViewModel
+import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollectionIdViewModelFactory
 import com.malakezzat.yallabuy.ui.search.SearchScreen
 import com.malakezzat.yallabuy.ui.search.SearchViewModel
 import com.malakezzat.yallabuy.ui.search.SearchViewModelFactory
@@ -52,7 +52,7 @@ fun NavigationApp(
     shoppingCartViewModelFactory: ShoppingCartViewModelFactory,
     productInfoViewModelFactory: ProductInfoViewModelFactory,
     categoriesViewModelFactory: CategoriesViewModelFactory,
-    productsByCategoryViewModelFactory: ProductsByCategoryViewModelFactory,
+    productsByCollectionIdViewModelFactory: ProductsByCollectionIdViewModelFactory,
     navController: NavHostController = rememberNavController()
 ) {
     val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -88,10 +88,11 @@ fun NavigationApp(
                     val viewModel: CategoriesViewModel = viewModel(factory = categoriesViewModelFactory)
                     CategoriesScreen(viewModel = viewModel, navController)
                 }
-                composable("${Screen.ProductsByCategoryScreen.route}/{categoryId}") { backStackEntry ->
+                composable("${Screen.ProductsByCategoryScreen.route}/{categoryId}/{body_html}") { backStackEntry ->
                     val categoryId = backStackEntry.arguments?.getString("categoryId")
-                    val viewModel: ProductsByCategoryViewModel = viewModel(factory = productsByCategoryViewModelFactory)
-                    ProductsByCategoryScreen(viewModel = viewModel, navController)
+                    val bodyHtml = backStackEntry.arguments?.getString("body_html")
+                    val viewModel: ProductsByCollectionIdViewModel = viewModel(factory = productsByCollectionIdViewModelFactory)
+                    ProductsByCategoryScreen(viewModel = viewModel, navController, categoryId, bodyHtml)
                 }
 
                 composable(Screen.SignUpScreen.route) {

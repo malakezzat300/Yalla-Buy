@@ -5,15 +5,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import com.malakezzat.yallabuy.ui.categories.view.CustomTopBarCategory
-import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCategoryViewModel
+import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollectionIdViewModel
 
 @Composable
 fun ProductsByCategoryScreen(
-    viewModel: ProductsByCategoryViewModel,
-    navController: NavController
+    viewModel: ProductsByCollectionIdViewModel,
+    navController: NavController,
+    id: String?,
+    body: String?
 ) {
+    val categoryId: Long? = id?.toLongOrNull()
+    /*categoryId?.let {
+    }*/
     Scaffold(
-        topBar = { CustomTopBarCategory(navController,"Products By Category") },
+        topBar = { body?.let { CustomTopBarCategory(navController, it) } },
         containerColor = Color.White
     ) {
 

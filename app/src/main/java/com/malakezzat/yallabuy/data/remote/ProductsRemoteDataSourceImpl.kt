@@ -36,7 +36,7 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         emit(emptyList())
     }
 
-    override suspend fun getProductsByCategory(id: Long): Flow<List<Product>> = flow  {
+    override suspend fun getProductsByCollectionId(id: Long): Flow<List<Product>> = flow  {
         val response = productService.getProductsInCollection(id).products
         emit(response)
     }.catch { e ->
