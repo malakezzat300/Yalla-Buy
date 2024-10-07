@@ -36,6 +36,14 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         emit(emptyList())
     }
 
+    override suspend fun getProductsByCollectionId(id: Long): Flow<List<Product>> = flow  {
+        val response = productService.getProductsInCollection(id).products
+        emit(response)
+    }.catch { e ->
+        Log.e(TAG, "Error fetching products", e)
+        emit(emptyList())
+    }
+
     override suspend fun getCategories(): Flow<List<CustomCollection>> = flow {
         val response = productService.getCategories().custom_collections
         emit(response)

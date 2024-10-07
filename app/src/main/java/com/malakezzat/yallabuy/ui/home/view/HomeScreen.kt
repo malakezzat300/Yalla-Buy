@@ -82,7 +82,7 @@ import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
 import kotlinx.coroutines.delay
 
-private val TAG = "HomeScreen"
+val TAG = "HomeScreen"
 
 @Composable
 fun HomeScreen(
@@ -136,7 +136,7 @@ fun HomeScreen(
                 is ApiState.Success -> {
                     val categories =
                         (categoriesState as ApiState.Success<List<CustomCollection>>).data
-                    CategoriesSection(categories)
+                    CategoriesSection(categories,navController)
                     Log.d(TAG, "$categoriesState")
                 }
 
@@ -399,7 +399,7 @@ fun CouponsCard(code: String?) {
 
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun CategoriesSection(categories: List<CustomCollection>) {
+fun CategoriesSection(categories: List<CustomCollection>,navController: NavController) {
     //categories: List<CustomCollection>
     Log.d(TAG, "3. ${categories}")
     Column(modifier = Modifier.padding(16.dp)) {
@@ -415,7 +415,7 @@ fun CategoriesSection(categories: List<CustomCollection>) {
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             itemsIndexed(categories) { index, category ->
-                CategoryItem(category)
+                CategoryItem(category,navController)
             }
         }
     }
@@ -424,11 +424,14 @@ fun CategoriesSection(categories: List<CustomCollection>) {
 
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun CategoryItem(category: CustomCollection) {
+fun CategoryItem(category: CustomCollection,navController: NavController) {
     Log.d(TAG, "4. ${category}")
     Card(
         modifier = Modifier
-            .size(200.dp),
+            .size(200.dp)
+            .clickable {
+                navController.navigate("${Screen.ProductsByCategoryScreen.route}/${category.id.toString()}/${category.body_html}")
+            },
         shape = RoundedCornerShape(28.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -635,14 +638,14 @@ fun BottomNavigationBar(navController: NavController) {
                 )
             },
             label = { Text("Categories", style = TextStyle(fontSize = 11.5.sp)) },
-            selected = false /*currentRoute == Screen.CategoriesScreen.route*/,
+            selected = currentRoute == Screen.CategoriesScreen.route,
             onClick = {
-                /*if (currentRoute != Screen.CategoriesScreen.route) {
+                if (currentRoute != Screen.CategoriesScreen.route) {
                     navController.popBackStack(Screen.CategoriesScreen.route, inclusive = false)
                     navController.navigate(Screen.CategoriesScreen.route) {
                         launchSingleTop = true
                     }
-                }*/
+                }
             }
         )
         BottomNavigationItem(

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ProductsRepository {
     suspend fun getAllProducts(): Flow<List<Product>>
+    suspend fun getProductsByCollectionId(id:Long): Flow<List<Product>>
     suspend fun getCategories(): Flow<List<CustomCollection>>
     suspend fun getBrands(): Flow<List<SmartCollection>>
     fun getPriceRules(): Flow<List<PriceRule>>

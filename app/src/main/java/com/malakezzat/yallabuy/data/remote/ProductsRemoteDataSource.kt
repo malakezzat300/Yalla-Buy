@@ -8,15 +8,10 @@ import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.ProductResponse
 import com.malakezzat.yallabuy.model.SmartCollection
 import kotlinx.coroutines.flow.Flow
-import retrofit2.http.Body
-import retrofit2.http.DELETE
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.PUT
-import retrofit2.http.Path
 
 interface ProductsRemoteDataSource {
     suspend fun getAllProducts(): Flow<List<Product>>
+    suspend fun getProductsByCollectionId(id:Long): Flow<List<Product>>
     suspend fun getCategories(): Flow<List<CustomCollection>>
     suspend fun getBrands(): Flow<List<SmartCollection>>
 

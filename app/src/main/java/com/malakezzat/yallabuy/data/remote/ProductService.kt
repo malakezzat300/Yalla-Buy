@@ -28,6 +28,11 @@ interface ProductService {
     @GET("custom_collections.json")
     suspend fun getCategories(): Category
 
+    @GET("collections/{collection_id}/products.json") //collections/841564295/products.json
+    suspend fun getProductsInCollection(
+        @Path("collection_id") collectionId: Long
+    ): ProductsResponse
+
     @GET("smart_collections.json")
     suspend fun getBrands(): Brands
 
