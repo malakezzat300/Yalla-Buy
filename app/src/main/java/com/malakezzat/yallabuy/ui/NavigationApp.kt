@@ -32,6 +32,7 @@ import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModelFactory
 import com.malakezzat.yallabuy.ui.product_info.ProductInfoScreen
 import com.malakezzat.yallabuy.ui.product_info.ProductInfoViewModel
 import com.malakezzat.yallabuy.ui.product_info.ProductInfoViewModelFactory
+import com.malakezzat.yallabuy.ui.productbycategory.view.ProductsByBrandScreen
 import com.malakezzat.yallabuy.ui.productbycategory.view.ProductsByCategoryScreen
 import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollectionIdViewModel
 import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollectionIdViewModelFactory
@@ -94,7 +95,12 @@ fun NavigationApp(
                     val viewModel: ProductsByCollectionIdViewModel = viewModel(factory = productsByCollectionIdViewModelFactory)
                     ProductsByCategoryScreen(viewModel = viewModel, navController, categoryId, bodyHtml)
                 }
-
+                composable("${Screen.ProductsByBrandScreen.route}/{categoryId}/{body_html}") { backStackEntry ->
+                    val categoryId = backStackEntry.arguments?.getString("categoryId")
+                    val bodyHtml = backStackEntry.arguments?.getString("body_html")
+                    val viewModel: ProductsByCollectionIdViewModel = viewModel(factory = productsByCollectionIdViewModelFactory)
+                    ProductsByBrandScreen(viewModel = viewModel, navController, categoryId, bodyHtml)
+                }
                 composable(Screen.SignUpScreen.route) {
                     val viewModel: SignUpViewModel = viewModel(factory = signUpViewModelFactory)
                     SignupScreen(viewModel, navController)

@@ -36,7 +36,7 @@ class ProductsByCollectionIdViewModel(private val repository: ProductsRepository
                 //val brands = productList.map { it.vendor }.distinct()
                 // _brandsList.value = ApiState.Success(brands)
 
-                Log.i(TAG, "getProductsByCollectionId: ${productList.get(2)}")
+                Log.i(TAG, "getProductsByCollectionId: ${productList.size}")
                 // Log.i(TAG, "Brands: $brands")
             }
         }
