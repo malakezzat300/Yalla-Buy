@@ -92,4 +92,7 @@ class ProductsRepositoryImpl private constructor(
     override suspend fun getCustomerByEmail(customer: String): Flow<CustomerSearchRespnse> {
         return productsRemoteDataSource.getCustomerByEmai(customer)
     }
+    override suspend fun getCustomerById(customer: Long): Flow<CustomerSearchRespnse> {
+        return productsRemoteDataSource.getCustomerById(customer)
+    }
 }

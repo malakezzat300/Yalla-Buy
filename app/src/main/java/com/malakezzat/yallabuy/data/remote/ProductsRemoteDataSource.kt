@@ -31,4 +31,5 @@ interface ProductsRemoteDataSource {
     suspend fun getProductById(id: Long) : Flow<ProductResponse>
     suspend fun createCustomer(customerRequest: CustomerRequest): Flow<CustomerResponse>
     suspend fun getCustomerByEmai(customer: String): Flow<CustomerSearchRespnse>
+    suspend fun getCustomerById(customerId: Long): Flow<CustomerSearchRespnse>
 }

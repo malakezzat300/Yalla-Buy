@@ -74,4 +74,9 @@ interface ProductService {
     suspend fun getCustomerByEmail(
         @Query("email") email: String
     ): CustomerSearchRespnse
+
+    @GET("customers/search.json")
+    suspend fun getCustomerById(
+        @Query("id") email: Long
+    ): CustomerSearchRespnse
 }

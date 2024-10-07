@@ -202,8 +202,7 @@ fun SignupScreen(viewModel: SignUpViewModel,
         // Create Account Button
         Button(
             onClick = {
-              //  viewModel.signInWithEmailAndPassword(email,password,fullName)
-                viewModel.getCustomerByEmail("sammaralaa33@gmail.com")
+                viewModel.getCustomerById(7716613128374)
                 when(customerData){
                     is ApiState.Error -> {
                         Log.i("TAG", "SignupScreen: customer by id failed")

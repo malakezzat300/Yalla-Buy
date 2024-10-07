@@ -108,9 +108,17 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         throw e
     }
 
-    override suspend fun getCustomerByEmai(customer: String) : Flow<CustomerSearchRespnse> = flow{
-        val response = productService.getCustomerByEmail(customer)
+    override suspend fun getCustomerByEmai(customerEmail: String) : Flow<CustomerSearchRespnse> = flow{
+        val response = productService.getCustomerByEmail(customerEmail)
         Log.i(TAG, "getCustomerByEmai: ${response}")
+        emit(response)
+    }.catch { e ->
+        Log.e(TAG, "Error creating customer ", e)
+        throw e
+    }
+    override suspend fun getCustomerById(customerId: Long) : Flow<CustomerSearchRespnse> = flow{
+        val response = productService.getCustomerById(customerId)
+        Log.i(TAG, "getCustomerById: ${response}")
         emit(response)
     }.catch { e ->
         Log.e(TAG, "Error creating customer ", e)

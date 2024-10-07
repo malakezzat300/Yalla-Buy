@@ -31,4 +31,5 @@ interface ProductsRepository {
     suspend fun getProductById(productId: Long): Flow<ProductResponse>
     suspend fun createCustomer(customerRequest: CustomerRequest): Flow<CustomerResponse>
     suspend fun getCustomerByEmail(customer: String): Flow<CustomerSearchRespnse>
+    suspend fun getCustomerById(customer: Long): Flow<CustomerSearchRespnse>
 }
