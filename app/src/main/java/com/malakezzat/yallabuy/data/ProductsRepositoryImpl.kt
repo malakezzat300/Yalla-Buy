@@ -6,6 +6,8 @@ import com.malakezzat.yallabuy.data.remote.coupons.DiscountCode
 import com.malakezzat.yallabuy.data.remote.coupons.PriceRule
 import com.malakezzat.yallabuy.data.sharedpref.GlobalSharedPreferenceDataSource
 import com.malakezzat.yallabuy.model.CustomCollection
+import com.malakezzat.yallabuy.model.CustomerRequest
+import com.malakezzat.yallabuy.model.CustomerResponse
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
@@ -79,7 +81,14 @@ class ProductsRepositoryImpl private constructor(
     override suspend fun finalizeDraftOrder(draftOrderId: Long): Flow<DraftOrderResponse> {
         return finalizeDraftOrder(draftOrderId)
     }
+
     override suspend fun getProductById(productId: Long): Flow<ProductResponse> {
         return productsRemoteDataSource.getProductById(productId)
+    }
+    override suspend fun createCustomer(customerRequest: CustomerRequest): Flow<CustomerResponse> {
+        return productsRemoteDataSource.createCustomer(customerRequest)
+    }
+    override suspend fun getCustomerByEmail(customer: String): Flow<CustomerResponse> {
+        return productsRemoteDataSource.getCustomerByEmai(customer)
     }
 }

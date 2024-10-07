@@ -30,6 +30,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,10 +49,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.firebase.FirebaseAuthun
+import com.malakezzat.yallabuy.model.Customer
+import com.malakezzat.yallabuy.model.CustomerRequest
+import com.malakezzat.yallabuy.model.Customerr
 import com.malakezzat.yallabuy.ui.auth.viewmodel.SignUpViewModel
 
 @Composable
@@ -63,7 +68,7 @@ fun SignupScreen(viewModel: SignUpViewModel,
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
-    var isSuccess by remember { mutableStateOf(false) }
+    val customerData by viewModel.customerData.collectAsStateWithLifecycle()
     var auth = FirebaseAuthun()
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
@@ -206,8 +211,15 @@ fun SignupScreen(viewModel: SignUpViewModel,
                         auth.signInWithEmailAndPassword(email,password,fullName, onSuccess = {
                             showDialog = true
                             /*create customer on API*/
+                            val customer = Customerr(
+                                first_name = fullName,
+                                last_name = "",
+                                email = email,
+                                phone = ""
+                            )
 
-
+                            val customerRequest = CustomerRequest(customer)
+                            viewModel.createCustomer(customerRequest)
 
 
                         }, onError = {m->

@@ -3,6 +3,8 @@ package com.malakezzat.yallabuy.data.remote
 import android.util.Log
 import com.malakezzat.yallabuy.data.remot.ProductService
 import com.malakezzat.yallabuy.model.CustomCollection
+import com.malakezzat.yallabuy.model.CustomerRequest
+import com.malakezzat.yallabuy.model.CustomerResponse
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
@@ -94,6 +96,22 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         emit(response)
     }.catch { e ->
         Log.e(TAG, "Error fetching Product by id", e)
+        throw e
+    }
+
+    override suspend fun createCustomer(customerRequest: CustomerRequest) : Flow<CustomerResponse> = flow{
+        val response = productService.createCustomer(customerRequest)
+        emit(response)
+    }.catch { e ->
+        Log.e(TAG, "Error creating customer ", e)
+        throw e
+    }
+
+    override suspend fun getCustomerByEmai(customer: String) : Flow<CustomerResponse> = flow{
+        val response = productService.getCustomerByEmail(customer)
+        emit(response)
+    }.catch { e ->
+        Log.e(TAG, "Error creating customer ", e)
         throw e
     }
 }

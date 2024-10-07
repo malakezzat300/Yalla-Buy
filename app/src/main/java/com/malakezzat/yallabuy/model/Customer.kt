@@ -22,5 +22,6 @@ data class CustomerDetails(
     val first_name: String?,
     val last_name: String?,
     val phone: String?,
-    val created_at: String
+    val created_at: String,
+    val orders_count:Int=0
 )
