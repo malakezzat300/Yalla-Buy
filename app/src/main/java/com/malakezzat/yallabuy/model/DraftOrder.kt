@@ -15,7 +15,7 @@ data class LineItem(
     val title: String,
     val price : String,
     val variant_id: Long,
-    val quantity: Int,
+    var quantity: Int,
     val properties : List<Property>
 )
 

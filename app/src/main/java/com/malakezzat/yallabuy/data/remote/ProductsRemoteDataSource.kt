@@ -11,7 +11,9 @@ import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.ProductResponse
 import com.malakezzat.yallabuy.model.SmartCollection
+import com.malakezzat.yallabuy.model.VariantResponse
 import kotlinx.coroutines.flow.Flow
+import retrofit2.http.Path
 
 interface ProductsRemoteDataSource {
     suspend fun getAllProducts(): Flow<List<Product>>
@@ -33,5 +35,5 @@ interface ProductsRemoteDataSource {
     suspend fun createCustomer(customerRequest: CustomerRequest): Flow<CustomerResponse>
     suspend fun getCustomerByEmai(customer: String): Flow<CustomerSearchRespnse>
     suspend fun getCustomerById(customerId: Long): Flow<CustomerSearchRespnse>
-
+    suspend fun getVariantById(variantId: Long): Flow<VariantResponse>
 }
