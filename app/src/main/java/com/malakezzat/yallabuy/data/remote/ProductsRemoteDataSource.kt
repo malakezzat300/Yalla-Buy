@@ -5,6 +5,7 @@ import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
 import com.malakezzat.yallabuy.model.CustomerSearchRespnse
 import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Product
@@ -20,10 +21,10 @@ interface ProductsRemoteDataSource {
 
     suspend fun getAllDraftOrders(): Flow<DraftOrdersResponse>
     suspend fun getDraftOrder(draftOrderId: Long): Flow<DraftOrderResponse>
-    suspend fun createDraftOrder(draftOrder: DraftOrder): Flow<DraftOrderResponse>
+    suspend fun createDraftOrder(draftOrder: DraftOrderRequest): Flow<DraftOrderResponse>
     suspend fun updateDraftOrder(
         draftOrderId: Long,
-        draftOrder: DraftOrder
+        draftOrder: DraftOrderRequest
     ): Flow<DraftOrderResponse>
 
     suspend fun deleteDraftOrder(draftOrderId: Long)

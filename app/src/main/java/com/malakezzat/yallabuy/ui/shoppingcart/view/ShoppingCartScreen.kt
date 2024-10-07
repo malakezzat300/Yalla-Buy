@@ -1,5 +1,8 @@
 package com.malakezzat.yallabuy.ui.shoppingcart.view
 
+import android.provider.Telephony.Mms.Draft
+import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -55,9 +58,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.malakezzat.yallabuy.data.ProductsRepository
+import com.malakezzat.yallabuy.data.remote.ApiState
+import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.DraftOrderRequest
+import com.malakezzat.yallabuy.model.LineItem
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModel
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -67,6 +76,27 @@ fun ShoppingCartScreen(
 ) {
 
     val bottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    var orderItems by remember { mutableStateOf( emptyList<LineItem>() ) }
+    var draftOrder by remember { mutableStateOf( DraftOrder() ) }
+    var isLoading by remember { mutableStateOf( false ) }
+    val shoppingCartOrder by viewModel.shoppingCartDraftOrder.collectAsState()
+    val visibleItems = remember { mutableStateListOf<LineItem>(*draftOrder.line_items.toTypedArray()) }
+
+    when(shoppingCartOrder){
+        is ApiState.Error ->{
+            isLoading = false
+            Log.i("shoppingCartTest", "ShoppingCartScreen: draftOrder ${(shoppingCartOrder as ApiState.Error).message}")
+        }
+        ApiState.Loading -> {
+            isLoading = true
+        }
+        is ApiState.Success -> {
+            isLoading = false
+            orderItems = (shoppingCartOrder as ApiState.Success).data.line_items
+            draftOrder = (shoppingCartOrder as ApiState.Success).data
+        }
+    }
+
 
     ModalBottomSheetLayout(
         sheetState = bottomSheetState,
@@ -83,15 +113,23 @@ fun ShoppingCartScreen(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(paddingValues)
+
                         ) {
+                            if(isLoading) {
+                                CircularProgressIndicator(modifier = Modifier.align(alignment = Alignment.Center))
+                            }
                             LazyColumn(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .align(Alignment.TopCenter)
                                     .padding(bottom = 230.dp)
                             ) {
-                                items(list.size) {
-                                    ShoppingItem()
+
+                                if(orderItems.isNotEmpty()){
+                                    items(orderItems.size) { index ->
+                                        val orderItem = orderItems[index]
+                                        ShoppingItem(viewModel,orderItem,draftOrder)
+                                    }
                                 }
                             }
 
@@ -120,7 +158,7 @@ fun CustomTopBar(sheetState: ModalBottomSheetState) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 38.dp, start = 10.dp, end = 10.dp, bottom = 10.dp),
+            .padding(top = 16.dp, start = 10.dp, end = 10.dp, bottom = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -165,92 +203,161 @@ fun CustomTopBar(sheetState: ModalBottomSheetState) {
 }
 
 @Composable
-fun ShoppingItem(){
-    Row(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth()
-            .height(140.dp)
-    ) {
-        Card(
+fun ShoppingItem(viewModel: ShoppingCartViewModel, item: LineItem, draftOrder: DraftOrder) {
+    var quantity by remember { mutableIntStateOf(item.quantity) }
+    val coroutineScope = rememberCoroutineScope()
+//    var isVisible by remember { mutableStateOf(true) }
+//    AnimatedVisibility(visible = isVisible) {
+        Row(
             modifier = Modifier
-                .weight(1.2f)
                 .padding(8.dp)
-                .fillMaxHeight(),
-            shape = RoundedCornerShape(12.dp),
-            elevation = CardDefaults.cardElevation(12.dp),
+                .fillMaxWidth()
+                .height(140.dp)
         ) {
-            Image(
+            Card(
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .clip(shape = RoundedCornerShape(10)),
-                painter = painterResource(R.drawable.ad2),
-                contentDescription = "ad",
-                contentScale = ContentScale.FillBounds,
-            )
-        }
-
-        Column(
-            modifier = Modifier
-                .padding(4.dp)
-                .weight(2f)
-                .fillMaxHeight(),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column {
-                Text(
-                    text = "Loop Silicone Strong Magnetic Watch Band",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(top = 4.dp,bottom = 4.dp)
-                )
-                Text(
-                    text = "$15.25",  // Second Text
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+                    .weight(1.2f)
+                    .padding(8.dp)
+                    .fillMaxHeight(),
+                shape = RoundedCornerShape(12.dp),
+                elevation = CardDefaults.cardElevation(12.dp),
             ) {
-                IconButton(
-                    onClick = { /* decrease action */ }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_minus),
-                        contentDescription = "minus",
-                    )
-                }
-
-                Text(
-                    text = "1",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
+                Image(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .clip(shape = RoundedCornerShape(10)),
+                    painter = rememberAsyncImagePainter(item.properties[0].value),
+                    contentDescription = "ad",
+                    contentScale = ContentScale.FillBounds,
                 )
+            }
 
-                IconButton(
-                    onClick = { /* increase action */ }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_add),
-                        contentDescription = "add",
+            Column(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .weight(2f)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        text = item.title,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
+                    )
+                    Text(
+                        text = item.price,
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
 
-                Spacer(modifier = Modifier.width(16.dp))
-
-                IconButton(
-                    onClick = { /* Delete action */ }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_delete),
-                        contentDescription = "Delete",
-                        tint = Color.Red
+                    IconButton(
+                        onClick = {
+                            val newQuantity = (quantity - 1).coerceAtLeast(1)
+                            quantity = newQuantity
+
+                            val updatedDraftItems = draftOrder.line_items.map { currentItem ->
+                                if (currentItem == item) {
+                                    currentItem.copy(quantity = newQuantity)
+                                } else {
+                                    currentItem
+                                }
+                            }
+                            val updatedDraftOrder = draftOrder.copy(line_items = updatedDraftItems)
+                            val updatedDraftItemsRequest = DraftOrderRequest(updatedDraftOrder)
+
+                            coroutineScope.launch {
+                                delay(200)
+                                draftOrder.id?.let {
+                                    viewModel.updateDraftOrder(
+                                        it,
+                                        updatedDraftItemsRequest
+                                    )
+                                }
+                            }
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_minus),
+                            contentDescription = "minus",
+                        )
+                    }
+
+                    Text(
+                        text = quantity.toString(),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
                     )
+
+                    IconButton(
+                        onClick = {
+                            val newQuantity = (quantity + 1).coerceAtMost(3)
+                            quantity = newQuantity
+
+                            val updatedDraftItems = draftOrder.line_items.map { currentItem ->
+                                if (currentItem == item) {
+                                    currentItem.copy(quantity = newQuantity)
+                                } else {
+                                    currentItem
+                                }
+                            }
+                            val updatedDraftOrder = draftOrder.copy(line_items = updatedDraftItems)
+                            val updatedDraftItemsRequest = DraftOrderRequest(updatedDraftOrder)
+
+                            coroutineScope.launch {
+                                delay(200)
+                                draftOrder.id?.let {
+                                    viewModel.updateDraftOrder(
+                                        it,
+                                        updatedDraftItemsRequest
+                                    )
+                                }
+                            }
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_add),
+                            contentDescription = "add",
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    IconButton(
+                        onClick = {
+                            if(draftOrder.line_items.size > 1) {
+                                //isVisible = false
+                                val updatedDraftItems = draftOrder.line_items.filter { it != item }
+                                val updatedDraftOrder =
+                                    draftOrder.copy(line_items = updatedDraftItems)
+                                val updatedDraftItemsRequest = DraftOrderRequest(updatedDraftOrder)
+                                draftOrder.id?.let {
+                                    viewModel.updateDraftOrder(
+                                        it,
+                                        updatedDraftItemsRequest
+                                    )
+                                }
+                            } else {
+                                //isVisible = false
+                                draftOrder.id?.let { viewModel.deleteDraftOrder(it) }
+                            }
+
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_delete),
+                            contentDescription = "Delete",
+                            tint = Color.Red
+                        )
+                    }
                 }
             }
-        }
+        //}
     }
 }
 
@@ -308,7 +415,8 @@ fun ShoppingView(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp)
-                    .height(56.dp),
+                    .height(56.dp)
+                    .align(Alignment.CenterHorizontally),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                 shape = RoundedCornerShape(10.dp)
             ) {

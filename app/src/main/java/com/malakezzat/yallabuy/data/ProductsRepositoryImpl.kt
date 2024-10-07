@@ -10,6 +10,7 @@ import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
 import com.malakezzat.yallabuy.model.CustomerSearchRespnse
 import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Product
@@ -73,13 +74,13 @@ class ProductsRepositoryImpl private constructor(
         return productsRemoteDataSource.getDraftOrder(draftOrderId)
     }
 
-    override suspend fun createDraftOrder(draftOrder: DraftOrder): Flow<DraftOrderResponse> {
+    override suspend fun createDraftOrder(draftOrder: DraftOrderRequest): Flow<DraftOrderResponse> {
         return productsRemoteDataSource.createDraftOrder(draftOrder)
     }
 
     override suspend fun updateDraftOrder(
         draftOrderId: Long,
-        draftOrder: DraftOrder
+        draftOrder: DraftOrderRequest
     ): Flow<DraftOrderResponse> {
         return productsRemoteDataSource.updateDraftOrder(draftOrderId,draftOrder)
     }

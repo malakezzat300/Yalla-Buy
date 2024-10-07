@@ -10,6 +10,7 @@ import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
 import com.malakezzat.yallabuy.model.CustomerSearchRespnse
 import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.ProductResponse
@@ -56,12 +57,12 @@ interface ProductService {
     suspend fun getDraftOrder(@Path("draft_order_id") draftOrderId: Long): DraftOrderResponse
 
     @POST("draft_orders.json")
-    suspend fun createDraftOrder(@Body draftOrder: DraftOrder): DraftOrderResponse
+    suspend fun createDraftOrder(@Body draftOrder: DraftOrderRequest): DraftOrderResponse
 
     @PUT("draft_orders/{draft_order_id}.json")
     suspend fun updateDraftOrder(
         @Path("draft_order_id") draftOrderId: Long,
-        @Body draftOrder: DraftOrder
+        @Body draftOrder: DraftOrderRequest
     ): DraftOrderResponse
 
     @DELETE("draft_orders/{draft_order_id}.json")
@@ -74,17 +75,17 @@ interface ProductService {
     suspend fun getProductById(@Path("id") productId: Long): ProductResponse
 
     @POST("customers.json")
-    suspend fun createCustomer(
-        @Body customerRequest: CustomerRequest
-    ): CustomerResponse
+    suspend fun createCustomer(@Body customerRequest: CustomerRequest): CustomerResponse
 
     @GET("customers/search.json")
-    suspend fun getCustomerByEmail(
-        @Query("email") email: String
-    ): CustomerSearchRespnse
+    suspend fun getCustomerByEmail(@Query("email") email: String): CustomerSearchRespnse
 
     @GET("customers/search.json")
-    suspend fun getCustomerById(
-        @Query("id") email: Long
-    ): CustomerSearchRespnse
+    suspend fun getCustomerById(@Query("id") email: Long): CustomerSearchRespnse
+
+    //customers/207119551/orders.json
+    @GET("customers/{id}/orders.json")
+    suspend fun getAllOrdersForCustomerById(
+        @Path("id") productId: Long
+    )
 }
