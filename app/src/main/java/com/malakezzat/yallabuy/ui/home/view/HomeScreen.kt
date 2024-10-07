@@ -81,6 +81,7 @@ import com.malakezzat.yallabuy.model.SmartCollection
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
 import kotlinx.coroutines.delay
+import kotlin.random.Random
 
 val TAG = "HomeScreen"
 
@@ -311,9 +312,8 @@ fun AdList(viewModel: HomeScreenViewModel) {
         }
         item {
             if (discountCodeIds.isNotEmpty()) {
-                for (item in discountCodeIds) {
-                    CouponsCard(item)
-                }
+                    val randomCoupon = discountCodeIds.random()
+                    CouponsCard(randomCoupon)
             }
         }
 //        items(filteredDiscountCodes.size) { index ->

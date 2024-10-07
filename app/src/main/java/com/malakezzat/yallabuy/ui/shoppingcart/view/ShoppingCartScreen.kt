@@ -70,6 +70,7 @@ import com.malakezzat.yallabuy.model.Variant
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModel
 import kotlinx.coroutines.delay
+import kotlin.math.round
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -85,6 +86,7 @@ fun ShoppingCartScreen(
     val shoppingCartOrder by viewModel.shoppingCartDraftOrder.collectAsState()
     val visibleItems = remember { mutableStateListOf<LineItem>(*draftOrder.line_items.toTypedArray()) }
     var subtotal by remember { mutableDoubleStateOf(0.0) }
+    var discountAmount by remember { mutableDoubleStateOf(0.0) }
     var total by remember { mutableDoubleStateOf(0.0) }
     val variantState by viewModel.variantId.collectAsState()
     var variant by remember { mutableStateOf(Variant()) }
@@ -122,9 +124,11 @@ fun ShoppingCartScreen(
     ModalBottomSheetLayout(
         sheetState = bottomSheetState,
         sheetContent = {
-            VoucherBottomSheet(){ discount ->
+            VoucherBottomSheet{ discount ->
                 if(discount != 0.0){
-                    total = subtotal * (1 - discount)
+                    val percentage = 1 - discount
+                    total = round(subtotal * percentage)
+                    discountAmount = round(subtotal * ( 1 - percentage))
                 } else {
                     total = subtotal
                 }
@@ -157,6 +161,7 @@ fun ShoppingCartScreen(
                                         val orderItem = orderItems[index]
                                         ShoppingItem(viewModel,orderItem,draftOrder,variantSet,subtotal){
                                             subtotal = calculateSubtotal(orderItems)
+                                            total = subtotal
                                         }
 
                                     }
@@ -170,6 +175,7 @@ fun ShoppingCartScreen(
                                     .align(Alignment.BottomCenter)
                                     .padding(16.dp),
                                 subtotal.toString(),
+                                discountAmount.toString(),
                                 total.toString()
                             )
                         }
@@ -426,6 +432,7 @@ fun ShoppingItem(
 fun ShoppingView(
     modifier: Modifier,
     subtotal : String,
+    discount: String,
     total : String
 ) {
     Box(
@@ -454,7 +461,7 @@ fun ShoppingView(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(text = "Discount", style = MaterialTheme.typography.bodyLarge)
-                Text(text = "$0.00", style = MaterialTheme.typography.bodyLarge)
+                Text(text = discount, style = MaterialTheme.typography.bodyLarge)
             }
 
             Row(
@@ -573,17 +580,26 @@ fun VoucherBottomSheet(onApplyDiscount: (discount: Double) -> Unit) {
 
             Button(
                 onClick = {
-                    // Check if voucher code ends with "10"
-                    if (voucherCode.endsWith("10")) {
-                        val discount = 0.10 // 10% discount
-                        onApplyDiscount(discount) // Pass discount to the parent function
+                    if (voucherCode.endsWith("YALLABUY10")) {
+                        val discount = 0.10 //
+                        onApplyDiscount(discount)
                         discountMessage = "10% discount applied!"
                         discountApplied = true
+                    } else if (voucherCode.endsWith("YALLABUY30")) {
+                    val discount = 0.30 //
+                    onApplyDiscount(discount)
+                    discountMessage = "30% discount applied!"
+                    discountApplied = true
+                    } else if (voucherCode.endsWith("YALLABUY50")) {
+                        val discount = 0.50 //
+                        onApplyDiscount(discount)
+                        discountMessage = "50% discount applied!"
+                        discountApplied = true
                     } else {
-                        discountMessage = "Invalid voucher code"
-                        discountApplied = false
-                    }
-                },
+                            discountMessage = "Invalid voucher code"
+                            discountApplied = false
+                        }
+                    },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
