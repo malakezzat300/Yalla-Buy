@@ -138,10 +138,9 @@ fun ShoppingCartScreen(
             }
         },
         content = {
-            val list = listOf("1", "2")
             if (orderItems.isNotEmpty()) {
                 Scaffold(
-                    topBar = { CustomTopBar(bottomSheetState) },
+                    topBar = { CustomTopBar(bottomSheetState,navController) },
                     content = { paddingValues ->
                         Box(
                             modifier = Modifier
@@ -195,7 +194,7 @@ fun ShoppingCartScreen(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun CustomTopBar(sheetState: ModalBottomSheetState) {
+fun CustomTopBar(sheetState: ModalBottomSheetState,navController : NavController) {
     val coroutineScope = rememberCoroutineScope()
 
     Row(
@@ -209,7 +208,9 @@ fun CustomTopBar(sheetState: ModalBottomSheetState) {
             Spacer(modifier = Modifier.padding(2.dp))
             IconButton(
                 modifier = Modifier.size(30.dp),
-                onClick = { /* Decrease action */ }
+                onClick = {
+                    navController.navigate(Screen.HomeScreen.route)
+                }
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_back),
