@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.malakezzat.yallabuy.data.ProductsRepository
 import com.malakezzat.yallabuy.data.remote.ApiState
+import com.malakezzat.yallabuy.model.CustomerResponse
+import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.CustomerSearchRespnse
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderRequest
@@ -19,7 +21,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 class ProductInfoViewModel(var repository : ProductsRepository) : ViewModel() {
-
     private val _searchProductsList = MutableStateFlow<ApiState<Product>>(ApiState.Loading)
     val searchProductsList = _searchProductsList.asStateFlow()
 

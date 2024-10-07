@@ -102,7 +102,7 @@ fun SignupScreen(viewModel: SignUpViewModel,
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(text = "Already have an account?")
                 TextButton(onClick = {navController.navigate(Screen.LogInScreen.route) }) {
-                    Text(text = " Login", color = Color.Cyan)
+                    Text(text = " Login", color = Color.Green)
                 }
             }
 //            Spacer(modifier = Modifier.height(8.dp))
@@ -121,7 +121,7 @@ fun SignupScreen(viewModel: SignUpViewModel,
                 .fillMaxWidth()
                 .background(color = Color.White)
                 .padding(10.dp),
-            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Green)
         )
 
 
@@ -137,7 +137,7 @@ fun SignupScreen(viewModel: SignUpViewModel,
                 .background(color = Color.White)
                 .padding(10.dp),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
-            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Green)
 
         )
 
@@ -165,7 +165,7 @@ fun SignupScreen(viewModel: SignUpViewModel,
                 }
             },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
-            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Green)
 
 
         )
@@ -194,7 +194,7 @@ fun SignupScreen(viewModel: SignUpViewModel,
                 }
             },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
-            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Green)
 
 
         )
@@ -303,7 +303,7 @@ fun SignupScreen(viewModel: SignUpViewModel,
                         showDialog = false
                         navController.navigate(Screen.LogInScreen.route)
                     }) {
-                        Text("OK", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Cyan)
+                        Text("OK", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Green)
                     }
                 },
                 title = {
@@ -357,7 +357,7 @@ fun SignupScreenPreview() {
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(text = "Already have an account?")
                 TextButton(onClick = {/*navController.navigate(Screen.LogInScreen.route) */}) {
-                    Text(text = " Login", color = Color.Cyan)
+                    Text(text = " Login", color = Color.Green)
                 }
             }
 //            Spacer(modifier = Modifier.height(8.dp))
@@ -377,7 +377,7 @@ fun SignupScreenPreview() {
                 .fillMaxWidth()
                 .background(color = Color.White)
                 .padding(10.dp),
-            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Green)
         )
 
 
@@ -393,7 +393,7 @@ fun SignupScreenPreview() {
                 .background(color = Color.White)
                 .padding(10.dp),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
-            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Green)
 
         )
 
@@ -421,7 +421,7 @@ fun SignupScreenPreview() {
                 }
             },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
-            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Green)
 
 
         )
@@ -450,7 +450,7 @@ fun SignupScreenPreview() {
                 }
             },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
-            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Green)
 
 
         )

@@ -76,7 +76,7 @@ fun SearchScreen(viewModel: SearchViewModel,
                 .fillMaxWidth()
                 .background(color = Color.White)
                 .padding(10.dp),
-            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Green)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -96,8 +96,8 @@ fun SearchScreen(viewModel: SearchViewModel,
                 viewModel.onSearchQueryChanged(searchQuery, sliderPosition)
             },
             colors = SliderDefaults.colors(
-                thumbColor = Color.Cyan,
-                activeTrackColor = Color.Cyan,
+                thumbColor = Color.Green,
+                activeTrackColor = Color.Green,
                 inactiveTrackColor = Color.Gray
             )
         )
