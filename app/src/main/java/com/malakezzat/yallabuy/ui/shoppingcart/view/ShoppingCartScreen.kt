@@ -2,6 +2,7 @@ package com.malakezzat.yallabuy.ui.shoppingcart.view
 
 import android.provider.Telephony.Mms.Draft
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -56,6 +57,7 @@ import com.malakezzat.yallabuy.R
 import kotlinx.coroutines.launch
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
@@ -64,6 +66,7 @@ import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.LineItem
+import com.malakezzat.yallabuy.model.Variant
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModel
 import kotlinx.coroutines.delay
@@ -81,6 +84,20 @@ fun ShoppingCartScreen(
     var isLoading by remember { mutableStateOf( false ) }
     val shoppingCartOrder by viewModel.shoppingCartDraftOrder.collectAsState()
     val visibleItems = remember { mutableStateListOf<LineItem>(*draftOrder.line_items.toTypedArray()) }
+    var subtotal by remember { mutableDoubleStateOf(0.0) }
+    var total by remember { mutableDoubleStateOf(0.0) }
+    val variantState by viewModel.variantId.collectAsState()
+    var variant by remember { mutableStateOf(Variant()) }
+    var variantSet by remember { mutableStateOf(mutableSetOf<Variant>() ) }
+
+    when(variantState){
+        is ApiState.Error -> Log.i("shoppingCartTest", "ShoppingCartScreen: draftOrder ${(variantState as ApiState.Error).message}")
+        ApiState.Loading -> {}
+        is ApiState.Success -> {
+            variant = (variantState as ApiState.Success).data.variant
+            variantSet.add(variant)
+        }
+    }
 
     when(shoppingCartOrder){
         is ApiState.Error ->{
@@ -94,6 +111,10 @@ fun ShoppingCartScreen(
             isLoading = false
             orderItems = (shoppingCartOrder as ApiState.Success).data.line_items
             draftOrder = (shoppingCartOrder as ApiState.Success).data
+            LaunchedEffect (Unit){
+                viewModel.getVariantById(orderItems.get(0).variant_id)
+            }
+            subtotal = calculateSubtotal(orderItems)
         }
     }
 
@@ -101,11 +122,17 @@ fun ShoppingCartScreen(
     ModalBottomSheetLayout(
         sheetState = bottomSheetState,
         sheetContent = {
-            VoucherBottomSheet()
+            VoucherBottomSheet(){ discount ->
+                if(discount != 0.0){
+                    total = subtotal * (1 - discount)
+                } else {
+                    total = subtotal
+                }
+            }
         },
         content = {
             val list = listOf("1", "2")
-            if (list.isNotEmpty()) {
+            if (orderItems.isNotEmpty()) {
                 Scaffold(
                     topBar = { CustomTopBar(bottomSheetState) },
                     content = { paddingValues ->
@@ -128,7 +155,10 @@ fun ShoppingCartScreen(
                                 if(orderItems.isNotEmpty()){
                                     items(orderItems.size) { index ->
                                         val orderItem = orderItems[index]
-                                        ShoppingItem(viewModel,orderItem,draftOrder)
+                                        ShoppingItem(viewModel,orderItem,draftOrder,variantSet,subtotal){
+                                            subtotal = calculateSubtotal(orderItems)
+                                        }
+
                                     }
                                 }
                             }
@@ -138,13 +168,17 @@ fun ShoppingCartScreen(
                                     .fillMaxWidth()
                                     .background(MaterialTheme.colorScheme.surface)
                                     .align(Alignment.BottomCenter)
-                                    .padding(16.dp)
+                                    .padding(16.dp),
+                                subtotal.toString(),
+                                total.toString()
                             )
                         }
                     }
                 )
             } else {
-                ShoppingEmpty()
+                if(!isLoading) {
+                    ShoppingEmpty()
+                }
             }
         }
     )
@@ -203,167 +237,196 @@ fun CustomTopBar(sheetState: ModalBottomSheetState) {
 }
 
 @Composable
-fun ShoppingItem(viewModel: ShoppingCartViewModel, item: LineItem, draftOrder: DraftOrder) {
-    var quantity by remember { mutableIntStateOf(item.quantity) }
+fun ShoppingItem(
+    viewModel: ShoppingCartViewModel,
+    item: LineItem,
+    draftOrder: DraftOrder,
+    variantSet: Set<Variant>,
+    subtotal : Double,
+    onItemUpdated: () -> Unit
+) {
     val coroutineScope = rememberCoroutineScope()
-//    var isVisible by remember { mutableStateOf(true) }
-//    AnimatedVisibility(visible = isVisible) {
-        Row(
+    var showDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    Row(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+            .height(140.dp)
+    ) {
+        Card(
             modifier = Modifier
+                .weight(1.2f)
                 .padding(8.dp)
-                .fillMaxWidth()
-                .height(140.dp)
+                .fillMaxHeight(),
+            shape = RoundedCornerShape(12.dp),
+            elevation = CardDefaults.cardElevation(12.dp),
         ) {
-            Card(
+            Image(
                 modifier = Modifier
-                    .weight(1.2f)
-                    .padding(8.dp)
-                    .fillMaxHeight(),
-                shape = RoundedCornerShape(12.dp),
-                elevation = CardDefaults.cardElevation(12.dp),
-            ) {
-                Image(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .clip(shape = RoundedCornerShape(10)),
-                    painter = rememberAsyncImagePainter(item.properties[0].value),
-                    contentDescription = "ad",
-                    contentScale = ContentScale.FillBounds,
+                    .fillMaxHeight()
+                    .clip(shape = RoundedCornerShape(10)),
+                painter = rememberAsyncImagePainter(item.properties[0].value),
+                contentDescription = "ad",
+                contentScale = ContentScale.FillBounds,
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .padding(4.dp)
+                .weight(2f)
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(
+                    text = item.title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
+                )
+                Text(
+                    text = item.price,
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
 
-            Column(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .weight(2f)
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceBetween
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Column {
-                    Text(
-                        text = item.title,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
-                    )
-                    Text(
-                        text = item.price,
-                        style = MaterialTheme.typography.bodyMedium,
+                // Minus Button
+                IconButton(
+                    onClick = {
+                        val newQuantity = (item.quantity - 1).coerceAtLeast(1)
+                        item.quantity = newQuantity
+                        if(item.quantity == 1){
+                            Toast.makeText(context, "Min Limit reached", Toast.LENGTH_SHORT).show()
+                        }
+
+                        val updatedDraftItems = draftOrder.line_items.map { currentItem ->
+                            if (currentItem == item) {
+                                currentItem.copy(quantity = newQuantity)
+                            } else {
+                                currentItem
+                            }
+                        }
+                        val updatedDraftOrder = draftOrder.copy(line_items = updatedDraftItems)
+                        val updatedDraftItemsRequest = DraftOrderRequest(updatedDraftOrder)
+
+                        coroutineScope.launch {
+                            delay(200)
+                            draftOrder.id?.let {
+                                viewModel.updateDraftOrder(it, updatedDraftItemsRequest)
+                            }
+                        }
+                        onItemUpdated()
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_minus),
+                        contentDescription = "minus",
                     )
                 }
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
+                Text(
+                    text = item.quantity.toString(),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold
+                )
+
+                // Plus Button
+                IconButton(
+                    onClick = {
+                        if(subtotal <= 1000) {
+                            val newQuantity = (item.quantity + 1).coerceAtMost(
+                                checkMaxQuantity(
+                                    item.variant_id,
+                                    variantSet
+                                )
+                            )
+                            item.quantity = newQuantity
+                            if (item.quantity == checkMaxQuantity(item.variant_id, variantSet)) {
+                                Toast.makeText(context, "Max Limit reached", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+
+                            val updatedDraftItems = draftOrder.line_items.map { currentItem ->
+                                if (currentItem == item) {
+                                    currentItem.copy(quantity = newQuantity)
+                                } else {
+                                    currentItem
+                                }
+                            }
+                            val updatedDraftOrder = draftOrder.copy(line_items = updatedDraftItems)
+                            val updatedDraftItemsRequest = DraftOrderRequest(updatedDraftOrder)
+
+                            coroutineScope.launch {
+                                delay(200)
+                                draftOrder.id?.let {
+                                    viewModel.updateDraftOrder(it, updatedDraftItemsRequest)
+                                }
+                            }
+                            onItemUpdated()
+                        } else {
+                            Toast.makeText(context, "Maximum payment reached", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
                 ) {
-                    IconButton(
-                        onClick = {
-                            val newQuantity = (quantity - 1).coerceAtLeast(1)
-                            quantity = newQuantity
-
-                            val updatedDraftItems = draftOrder.line_items.map { currentItem ->
-                                if (currentItem == item) {
-                                    currentItem.copy(quantity = newQuantity)
-                                } else {
-                                    currentItem
-                                }
-                            }
-                            val updatedDraftOrder = draftOrder.copy(line_items = updatedDraftItems)
-                            val updatedDraftItemsRequest = DraftOrderRequest(updatedDraftOrder)
-
-                            coroutineScope.launch {
-                                delay(200)
-                                draftOrder.id?.let {
-                                    viewModel.updateDraftOrder(
-                                        it,
-                                        updatedDraftItemsRequest
-                                    )
-                                }
-                            }
-                        }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_minus),
-                            contentDescription = "minus",
-                        )
-                    }
-
-                    Text(
-                        text = quantity.toString(),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold
+                    Icon(
+                        painter = painterResource(R.drawable.ic_add),
+                        contentDescription = "add",
                     )
+                }
 
-                    IconButton(
-                        onClick = {
-                            val newQuantity = (quantity + 1).coerceAtMost(3)
-                            quantity = newQuantity
+                Spacer(modifier = Modifier.width(16.dp))
 
-                            val updatedDraftItems = draftOrder.line_items.map { currentItem ->
-                                if (currentItem == item) {
-                                    currentItem.copy(quantity = newQuantity)
-                                } else {
-                                    currentItem
-                                }
-                            }
-                            val updatedDraftOrder = draftOrder.copy(line_items = updatedDraftItems)
-                            val updatedDraftItemsRequest = DraftOrderRequest(updatedDraftOrder)
-
-                            coroutineScope.launch {
-                                delay(200)
-                                draftOrder.id?.let {
-                                    viewModel.updateDraftOrder(
-                                        it,
-                                        updatedDraftItemsRequest
-                                    )
-                                }
-                            }
-                        }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_add),
-                            contentDescription = "add",
-                        )
+                IconButton(
+                    onClick = {
+                        showDialog = true
                     }
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    IconButton(
-                        onClick = {
-                            if(draftOrder.line_items.size > 1) {
-                                //isVisible = false
-                                val updatedDraftItems = draftOrder.line_items.filter { it != item }
-                                val updatedDraftOrder =
-                                    draftOrder.copy(line_items = updatedDraftItems)
-                                val updatedDraftItemsRequest = DraftOrderRequest(updatedDraftOrder)
-                                draftOrder.id?.let {
-                                    viewModel.updateDraftOrder(
-                                        it,
-                                        updatedDraftItemsRequest
-                                    )
-                                }
-                            } else {
-                                //isVisible = false
-                                draftOrder.id?.let { viewModel.deleteDraftOrder(it) }
-                            }
-
-                        }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_delete),
-                            contentDescription = "Delete",
-                            tint = Color.Red
-                        )
-                    }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_delete),
+                        contentDescription = "Delete",
+                        tint = Color.Red
+                    )
                 }
             }
-        //}
+        }
+    }
+
+    if (showDialog) {
+        DeleteConfirmationDialog(
+            showDialog = showDialog,
+            onDismiss = { showDialog = false },
+            onConfirmDelete = {
+                showDialog = false
+                if (draftOrder.line_items.size > 1) {
+                    val updatedDraftItems = draftOrder.line_items.filter { it != item }
+                    val updatedDraftOrder = draftOrder.copy(line_items = updatedDraftItems)
+                    val updatedDraftItemsRequest = DraftOrderRequest(updatedDraftOrder)
+                    draftOrder.id?.let {
+                        viewModel.updateDraftOrder(it, updatedDraftItemsRequest)
+                    }
+                } else {
+                    draftOrder.id?.let { viewModel.deleteDraftOrder(it) }
+                }
+                onItemUpdated()
+            }
+        )
     }
 }
 
+
 @Composable
 fun ShoppingView(
-    modifier: Modifier
+    modifier: Modifier,
+    subtotal : String,
+    total : String
 ) {
     Box(
         modifier = modifier
@@ -383,7 +446,7 @@ fun ShoppingView(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(text = "Subtotal", style = MaterialTheme.typography.bodyLarge)
-                Text(text = "$27.25", style = MaterialTheme.typography.bodyLarge)
+                Text(text = subtotal, style = MaterialTheme.typography.bodyLarge)
             }
 
             Row(
@@ -404,7 +467,7 @@ fun ShoppingView(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "$27.25",
+                    text = total,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -421,7 +484,7 @@ fun ShoppingView(
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Text(
-                    text = "Checkout (2)",
+                    text = "Checkout",
                     color = Color.White,
                     fontSize = 16.sp
                 )
@@ -461,27 +524,29 @@ fun ShoppingEmpty(){
         )
 
 
-        Button(
-            onClick = { /* Action for button click */ },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp)
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-            shape = RoundedCornerShape(10.dp)
-        ) {
-            Text(
-                text = "Explore Categories",
-                color = Color.White,
-                fontSize = 16.sp
-            )
-        }
+//        Button(
+//            onClick = { /* Action for button click */ },
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(top = 16.dp)
+//                .height(56.dp),
+//            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+//            shape = RoundedCornerShape(10.dp)
+//        ) {
+//            Text(
+//                text = "Explore Categories",
+//                color = Color.White,
+//                fontSize = 16.sp
+//            )
+//        }
     }
 }
 
 @Composable
-fun VoucherBottomSheet() {
+fun VoucherBottomSheet(onApplyDiscount: (discount: Double) -> Unit) {
     var voucherCode by remember { mutableStateOf("") }
+    var discountApplied by remember { mutableStateOf(false) }
+    var discountMessage by remember { mutableStateOf("") }
 
     Box(
         modifier = Modifier
@@ -507,7 +572,18 @@ fun VoucherBottomSheet() {
             )
 
             Button(
-                onClick = { /* Action for button click */ },
+                onClick = {
+                    // Check if voucher code ends with "10"
+                    if (voucherCode.endsWith("10")) {
+                        val discount = 0.10 // 10% discount
+                        onApplyDiscount(discount) // Pass discount to the parent function
+                        discountMessage = "10% discount applied!"
+                        discountApplied = true
+                    } else {
+                        discountMessage = "Invalid voucher code"
+                        discountApplied = false
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -520,8 +596,81 @@ fun VoucherBottomSheet() {
                     fontSize = 16.sp
                 )
             }
+
+            if (discountApplied) {
+                Text(
+                    text = discountMessage,
+                    color = Color.Green,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            } else if (discountMessage.isNotEmpty()) {
+                Text(
+                    text = discountMessage,
+                    color = Color.Red,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
         }
     }
+}
+
+fun calculateSubtotal(orderItems: List<LineItem>): Double {
+    var newSubtotal = 0.0
+    for (item in orderItems) {
+        newSubtotal += item.price.toDouble() * item.quantity
+    }
+    return newSubtotal
+}
+
+@Composable
+fun DeleteConfirmationDialog(
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    onConfirmDelete: () -> Unit
+) {
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { onDismiss() },
+            title = {
+                Text(text = "Delete Confirmation")
+            },
+            text = {
+                Text("Are you sure you want to delete this item? This action cannot be undone.")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onConfirmDelete()
+                        onDismiss()
+                    }
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { onDismiss() }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+}
+
+fun checkMaxQuantity(variantId : Long,variantSet : Set<Variant>) : Int{
+    for(item in variantSet){
+        if(item.id == variantId){
+            if(item.inventory_quantity < 2){
+                return 1
+            } else {
+                return (item.inventory_quantity / 2).toInt()
+            }
+        }
+    }
+    return 1
 }
 
 //@Composable

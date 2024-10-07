@@ -12,6 +12,8 @@ import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Product
+import com.malakezzat.yallabuy.model.Variant
+import com.malakezzat.yallabuy.model.VariantResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +34,9 @@ class ShoppingCartViewModel(private val repository: ProductsRepository) : ViewMo
 
     private val _shoppingCartDraftOrder = MutableStateFlow<ApiState<DraftOrder>>(ApiState.Loading)
     val shoppingCartDraftOrder = _shoppingCartDraftOrder.asStateFlow()
+
+    private val _variantId = MutableStateFlow<ApiState<VariantResponse>>(ApiState.Loading)
+    val variantId = _variantId.asStateFlow()
 
     init {
         getDraftOrders()
@@ -121,5 +126,19 @@ class ShoppingCartViewModel(private val repository: ProductsRepository) : ViewMo
         }
     }
 
+
+    fun getVariantById(variantId : Long){
+        viewModelScope.launch {
+            repository.getVariantById(variantId).onStart {
+                _variantId.value = ApiState.Loading
+            }
+                .catch { e ->
+                    _variantId.value = ApiState.Error(e.message ?: "Unknown error")
+                }
+                .collect { customerResponse ->
+                    _variantId.value = ApiState.Success(customerResponse)
+                }
+        }
+    }
 
 }

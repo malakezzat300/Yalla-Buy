@@ -15,6 +15,7 @@ import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.ProductResponse
 import com.malakezzat.yallabuy.model.ProductsResponse
+import com.malakezzat.yallabuy.model.VariantResponse
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -88,4 +89,8 @@ interface ProductService {
     suspend fun getCustomerById(
         @Query("id") email: Long
     ): CustomerSearchRespnse
+
+    @GET("variants/{id}.json")
+    suspend fun getVariantById(@Path("id") variantId: Long): VariantResponse
+
 }

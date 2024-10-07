@@ -14,10 +14,11 @@ data class Product(
 )
 
 data class Variant(
-    val id: Long,
-    val title: String,
-    val price: String,
-    val sku: String
+    val id: Long = 0,
+    val title: String = "",
+    val price: String = "",
+    val sku: String = "",
+    val inventory_quantity  : Long = 0
 )
 
 data class Image(
@@ -30,4 +31,8 @@ data class ProductResponse(
 
 data class ProductsResponse(
     val products: List<Product>
+)
+
+data class VariantResponse(
+    val variant: Variant
 )
