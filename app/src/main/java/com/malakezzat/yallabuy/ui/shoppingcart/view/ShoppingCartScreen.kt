@@ -158,7 +158,7 @@ fun CustomTopBar(sheetState: ModalBottomSheetState) {
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium
                 ),
-                color = Color.Cyan
+                color = Color.Green
             )
         }
     }

@@ -81,7 +81,7 @@ fun LogInScreen(viewModel: LogInViewModel,
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(text = "Don’t have an account?")
                 TextButton(onClick = {navController.navigate(Screen.SignUpScreen.route) }) {
-                    Text(text = " Signup", color = Color.Cyan)
+                    Text(text = " Signup", color = Color.Green)
                 }
             }
 //            Spacer(modifier = Modifier.height(8.dp))
@@ -100,7 +100,7 @@ fun LogInScreen(viewModel: LogInViewModel,
                 .fillMaxWidth()
                 .background(color = Color.White)
                 .padding(10.dp),
-            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Green)
         )
 
         Text(text = "Password", fontSize = 18.sp, modifier = Modifier.padding(8.dp))
@@ -127,7 +127,7 @@ fun LogInScreen(viewModel: LogInViewModel,
                 }
             },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
-            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Green)
 
 
         )
@@ -231,7 +231,7 @@ fun LogInScreenPreview(
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(text = "Don’t have an account?")
                 TextButton(onClick = {/*navController.navigate(Screen.SignUpScreen.route) */}) {
-                    Text(text = " Signup", color = Color.Cyan)
+                    Text(text = " Signup", color = Color.Green)
                 }
             }
 //            Spacer(modifier = Modifier.height(8.dp))
