@@ -88,10 +88,12 @@ fun NavigationApp(
                     val viewModel: CategoriesViewModel = viewModel(factory = categoriesViewModelFactory)
                     CategoriesScreen(viewModel = viewModel, navController)
                 }
-                composable(Screen.ProductsByCategoryScreen.route) {
+                composable("${Screen.ProductsByCategoryScreen.route}/{categoryId}") { backStackEntry ->
+                    val categoryId = backStackEntry.arguments?.getString("categoryId")
                     val viewModel: ProductsByCategoryViewModel = viewModel(factory = productsByCategoryViewModelFactory)
                     ProductsByCategoryScreen(viewModel = viewModel, navController)
                 }
+
                 composable(Screen.SignUpScreen.route) {
                     val viewModel: SignUpViewModel = viewModel(factory = signUpViewModelFactory)
                     SignupScreen(viewModel, navController)

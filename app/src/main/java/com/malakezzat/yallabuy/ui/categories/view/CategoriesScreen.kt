@@ -59,9 +59,8 @@ fun CategoriesScreen(
         viewModel.getAllCategories()
     }
     Scaffold(
-        topBar = { CustomTopBarCategory(navController) },
-        containerColor = Color.White,
-        //  bottomBar = { BottomNavigationBar(navController) }
+        topBar = { CustomTopBarCategory(navController,"Categories") },
+        containerColor = Color.White
     ) {
         Column(
             modifier = Modifier
@@ -77,7 +76,7 @@ fun CategoriesScreen(
                 is ApiState.Success -> {
                     val categories =
                         (categoriesState as ApiState.Success<List<CustomCollection>>).data
-                    CategoriesSectionInCategoriesScreen(categories)
+                    CategoriesSectionInCategoriesScreen(categories,navController)
                     Log.d(com.malakezzat.yallabuy.ui.home.view.TAG, "$categoriesState")
                 }
 
@@ -95,7 +94,7 @@ fun CategoriesScreen(
 
 
 @Composable
-fun CategoriesSectionInCategoriesScreen(categories: List<CustomCollection>) {
+fun CategoriesSectionInCategoriesScreen(categories: List<CustomCollection>,navController: NavController) {
     //categories: List<CustomCollection>
     Log.d(com.malakezzat.yallabuy.ui.home.view.TAG, "3. ${categories}")
     Column(modifier = Modifier.padding(16.dp)) {
@@ -112,14 +111,14 @@ fun CategoriesSectionInCategoriesScreen(categories: List<CustomCollection>) {
 
             ) {
                 itemsIndexed(categories) { _, category ->
-                    CategoryItem(category)
+                    CategoryItem(category, navController)
                 }
             }
     }
 }
 
 @Composable
-fun CustomTopBarCategory(navController: NavController) {
+fun CustomTopBarCategory(navController: NavController, title :String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -135,7 +134,7 @@ fun CustomTopBarCategory(navController: NavController) {
                 modifier = Modifier.size(30.dp)
             )*/
             Text(
-                text = "Categories",
+                text = title,
                 style = TextStyle(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
