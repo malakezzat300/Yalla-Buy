@@ -50,20 +50,22 @@ class SearchViewModel(var repository : ProductsRepository) : ViewModel(){
     }
     var filteredProducts = searchQuery
         .debounce(300) // Delay to avoid querying on every character
-        .combine(_searchProductsList) { query, productsState ->
-            // Combine the search query and products list
+        .combine(_filterByPrice) { query, price ->
+            Pair(query, price)
+        }
+        .combine(_searchProductsList) { queryAndPrice, productsState ->
+            val (query, price) = queryAndPrice
             when (productsState) {
                 is ApiState.Success -> {
                     if (query.isBlank()) {
-                        productsState.data // Return all products if query is blank
-                    } else {
-                        // Filter products based on query
                         productsState.data.filter { product ->
-                           val matchQuery =  product.title.startsWith(query, ignoreCase = true)
-                            val matchPrice =  product.variants[0].price.toFloat()<= _filterByPrice.value
-                            Log.i("TAG", "filtrr: ")
+                            product.variants[0].price.toFloat() <= price
+                        } // Filter only by price if no search query
+                    } else {
+                        productsState.data.filter { product ->
+                            val matchQuery = product.title.contains(query, ignoreCase = true)
+                            val matchPrice = product.variants[0].price.toFloat() <= price
                             matchQuery && matchPrice
-
                         }
                     }
                 }

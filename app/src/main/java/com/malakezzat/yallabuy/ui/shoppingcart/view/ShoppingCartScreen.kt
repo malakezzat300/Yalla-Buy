@@ -240,7 +240,7 @@ fun CustomTopBar(sheetState: ModalBottomSheetState,navController : NavController
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium
                 ),
-                color = Color.Cyan
+                color = Color.Green
             )
         }
     }
@@ -693,9 +693,10 @@ fun checkMaxQuantity(variantId : Long,variantSet : Set<Variant>) : Int{
     return 1
 }
 
-//@Composable
-//fun ShoppingScreenPreview() {
-//    YallaBuyTheme {
-//        ShoppingCartScreen()
-//    }
-//}
+/*
+@Composable
+fun ShoppingScreenPreview() {
+    YallaBuyTheme {
+        ShoppingCartScreen()
+    }
+}*/
