@@ -1,12 +1,10 @@
 package com.malakezzat.yallabuy.ui
 
-import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,37 +19,26 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Label
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -62,144 +49,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException
-import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.UserProfileChangeRequest
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.firebase.FirebaseAuthun
+import com.malakezzat.yallabuy.data.remote.ApiState
+import com.malakezzat.yallabuy.model.Customer
+import com.malakezzat.yallabuy.model.CustomerRequest
+import com.malakezzat.yallabuy.model.CustomerSearchRespnse
+import com.malakezzat.yallabuy.model.Customerr
+import com.malakezzat.yallabuy.model.Customers
 import com.malakezzat.yallabuy.ui.auth.viewmodel.SignUpViewModel
-import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
-
-@Composable
-fun CreateAccountScreen(context : Context) {
-    var userName by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var pass by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-   // var showDialog by remember { mutableStateOf(false) }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Create Account",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "Start learning with create your account!",
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color.Gray
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-
-        OutlinedTextField(
-            value = userName,
-            onValueChange = {input -> userName = input},
-            label = { Text("Create your username") },
-            leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = {input -> email = input},
-            label = { Text("Enter your email or phone number") },
-            leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth()
-
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Password TextField
-        OutlinedTextField(
-            value = pass,
-            onValueChange = {input -> pass = input},
-            label = { Text("Create your password") },
-            leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
-           // trailingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation()
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = {
-                isLoading = true
-
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5C4CE3))
-        ) {
-            if (isLoading) {
-                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
-            } else {
-                Text(text = "Create Account", color = Color.White)
-            }
-        }
-        errorMessage?.let {
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = it, color = Color.Red)
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Or using other method",
-            color = Color.Gray,
-            style = MaterialTheme.typography.bodyMedium
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedButton(
-            onClick = { /* Handle Google Sign Up */ },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.google), // replace with your Google icon resource
-                contentDescription = null,
-                tint = Color.Unspecified,
-                modifier = Modifier.size(25.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Sign Up with Google")
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedButton(
-            onClick = { /* Handle Facebook Sign Up */ },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.facebook), // replace with your Facebook icon resource
-                contentDescription = null,
-                tint = Color.Unspecified,
-                modifier = Modifier.size(25.dp)
-
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Sign Up with Facebook")
-        }
-    }
-}
-
 
 @Composable
 fun SignupScreen(viewModel: SignUpViewModel,
@@ -210,7 +71,7 @@ fun SignupScreen(viewModel: SignUpViewModel,
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
-    var isSuccess by remember { mutableStateOf(false) }
+    val customerData by viewModel.customerDataByEmail.collectAsStateWithLifecycle()
     var auth = FirebaseAuthun()
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
@@ -341,7 +202,20 @@ fun SignupScreen(viewModel: SignUpViewModel,
         // Create Account Button
         Button(
             onClick = {
-              //  viewModel.signInWithEmailAndPassword(email,password,fullName)
+                viewModel.getCustomerById(7716613128374)
+                when(customerData){
+                    is ApiState.Error -> {
+                        Log.i("TAG", "SignupScreen: customer by id failed")
+                    }
+                    ApiState.Loading -> {
+
+                    }
+                    is ApiState.Success -> {
+                        val brands = (customerData as ApiState.Success<CustomerSearchRespnse>).data
+
+                        Log.i("TAG", "SignupScreen: ${ brands.customers.get(0).id}")
+                    }
+                }
                 isLoading=true
                 if(email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || email.isEmpty()){
                     Toast.makeText(context,"complete empty fields please",Toast.LENGTH_LONG).show()
@@ -349,11 +223,26 @@ fun SignupScreen(viewModel: SignUpViewModel,
                     //showDialog=true
                 }else{
                     if(password == confirmPassword){
-                         isSuccess = auth.signInWithEmailAndPassword(email,password,fullName)
-                        Log.i("TAG", "SignupScreen: isSuccess ${auth.signInWithEmailAndPassword(email,password,fullName)}")
-                      if(!isSuccess){
-                        showDialog = true
-                      }
+                        isLoading = true
+                        auth.signInWithEmailAndPassword(email,password,fullName, onSuccess = {
+                            showDialog = true
+                            /*create customer on API*/
+                            val customer = Customerr(
+                                first_name = fullName,
+                                last_name = "",
+                                email = email,
+                                phone = ""
+                            )
+
+                            val customerRequest = CustomerRequest(customer)
+                            viewModel.createCustomer(customerRequest)
+
+
+                        }, onError = {m->
+                            Toast.makeText(context,m,Toast.LENGTH_LONG).show()
+                            isLoading=false
+                        })
+
                     }else{
                         isLoading=false
                         Toast.makeText(context,"password and confirm password are not the same",Toast.LENGTH_LONG).show()

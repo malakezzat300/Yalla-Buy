@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -115,15 +116,15 @@ fun ProductInfoSection(product: Product) {
         // Image Carousel (Placeholder for actual image carousel)
         LazyRow {
             items(product.images) { imageUrl ->
-                product.images.firstOrNull()?.let { image ->
+               // product.images.firstOrNull()?.let { image ->
                     Image(
-                        painter = rememberAsyncImagePainter(image.src),
+                        painter = rememberAsyncImagePainter(imageUrl.src),
                         contentDescription = null,
                         modifier = Modifier
-                            .size(100.dp)
+                            .size(300.dp)
                             .padding(4.dp)
                     )
-                }
+              //  }
             }
         }
 

@@ -1,6 +1,9 @@
 package com.malakezzat.yallabuy.data.remote
 
 import com.malakezzat.yallabuy.model.CustomCollection
+import com.malakezzat.yallabuy.model.CustomerRequest
+import com.malakezzat.yallabuy.model.CustomerResponse
+import com.malakezzat.yallabuy.model.CustomerSearchRespnse
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
@@ -25,5 +28,9 @@ interface ProductsRemoteDataSource {
 
     suspend fun deleteDraftOrder(draftOrderId: Long)
     suspend fun finalizeDraftOrder(draftOrderId: Long): Flow<DraftOrderResponse>
-    suspend fun getProductById(id: Long): Flow<ProductResponse>
+    suspend fun getProductById(id: Long) : Flow<ProductResponse>
+    suspend fun createCustomer(customerRequest: CustomerRequest): Flow<CustomerResponse>
+    suspend fun getCustomerByEmai(customer: String): Flow<CustomerSearchRespnse>
+    suspend fun getCustomerById(customerId: Long): Flow<CustomerSearchRespnse>
+
 }

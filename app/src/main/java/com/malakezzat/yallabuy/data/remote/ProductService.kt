@@ -5,6 +5,10 @@ import com.malakezzat.yallabuy.data.remote.coupons.DiscountCodeResponse
 import com.malakezzat.yallabuy.data.remote.coupons.priceRuleResponse
 import com.malakezzat.yallabuy.model.Brands
 import com.malakezzat.yallabuy.model.Category
+import com.malakezzat.yallabuy.model.CustomCollection
+import com.malakezzat.yallabuy.model.CustomerRequest
+import com.malakezzat.yallabuy.model.CustomerResponse
+import com.malakezzat.yallabuy.model.CustomerSearchRespnse
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
@@ -16,6 +20,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ProductService {
 
@@ -67,4 +72,19 @@ interface ProductService {
 
     @GET("products/{id}.json")
     suspend fun getProductById(@Path("id") productId: Long): ProductResponse
+
+    @POST("customers.json")
+    suspend fun createCustomer(
+        @Body customerRequest: CustomerRequest
+    ): CustomerResponse
+
+    @GET("customers/search.json")
+    suspend fun getCustomerByEmail(
+        @Query("email") email: String
+    ): CustomerSearchRespnse
+
+    @GET("customers/search.json")
+    suspend fun getCustomerById(
+        @Query("id") email: Long
+    ): CustomerSearchRespnse
 }
