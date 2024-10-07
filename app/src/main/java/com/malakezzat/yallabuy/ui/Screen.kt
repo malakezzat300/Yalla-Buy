@@ -11,6 +11,11 @@ sealed class Screen(val route : String) {
     data object SearchScreen:Screen("searchScreen")
     data object ShoppingScreen:Screen("shoppingScreen")
     data object ProductInfScreen:Screen("productInfo")
-    data object AddressScreen:Screen("addressScreen")
-    data object MapScreen: Screen("mapScreen/{latitude}/{longitude}")
+    data object SettingsScreen:Screen("settingsScreen")
+    data object AddressScreen : Screen("addressScreen/{address}") {
+        fun createRoute(address: String) = "addressScreen/$address"
+    }
+    data object MapScreen : Screen("mapScreen/{latitude}/{longitude}") {
+        fun createRoute(latitude: Float, longitude: Float) = "mapScreen/$latitude/$longitude"
+    }
 }

@@ -66,11 +66,11 @@ import androidx.navigation.NavHostController
 
 
 @Composable
-fun AddressScreen(navController: NavHostController){
+fun AddressScreen(navController: NavHostController, address: String? = null){
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
-    var address by remember { mutableStateOf("") }
+    var addressState by remember { mutableStateOf(address ?: "") }
     var city by remember { mutableStateOf("") }
     var country by remember { mutableStateOf("") }
     var permissionGranted by remember { mutableStateOf(false) }
@@ -89,13 +89,13 @@ fun AddressScreen(navController: NavHostController){
         if (isGranted) {
             if (isLocationEnabled(context)) {
                 getUserLocation(context, fusedLocationClient) { loc ->
-                    address = loc
+                    addressState = loc
                 }
             } else {
                 locationEnabled = false
             }
         } else {
-            address = "Permission denied"
+            addressState = "Permission denied"
         }
     }
 
@@ -184,7 +184,7 @@ fun AddressScreen(navController: NavHostController){
                                 ) == PackageManager.PERMISSION_GRANTED
                             ) {
                                 getUserLocation(context,fusedLocationClient) { loc ->
-                                    address = loc
+                                    addressState = loc
                                 }
                             } else {
                                     permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -202,8 +202,8 @@ fun AddressScreen(navController: NavHostController){
                 }
             }
             OutlinedTextField(
-                value = address,
-                onValueChange = {input -> address = input },
+                value = addressState,
+                onValueChange = {input -> addressState = input },
                 label = { Text(text = "Address") },
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier

@@ -59,8 +59,8 @@ fun NavigationApp(
         Screen.LogInScreen.route,
         Screen.SignUpScreen.route,
         Screen.SearchScreen.route,
-        Screen.AddressScreen.route,
-        Screen.MapScreen.route
+//        Screen.AddressScreen.route,
+//        Screen.MapScreen.route
     )
 
     // Using Scaffold to manage layout
@@ -73,7 +73,7 @@ fun NavigationApp(
         }
         ) { paddingValues ->
 
-            NavHost(navController = navController, startDestination = Screen.AddressScreen.route, Modifier.padding(paddingValues)) {
+            NavHost(navController = navController, startDestination = Screen.AddressScreen.createRoute("addressToNavigate"), Modifier.padding(paddingValues)) {
                 composable(Screen.SplashScreen.route) {
                     SplashScreen(navController)
                 }
@@ -131,9 +131,21 @@ fun NavigationApp(
                     val viewModel: ProductInfoViewModel = viewModel(factory = productInfoViewModelFactory)
                     ProductInfoScreen(productId = productId, viewModel = viewModel, navController = navController)
                 }
-                composable(Screen.AddressScreen.route) {
+                composable( route = Screen.AddressScreen.route
+                ) { backStackEntry ->
+                    val address = backStackEntry.arguments?.getString("address") ?: " "
                     val viewModel: ShoppingCartViewModel = viewModel(factory = shoppingCartViewModelFactory)
-                    AddressScreen(navController)
+                    AddressScreen(navController,address)
+                }
+                composable(
+                    route = Screen.AddressScreen.route,
+                    arguments = listOf(
+                        navArgument("address") { type = NavType.StringType }
+                    )
+                    ) { backStackEntry ->
+                    val address = backStackEntry.arguments?.getString("address") ?: " "
+                    val viewModel: ShoppingCartViewModel = viewModel(factory = shoppingCartViewModelFactory)
+                    AddressScreen(navController,address)
                 }
                 composable(
                     route = Screen.MapScreen.route,
@@ -144,9 +156,7 @@ fun NavigationApp(
                 ) { backStackEntry ->
                     val latitude = backStackEntry.arguments?.getDouble("latitude") ?: 0.0
                     val longitude = backStackEntry.arguments?.getDouble("longitude") ?: 0.0
-                    MapScreen(latitude = latitude, longitude = longitude) { c ->
-                        Log.i("mapTest", "NavigationApp: $c")
-                    }
+                    MapScreen(navController,latitude = latitude, longitude = longitude)
                 }
             }
         }

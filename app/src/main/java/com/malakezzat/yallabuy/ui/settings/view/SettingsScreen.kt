@@ -30,13 +30,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.malakezzat.yallabuy.ui.Screen
 
 @Composable
 fun SettingsScreen() {
     val addresses: List<String> = listOf()
     var selectedCurrency by remember { mutableStateOf("EGP") }
     val onAddNewAddress: () -> Unit = {
-        //TODO open the address screen
+        Screen.AddressScreen.createRoute("addressToNavigate")
     }
     val onDeleteAddress: (String) -> Unit = {
         //TODO delete address from api
@@ -62,7 +63,8 @@ fun SettingsScreen() {
             Spacer(modifier = Modifier.width(50.dp))
 
             Button(
-                onClick = { /* Action for button click */ },
+                onClick = onAddNewAddress
+                ,
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                 shape = RoundedCornerShape(10.dp)
             ) {

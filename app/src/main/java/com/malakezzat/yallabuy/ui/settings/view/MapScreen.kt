@@ -41,6 +41,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation.NavController
+import com.malakezzat.yallabuy.ui.Screen
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -53,7 +55,7 @@ import java.util.Locale
 private var isZooming = false
 
 @Composable
-fun MapScreen(latitude: Double, longitude: Double, onMarkerClick: (String) -> Unit) {
+fun MapScreen(navController : NavController,latitude: Double, longitude: Double) {
     var selectedAddress by remember { mutableStateOf("") }
 
     Column {
@@ -81,7 +83,9 @@ fun MapScreen(latitude: Double, longitude: Double, onMarkerClick: (String) -> Un
                     .fillMaxWidth()
                     .height(50.dp),
                 onClick = {
-                    onMarkerClick(selectedAddress)
+                    navController.navigate(Screen.AddressScreen.createRoute(selectedAddress)) {
+                        popUpTo(Screen.AddressScreen.route) { inclusive = true }
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                 shape = RoundedCornerShape(10.dp),
