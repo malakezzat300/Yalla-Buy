@@ -11,4 +11,6 @@ sealed class Screen(val route : String) {
     data object SearchScreen:Screen("searchScreen")
     data object ShoppingScreen:Screen("shoppingScreen")
     data object ProductInfScreen:Screen("productInfo")
+    data object CategoriesScreen:Screen("categoriesScreen")
+    data object ProductsByCategoryScreen:Screen("productsByCategoryScreen")
 }
