@@ -699,14 +699,14 @@ fun BottomNavigationBar(navController: NavController) {
                 )
             },
             label = { Text("Profile", style = TextStyle(fontSize = 12.sp)) },
-            selected = false /*currentRoute == Screen.ProfileScreen.route*/,
+            selected =  currentRoute == Screen.SettingsScreen.route,
             onClick = {
-                /*if (currentRoute != Screen.ProfileScreen.route) {
-                    navController.popBackStack(Screen.ProfileScreen.route, inclusive = false)
-                    navController.navigate(Screen.ProfileScreen.route) {
+                if (currentRoute != Screen.SettingsScreen.route) {
+                    navController.popBackStack(Screen.SettingsScreen.route, inclusive = false)
+                    navController.navigate(Screen.SettingsScreen.route) {
                         launchSingleTop = true
                     }
-                }*/
+                }
             }
         )
     }

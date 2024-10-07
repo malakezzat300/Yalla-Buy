@@ -416,9 +416,10 @@ fun VoucherBottomSheet() {
     }
 }
 
-//@Composable
-//fun ShoppingScreenPreview() {
-//    YallaBuyTheme {
-//        ShoppingCartScreen()
-//    }
-//}
+/*
+@Composable
+fun ShoppingScreenPreview() {
+    YallaBuyTheme {
+        ShoppingCartScreen()
+    }
+}*/
