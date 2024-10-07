@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.malakezzat.yallabuy.model.Product
+import com.malakezzat.yallabuy.ui.Screen
 
 //@Preview(showSystemUi = true)
 @Composable
@@ -111,7 +112,7 @@ fun SearchScreen(viewModel: SearchViewModel,
                 contentPadding = PaddingValues(8.dp)
             ) {
                 items(filteredProducts) { searchItem ->
-                    RecentSearchItem(searchItem)
+                    RecentSearchItem(searchItem,navController)
                 }
             }
         }
@@ -119,7 +120,7 @@ fun SearchScreen(viewModel: SearchViewModel,
     }
 }
 @Composable
-fun RecentSearchItem(product: Product) {
+fun RecentSearchItem(product: Product,navController: NavController) {
 
     Column(
         modifier = Modifier
@@ -132,7 +133,9 @@ fun RecentSearchItem(product: Product) {
         Box(modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
-            .background(Color.White)) {
+            .background(Color.White)
+            .clickable { navController.navigate("${Screen.ProductInfScreen.route}/${product.id}") }
+        ) {
             if(product.image != null){
                 AsyncImage(
                     model = product.image.src,
