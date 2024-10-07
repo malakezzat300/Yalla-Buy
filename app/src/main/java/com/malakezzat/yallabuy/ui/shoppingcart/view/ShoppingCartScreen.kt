@@ -117,6 +117,9 @@ fun ShoppingCartScreen(
                 viewModel.getVariantById(orderItems.get(0).variant_id)
             }
             subtotal = calculateSubtotal(orderItems)
+            LaunchedEffect (Unit) {
+                total = subtotal
+            }
         }
     }
 
