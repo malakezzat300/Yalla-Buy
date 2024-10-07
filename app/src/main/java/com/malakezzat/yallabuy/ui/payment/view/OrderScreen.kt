@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.malakezzat.paymenttest2.model.FakeData
 import com.malakezzat.yallabuy.ui.Screen
@@ -75,7 +76,14 @@ fun OrderScreen(viewModel: PaymentViewModel,
 
         if (orderResponse != null) {
             Text("Order Created: ${orderResponse?.id}", color = Color.Green)
-            navController.navigate("checkout_screen/${orderResponse?.id}")
+            if(isLoading) {
+                navController.navigate(
+                    Screen.CheckoutScreen.route.replace(
+                        "{orderId}",
+                        orderResponse?.id ?: ""
+                    )
+                )
+            }
             isLoading = false
         }
     }

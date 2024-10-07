@@ -3,6 +3,7 @@ package com.malakezzat.yallabuy.data.remot
 
 import com.malakezzat.yallabuy.data.remote.coupons.DiscountCodeResponse
 import com.malakezzat.yallabuy.data.remote.coupons.priceRuleResponse
+import com.malakezzat.yallabuy.model.Brands
 import com.malakezzat.yallabuy.model.Category
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.CustomerRequest
@@ -32,6 +33,13 @@ interface ProductService {
     @GET("custom_collections.json")
     suspend fun getCategories(): Category
 
+    @GET("collections/{collection_id}/products.json") //collections/841564295/products.json
+    suspend fun getProductsInCollection(
+        @Path("collection_id") collectionId: Long
+    ): ProductsResponse
+
+    @GET("smart_collections.json")
+    suspend fun getBrands(): Brands
 
     @GET("price_rules.json")
     suspend fun getPriceRules(): priceRuleResponse

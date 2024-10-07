@@ -17,6 +17,9 @@ import com.malakezzat.yallabuy.ui.auth.viewmodel.SignUpViewModel
 import com.malakezzat.yallabuy.ui.auth.viewmodel.SignUpViewModelFactory
 import com.malakezzat.yallabuy.ui.auth.viewmodel.login.LogInViewModel
 import com.malakezzat.yallabuy.ui.auth.viewmodel.login.LogInViewModelFactory
+import com.malakezzat.yallabuy.ui.categories.view.CategoriesScreen
+import com.malakezzat.yallabuy.ui.categories.viewmodel.CategoriesViewModel
+import com.malakezzat.yallabuy.ui.categories.viewmodel.CategoriesViewModelFactory
 import com.malakezzat.yallabuy.ui.home.view.BottomNavigationBar
 import com.malakezzat.yallabuy.ui.home.view.HomeScreen
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
@@ -29,6 +32,9 @@ import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModelFactory
 import com.malakezzat.yallabuy.ui.product_info.ProductInfoScreen
 import com.malakezzat.yallabuy.ui.product_info.ProductInfoViewModel
 import com.malakezzat.yallabuy.ui.product_info.ProductInfoViewModelFactory
+import com.malakezzat.yallabuy.ui.productbycategory.view.ProductsByCategoryScreen
+import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollectionIdViewModel
+import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollectionIdViewModelFactory
 import com.malakezzat.yallabuy.ui.search.SearchScreen
 import com.malakezzat.yallabuy.ui.search.SearchViewModel
 import com.malakezzat.yallabuy.ui.search.SearchViewModelFactory
@@ -45,6 +51,8 @@ fun NavigationApp(
     searchViewModelFactory: SearchViewModelFactory,
     shoppingCartViewModelFactory: ShoppingCartViewModelFactory,
     productInfoViewModelFactory: ProductInfoViewModelFactory,
+    categoriesViewModelFactory: CategoriesViewModelFactory,
+    productsByCollectionIdViewModelFactory: ProductsByCollectionIdViewModelFactory,
     navController: NavHostController = rememberNavController()
 ) {
     val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -67,7 +75,8 @@ fun NavigationApp(
             }
         }
         ) { paddingValues ->
-            NavHost(navController = navController, startDestination = Screen.SplashScreen.route, Modifier.padding(paddingValues)) {
+
+            NavHost(navController = navController, startDestination = Screen.HomeScreen.route, Modifier.padding(paddingValues)) {
                 composable(Screen.SplashScreen.route) {
                     SplashScreen(navController)
                 }
@@ -75,6 +84,17 @@ fun NavigationApp(
                     val viewModel: HomeScreenViewModel = viewModel(factory = homeScreenViewModelFactory)
                     HomeScreen(viewModel = viewModel, navController)
                 }
+                composable(Screen.CategoriesScreen.route) {
+                    val viewModel: CategoriesViewModel = viewModel(factory = categoriesViewModelFactory)
+                    CategoriesScreen(viewModel = viewModel, navController)
+                }
+                composable("${Screen.ProductsByCategoryScreen.route}/{categoryId}/{body_html}") { backStackEntry ->
+                    val categoryId = backStackEntry.arguments?.getString("categoryId")
+                    val bodyHtml = backStackEntry.arguments?.getString("body_html")
+                    val viewModel: ProductsByCollectionIdViewModel = viewModel(factory = productsByCollectionIdViewModelFactory)
+                    ProductsByCategoryScreen(viewModel = viewModel, navController, categoryId, bodyHtml)
+                }
+
                 composable(Screen.SignUpScreen.route) {
                     val viewModel: SignUpViewModel = viewModel(factory = signUpViewModelFactory)
                     SignupScreen(viewModel, navController)
@@ -91,7 +111,7 @@ fun NavigationApp(
                     route = Screen.CheckoutScreen.route,
                     arguments = listOf(navArgument("orderId") { type = NavType.StringType })
                 ) { backStackEntry ->
-                    val orderId = backStackEntry.arguments?.getString("orderId")
+                    val orderId = backStackEntry.arguments?.getString("orderId") ?: return@composable
                     val viewModel: PaymentViewModel = viewModel(factory = paymentViewModelFactory)
                     CheckoutView(viewModel, navController, orderId)
                 }

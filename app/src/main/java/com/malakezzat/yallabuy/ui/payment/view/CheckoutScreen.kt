@@ -86,6 +86,8 @@ fun CheckoutScreen(
 
     val paymentKey by viewModel.paymentKey.collectAsState()
 
+    Log.i("paymentTest", "CheckoutScreen: orderId $orderId")
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -107,7 +109,9 @@ fun CheckoutScreen(
                 onValueChange = {},
                 readOnly = true,
                 label = { Text("Select Address") },
-                modifier = Modifier.fillMaxWidth().clickable { expanded = !expanded },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded = !expanded },
                 trailingIcon = {
                     Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Dropdown")
                 }
@@ -171,21 +175,25 @@ fun CheckoutScreen(
                     }
                 )
                 Text(text = method)
+                if(method == "Credit Card"){
+                    Log.i("paymentTest", "Checkout: Credit Card")
+                    val paymentKeyRequest = FakeData.paymentKeyRequest.apply {
+//                        this.order_id = orderId.toString()
+                    }
+                    viewModel.fetchPaymentKey(paymentKeyRequest)
+                }
             }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        val paymentKeyRequest = FakeData.paymentKeyRequest.apply {
-            this.order_id = orderId.toString()
-        }
-        viewModel.fetchPaymentKey(paymentKeyRequest)
 
+        Log.i("paymentTest", "Checkout: paymentKey $paymentKey")
         Button(
             onClick = {
                 if(selectedPaymentMethod == "Credit Card"){
-                    navController.navigate(Screen.PaymentScreen.route)
-                    paymentKey
+
+                    navController.navigate(Screen.PaymentScreen.route.replace("{paymentKey}", paymentKey ?: "default key"))
                 } else {
                     //with cash
                 }
