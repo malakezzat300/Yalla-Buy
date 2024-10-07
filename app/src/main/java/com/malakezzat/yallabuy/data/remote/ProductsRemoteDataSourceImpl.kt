@@ -3,11 +3,15 @@ package com.malakezzat.yallabuy.data.remote
 import android.util.Log
 import com.malakezzat.yallabuy.data.remot.ProductService
 import com.malakezzat.yallabuy.model.CustomCollection
+import com.malakezzat.yallabuy.model.CustomerRequest
+import com.malakezzat.yallabuy.model.CustomerResponse
+import com.malakezzat.yallabuy.model.CustomerSearchRespnse
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.ProductResponse
+import com.malakezzat.yallabuy.model.SmartCollection
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -35,6 +39,14 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         emit(emptyList())
     }
 
+    override suspend fun getProductsByCollectionId(id: Long): Flow<List<Product>> = flow  {
+        val response = productService.getProductsInCollection(id).products
+        emit(response)
+    }.catch { e ->
+        Log.e(TAG, "Error fetching products", e)
+        emit(emptyList())
+    }
+
     override suspend fun getCategories(): Flow<List<CustomCollection>> = flow {
         val response = productService.getCategories().custom_collections
         emit(response)
@@ -43,11 +55,19 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         throw e
     }
 
+    override suspend fun getBrands(): Flow<List<SmartCollection>> = flow{
+        val response = productService.getBrands().smart_collections
+        emit(response)
+    }.catch {e->
+        Log.e(TAG, "Error fetching Brands", e)
+        throw e
+    }
+
     override suspend fun getAllDraftOrders(): Flow<DraftOrdersResponse> = flow {
         val response = productService.getAllDraftOrders()
         emit(response)
     }.catch { e ->
-        Log.e(TAG, "Error fetching Categories", e)
+        Log.e(TAG, "Error fetching AllDraftOrders", e)
         throw e
     }
 
@@ -55,7 +75,7 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         val response = productService.getDraftOrder(draftOrderId)
         emit(response)
     }.catch { e ->
-        Log.e(TAG, "Error fetching Categories", e)
+        Log.e(TAG, "Error fetching DraftOrder", e)
         throw e
     }
 
@@ -63,7 +83,7 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         val response = productService.createDraftOrder(draftOrder)
         emit(response)
     }.catch { e ->
-        Log.e(TAG, "Error fetching Categories", e)
+        Log.e(TAG, "Error create DraftOrder", e)
         throw e
     }
 
@@ -74,7 +94,7 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         val response = productService.updateDraftOrder(draftOrderId,draftOrder)
         emit(response)
     }.catch { e ->
-        Log.e(TAG, "Error fetching Categories", e)
+        Log.e(TAG, "Error update DraftOrder", e)
         throw e
     }
 
@@ -86,7 +106,7 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         val response = productService.finalizeDraftOrder(draftOrderId)
         emit(response)
     }.catch { e ->
-        Log.e(TAG, "Error fetching Categories", e)
+        Log.e(TAG, "Error finalize DraftOrder", e)
         throw e
     }
     override suspend fun getProductById(id : Long) : Flow<ProductResponse> = flow{
@@ -94,6 +114,31 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         emit(response)
     }.catch { e ->
         Log.e(TAG, "Error fetching Product by id", e)
+        throw e
+    }
+
+    override suspend fun createCustomer(customerRequest: CustomerRequest) : Flow<CustomerResponse> = flow{
+        val response = productService.createCustomer(customerRequest)
+        emit(response)
+    }.catch { e ->
+        Log.e(TAG, "Error creating customer ", e)
+        throw e
+    }
+
+    override suspend fun getCustomerByEmai(customerEmail: String) : Flow<CustomerSearchRespnse> = flow{
+        val response = productService.getCustomerByEmail(customerEmail)
+        Log.i(TAG, "getCustomerByEmai: ${response}")
+        emit(response)
+    }.catch { e ->
+        Log.e(TAG, "Error creating customer ", e)
+        throw e
+    }
+    override suspend fun getCustomerById(customerId: Long) : Flow<CustomerSearchRespnse> = flow{
+        val response = productService.getCustomerById(customerId)
+        Log.i(TAG, "getCustomerById: ${response}")
+        emit(response)
+    }.catch { e ->
+        Log.e(TAG, "Error creating customer ", e)
         throw e
     }
 }

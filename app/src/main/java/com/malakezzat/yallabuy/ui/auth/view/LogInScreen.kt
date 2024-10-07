@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
+import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.firebase.FirebaseAuthun
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.auth.viewmodel.login.LogInViewModel
@@ -248,7 +250,7 @@ fun LogInScreenPreview(
                 .fillMaxWidth()
                 .background(color = Color.White)
                 .padding(10.dp),
-            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = colorResource(R.color.cyan))
         )
 
 
@@ -276,7 +278,7 @@ fun LogInScreenPreview(
                 }
             },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
-            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = colorResource(R.color.cyan))
 
 
         )
