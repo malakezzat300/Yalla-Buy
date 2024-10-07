@@ -54,9 +54,12 @@ import androidx.navigation.NavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.firebase.FirebaseAuthun
+import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.Customer
 import com.malakezzat.yallabuy.model.CustomerRequest
+import com.malakezzat.yallabuy.model.CustomerSearchRespnse
 import com.malakezzat.yallabuy.model.Customerr
+import com.malakezzat.yallabuy.model.Customers
 import com.malakezzat.yallabuy.ui.auth.viewmodel.SignUpViewModel
 
 @Composable
@@ -68,7 +71,7 @@ fun SignupScreen(viewModel: SignUpViewModel,
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
-    val customerData by viewModel.customerData.collectAsStateWithLifecycle()
+    val customerData by viewModel.customerDataByEmail.collectAsStateWithLifecycle()
     var auth = FirebaseAuthun()
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
@@ -200,6 +203,20 @@ fun SignupScreen(viewModel: SignUpViewModel,
         Button(
             onClick = {
               //  viewModel.signInWithEmailAndPassword(email,password,fullName)
+                viewModel.getCustomerByEmail("sammaralaa33@gmail.com")
+                when(customerData){
+                    is ApiState.Error -> {
+                        Log.i("TAG", "SignupScreen: customer by id failed")
+                    }
+                    ApiState.Loading -> {
+
+                    }
+                    is ApiState.Success -> {
+                        val brands = (customerData as ApiState.Success<CustomerSearchRespnse>).data
+
+                        Log.i("TAG", "SignupScreen: ${ brands.customers.get(0).id}")
+                    }
+                }
                 isLoading=true
                 if(email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || email.isEmpty()){
                     Toast.makeText(context,"complete empty fields please",Toast.LENGTH_LONG).show()

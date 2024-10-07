@@ -5,6 +5,7 @@ import com.malakezzat.yallabuy.data.remote.coupons.PriceRule
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
+import com.malakezzat.yallabuy.model.CustomerSearchRespnse
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
@@ -29,5 +30,5 @@ interface ProductsRepository {
 
     suspend fun getProductById(productId: Long): Flow<ProductResponse>
     suspend fun createCustomer(customerRequest: CustomerRequest): Flow<CustomerResponse>
-    suspend fun getCustomerByEmail(customer: String): Flow<CustomerResponse>
+    suspend fun getCustomerByEmail(customer: String): Flow<CustomerSearchRespnse>
 }

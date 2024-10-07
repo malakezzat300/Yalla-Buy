@@ -8,6 +8,7 @@ import com.malakezzat.yallabuy.data.sharedpref.GlobalSharedPreferenceDataSource
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
+import com.malakezzat.yallabuy.model.CustomerSearchRespnse
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
@@ -88,7 +89,7 @@ class ProductsRepositoryImpl private constructor(
     override suspend fun createCustomer(customerRequest: CustomerRequest): Flow<CustomerResponse> {
         return productsRemoteDataSource.createCustomer(customerRequest)
     }
-    override suspend fun getCustomerByEmail(customer: String): Flow<CustomerResponse> {
+    override suspend fun getCustomerByEmail(customer: String): Flow<CustomerSearchRespnse> {
         return productsRemoteDataSource.getCustomerByEmai(customer)
     }
 }

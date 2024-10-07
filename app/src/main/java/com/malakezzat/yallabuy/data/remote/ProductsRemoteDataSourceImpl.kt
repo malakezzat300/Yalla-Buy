@@ -5,6 +5,7 @@ import com.malakezzat.yallabuy.data.remot.ProductService
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
+import com.malakezzat.yallabuy.model.CustomerSearchRespnse
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
@@ -107,8 +108,9 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         throw e
     }
 
-    override suspend fun getCustomerByEmai(customer: String) : Flow<CustomerResponse> = flow{
+    override suspend fun getCustomerByEmai(customer: String) : Flow<CustomerSearchRespnse> = flow{
         val response = productService.getCustomerByEmail(customer)
+        Log.i(TAG, "getCustomerByEmai: ${response}")
         emit(response)
     }.catch { e ->
         Log.e(TAG, "Error creating customer ", e)

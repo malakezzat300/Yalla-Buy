@@ -7,6 +7,7 @@ import com.malakezzat.yallabuy.model.Category
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
+import com.malakezzat.yallabuy.model.CustomerSearchRespnse
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
@@ -72,5 +73,5 @@ interface ProductService {
     @GET("customers/search.json")
     suspend fun getCustomerByEmail(
         @Query("email") email: String
-    ): CustomerResponse
+    ): CustomerSearchRespnse
 }
