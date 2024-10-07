@@ -120,7 +120,7 @@ fun CustomTopBar(sheetState: ModalBottomSheetState) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 38.dp, start = 10.dp, end = 10.dp, bottom = 10.dp),
+            .padding(top = 16.dp, start = 10.dp, end = 10.dp, bottom = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -308,7 +308,8 @@ fun ShoppingView(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp)
-                    .height(56.dp),
+                    .height(56.dp)
+                    .align(Alignment.CenterHorizontally),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                 shape = RoundedCornerShape(10.dp)
             ) {
