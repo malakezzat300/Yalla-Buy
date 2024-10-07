@@ -41,7 +41,7 @@ fun SplashScreen(navController: NavController) {
             progress = progress
         )
         //Spacer(modifier = Modifier.height(16.dp)) // Optional spacing between animation and text
-        Text("Welcome to YallaBuy", fontSize = 24.sp, color = Color.Cyan, fontWeight = FontWeight.Normal)
+        Text("Welcome to YallaBuy", fontSize = 24.sp, color = Color.Green, fontWeight = FontWeight.Normal)
     }
 
     LaunchedEffect(Unit) {
