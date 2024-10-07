@@ -44,6 +44,7 @@ import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.LineItem
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.*
+import java.util.Properties
 
 
 @Composable
@@ -215,17 +216,28 @@ fun DescriptionSection(product: Product) {
 @Composable
 fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : String,oldDraftOrder : DraftOrder){
     Button(onClick = {
-        //val properties = Properties(listOf(Property(name = "imageUrl",value = product.image.src)))
+        val properties = listOf(Property(name = "imageUrl",value = product.image.src))
+        Log.i("propertiesTest", "AddToCart: $properties")
         if(oldDraftOrder.id == 0L) {
-            val lineItems = listOf(LineItem(product.title,product.variants[0].price,product.variants[0].id,1))
+            val lineItems = listOf(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties))
             val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
             val draftOrderRequest = DraftOrderRequest(draftOrder)
             viewModel.createDraftOrder(draftOrderRequest)
         } else {
-            val lineItems = oldDraftOrder.line_items + listOf(LineItem(product.title,product.variants[0].price,product.variants[0].id,1))
-            val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
-            val draftOrderRequest = DraftOrderRequest(draftOrder)
-            oldDraftOrder.id?.let { viewModel.updateDraftOrder(it,draftOrderRequest) }
+            if(!oldDraftOrder.line_items.contains(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties))) {
+                val lineItems = oldDraftOrder.line_items + listOf(
+                    LineItem(
+                        product.title,
+                        product.variants[0].price,
+                        product.variants[0].id,
+                        1,
+                        properties = properties
+                    )
+                )
+                val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
+                val draftOrderRequest = DraftOrderRequest(draftOrder)
+                oldDraftOrder.id?.let { viewModel.updateDraftOrder(it,draftOrderRequest) }
+            }
         }
     }) {
         Text("Add to Favorites")
@@ -235,17 +247,28 @@ fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : Str
 @Composable
 fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,oldDraftOrder : DraftOrder) {
         Button(onClick = {
-            //val properties = Properties(listOf(Property(name = "imageUrl",value = product.image.src)))
+            val properties = listOf(Property(name = "imageUrl",value = product.image.src))
+            Log.i("propertiesTest", "AddToCart: $properties")
             if(oldDraftOrder.id == 0L) {
-                val lineItems = listOf(LineItem(product.title,product.variants[0].price,product.variants[0].id,1))
+                val lineItems = listOf(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties))
                 val draftOrder = DraftOrder(note = "shoppingCart", line_items = lineItems, email = email)
                 val draftOrderRequest = DraftOrderRequest(draftOrder)
                 viewModel.createDraftOrder(draftOrderRequest)
             } else {
-                val lineItems = oldDraftOrder.line_items + listOf(LineItem(product.title,product.variants[0].price,product.variants[0].id,1))
-                val draftOrder = DraftOrder(note = "shoppingCart", line_items = lineItems, email = email)
-                val draftOrderRequest = DraftOrderRequest(draftOrder)
-                oldDraftOrder.id?.let { viewModel.updateDraftOrder(it,draftOrderRequest) }
+                if(!oldDraftOrder.line_items.contains(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties))) {
+                    val lineItems = oldDraftOrder.line_items + listOf(
+                        LineItem(
+                            product.title,
+                            product.variants[0].price,
+                            product.variants[0].id,
+                            1,
+                            properties = properties
+                        )
+                    )
+                    val draftOrder = DraftOrder(note = "shoppingCart", line_items = lineItems, email = email)
+                    val draftOrderRequest = DraftOrderRequest(draftOrder)
+                    oldDraftOrder.id?.let { viewModel.updateDraftOrder(it,draftOrderRequest) }
+                }
             }
         }) {
             Text("Add to Cart")

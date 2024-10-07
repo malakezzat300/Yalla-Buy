@@ -6,13 +6,9 @@ data class DraftOrderRequest(
 
 data class DraftOrder(
     val id: Long? = null,
-    val note: String, // "shoppingCart"
-    val line_items: List<LineItem>,
-    //val customer: Customer,
-    //val shipping_address: Address? = null,
-    //val save: Save,
-    //val use_customer_default_address: Boolean,
-    val email : String,
+    val note: String = "",
+    val line_items: List<LineItem> = emptyList(),
+    val email: String = ""
 )
 
 data class LineItem(
@@ -20,7 +16,7 @@ data class LineItem(
     val price : String,
     val variant_id: Long,
     val quantity: Int,
-    //val properties :Properties
+    val properties : List<Property>
 )
 
 data class Customer(
@@ -39,10 +35,6 @@ data class Address(
 
 data class Save(
     val update : Boolean = true
-)
-
-data class Properties(
-    val properties: List<Property>,
 )
 
 data class Property(
