@@ -102,6 +102,56 @@ fun ProductsByCategoryScreen(
 }
 
 
+@Composable
+fun ProductsByBrandScreen(
+    viewModel: ProductsByCollectionIdViewModel,
+    navController: NavController,
+    id: String?,
+    body: String?
+) {
+    val productState by viewModel.productList.collectAsStateWithLifecycle()
+    val categoryId: Long? = id?.toLongOrNull()
+
+    LaunchedEffect(Unit) {
+        //Log.d(TAG, categoriesState.toString())
+        categoryId?.let {
+            viewModel.getProductsByCollectionId(it)
+        }
+    }
+    Scaffold(
+        topBar = { body?.let { CustomTopBarCategory(navController, it) } },
+        containerColor = Color.White
+    ) {
+
+        Column(
+            modifier = Modifier
+                .padding(it)
+                .verticalScroll(rememberScrollState())
+                .background(color = Color.White)
+        ) {
+            when (productState) {
+                is ApiState.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                }
+
+                is ApiState.Success -> {
+                    val products = (productState as ApiState.Success<List<Product>>).data
+                    LatestProductsSectionById(products, navController)
+                }
+
+                is ApiState.Error -> {
+                    Text(
+                        text = "Error: ${(productState as ApiState.Error).message}",
+                        color = Color.Red
+                    )
+                }
+            }
+        }
+
+    }
+}
+
+
 
 @Composable
 fun LatestProductsSectionById(products: List<Product>, navController: NavController) {

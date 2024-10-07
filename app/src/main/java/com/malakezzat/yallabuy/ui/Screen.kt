@@ -13,4 +13,5 @@ sealed class Screen(val route : String) {
     data object ProductInfScreen:Screen("productInfo")
     data object CategoriesScreen:Screen("categoriesScreen")
     data object ProductsByCategoryScreen:Screen("productsByCategoryScreen")
+    data object ProductsByBrandScreen:Screen("productsByBrandScreen")
 }

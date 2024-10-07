@@ -118,7 +118,7 @@ fun HomeScreen(
 
                 is ApiState.Success -> {
                     val brands = (brandsState as ApiState.Success<List<SmartCollection>>).data
-                    BrandsList(brands)
+                    BrandsList(brands,navController)
                 }
 
                 is ApiState.Error -> {
@@ -172,7 +172,7 @@ fun HomeScreen(
 
 
 @Composable
-fun BrandsList(brands: List<SmartCollection>) {
+fun BrandsList(brands: List<SmartCollection>,navController: NavController) {
     Column(modifier = Modifier.padding(16.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -194,14 +194,18 @@ fun BrandsList(brands: List<SmartCollection>) {
                 Card(
                     modifier = Modifier
                         .padding(4.dp)
-                        .width(100.dp), // Adjust width as needed
+                        .width(120.dp)
+                        .clickable {
+                            Log.i(TAG, "BrandsList: clicked")
+                            navController.navigate("${Screen.ProductsByBrandScreen.route}/${brand.id.toString()}/${brand.title}")
+                        }
+                    ,
                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
-                            .clickable { isSelected = !isSelected }
                             .padding(8.dp) // Padding inside the card
                     ) {
                         Image(
