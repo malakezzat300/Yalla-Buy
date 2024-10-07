@@ -7,6 +7,7 @@ import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
 import com.malakezzat.yallabuy.model.CustomerSearchRespnse
 import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Product
@@ -79,7 +80,7 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         throw e
     }
 
-    override suspend fun createDraftOrder(draftOrder: DraftOrder): Flow<DraftOrderResponse> = flow {
+    override suspend fun createDraftOrder(draftOrder: DraftOrderRequest): Flow<DraftOrderResponse> = flow {
         val response = productService.createDraftOrder(draftOrder)
         emit(response)
     }.catch { e ->
@@ -89,7 +90,7 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
 
     override suspend fun updateDraftOrder(
         draftOrderId: Long,
-        draftOrder: DraftOrder
+        draftOrder: DraftOrderRequest
     ): Flow<DraftOrderResponse> = flow {
         val response = productService.updateDraftOrder(draftOrderId,draftOrder)
         emit(response)

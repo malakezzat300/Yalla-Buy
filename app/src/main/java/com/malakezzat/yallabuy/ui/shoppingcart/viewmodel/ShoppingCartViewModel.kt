@@ -7,6 +7,7 @@ import com.malakezzat.yallabuy.data.ProductsRepository
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Product
@@ -61,7 +62,7 @@ class ShoppingCartViewModel(private val repository: ProductsRepository) : ViewMo
         }
     }
 
-    fun createDraftOrder(draftOrder: DraftOrder) {
+    fun createDraftOrder(draftOrder: DraftOrderRequest) {
         viewModelScope.launch {
             repository.createDraftOrder(draftOrder)
                 .onStart {
@@ -77,7 +78,7 @@ class ShoppingCartViewModel(private val repository: ProductsRepository) : ViewMo
         }
     }
 
-    fun updateDraftOrder(draftOrderId: Long, draftOrder: DraftOrder) {
+    fun updateDraftOrder(draftOrderId: Long, draftOrder: DraftOrderRequest) {
         viewModelScope.launch {
             repository.updateDraftOrder(draftOrderId, draftOrder)
                 .onStart {
