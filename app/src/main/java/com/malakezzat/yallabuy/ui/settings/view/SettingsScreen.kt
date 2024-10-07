@@ -30,14 +30,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.malakezzat.yallabuy.ui.Screen
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(navController: NavController) {
     val addresses: List<String> = listOf()
     var selectedCurrency by remember { mutableStateOf("EGP") }
     val onAddNewAddress: () -> Unit = {
-        Screen.AddressScreen.createRoute("addressToNavigate")
+        navController.navigate(Screen.AddressScreen.createRoute(""))
     }
     val onDeleteAddress: (String) -> Unit = {
         //TODO delete address from api

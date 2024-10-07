@@ -35,6 +35,7 @@ import com.malakezzat.yallabuy.ui.search.SearchViewModel
 import com.malakezzat.yallabuy.ui.search.SearchViewModelFactory
 import com.malakezzat.yallabuy.ui.settings.view.AddressScreen
 import com.malakezzat.yallabuy.ui.settings.view.MapScreen
+import com.malakezzat.yallabuy.ui.settings.view.SettingsScreen
 import com.malakezzat.yallabuy.ui.shoppingcart.view.ShoppingCartScreen
 import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModel
 import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModelFactory
@@ -73,7 +74,7 @@ fun NavigationApp(
         }
         ) { paddingValues ->
 
-            NavHost(navController = navController, startDestination = Screen.AddressScreen.createRoute("addressToNavigate"), Modifier.padding(paddingValues)) {
+            NavHost(navController = navController, startDestination = Screen.HomeScreen.route, Modifier.padding(paddingValues)) {
                 composable(Screen.SplashScreen.route) {
                     SplashScreen(navController)
                 }
@@ -131,11 +132,10 @@ fun NavigationApp(
                     val viewModel: ProductInfoViewModel = viewModel(factory = productInfoViewModelFactory)
                     ProductInfoScreen(productId = productId, viewModel = viewModel, navController = navController)
                 }
-                composable( route = Screen.AddressScreen.route
-                ) { backStackEntry ->
-                    val address = backStackEntry.arguments?.getString("address") ?: " "
-                    val viewModel: ShoppingCartViewModel = viewModel(factory = shoppingCartViewModelFactory)
-                    AddressScreen(navController,address)
+                composable( route = Screen.SettingsScreen.route
+                ) {
+                    val viewModel: ProductInfoViewModel = viewModel(factory = productInfoViewModelFactory)
+                    SettingsScreen(navController)
                 }
                 composable(
                     route = Screen.AddressScreen.route,
