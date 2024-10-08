@@ -8,6 +8,8 @@ import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
+import com.malakezzat.yallabuy.model.Order
+import com.malakezzat.yallabuy.model.Orders
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.ProductResponse
 import com.malakezzat.yallabuy.model.SmartCollection
@@ -20,7 +22,7 @@ interface ProductsRemoteDataSource {
     suspend fun getProductsByCollectionId(id:Long): Flow<List<Product>>
     suspend fun getCategories(): Flow<List<CustomCollection>>
     suspend fun getBrands(): Flow<List<SmartCollection>>
-
+    suspend fun getAllOrdersForCustomerByID(id: Long): Flow<List<Order>>
     suspend fun getAllDraftOrders(): Flow<DraftOrdersResponse>
     suspend fun getDraftOrder(draftOrderId: Long): Flow<DraftOrderResponse>
     suspend fun createDraftOrder(draftOrder: DraftOrderRequest): Flow<DraftOrderResponse>
