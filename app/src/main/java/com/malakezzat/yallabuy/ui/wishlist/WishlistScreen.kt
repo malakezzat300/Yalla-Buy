@@ -30,6 +30,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -58,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remote.ApiState
@@ -94,10 +96,12 @@ fun WishlistScreen(viewModel: WishlistViewModel, navController: NavController) {
     when(wishlistItems){
         is ApiState.Error ->{
             isLoading = false
+
            // Log.i("shoppingCartTest", "ShoppingCartScreen: draftOrder ${(shoppingCartOrder as ApiState.Error).message}")
         }
         ApiState.Loading -> {
             isLoading = true
+            CircularProgressIndicator()
         }
         is ApiState.Success -> {
             isLoading = false
@@ -118,8 +122,12 @@ fun WishlistScreen(viewModel: WishlistViewModel, navController: NavController) {
             TopAppBar(
                 title = { Text(text = "Wishlist") },
                 navigationIcon = {
-                    IconButton(onClick = {  }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    IconButton(onClick = { navController.navigate(Screen.HomeScreen.route) }) {
+                        Image(
+                            painter = painterResource(id = R.drawable.back_arrow),
+                            contentDescription = "Search Icon",
+                            modifier = Modifier.size(24.dp)
+                        )
                     }
                 },
                 backgroundColor = Color.White,
@@ -136,7 +144,9 @@ fun WishlistScreen(viewModel: WishlistViewModel, navController: NavController) {
             }
         }
     }else{
-        EmptyWishlistScreen(navController)
+        if(!isLoading){
+            EmptyWishlistScreen(navController)
+        }
     }
 
 }
@@ -153,7 +163,8 @@ fun WishlistItem(viewModel: WishlistViewModel,
         modifier = Modifier
             .fillMaxWidth()
             .height(120.dp) // Adjust height as needed
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable { navController.navigate("${Screen.ProductInfScreen.route}/${item.variant_id}") },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -222,10 +233,14 @@ fun WishlistItem(viewModel: WishlistViewModel,
                             }
                         } else {
                             draftOrder.id?.let { viewModel.deleteDraftOrder(it) }
+                            navController.popBackStack(Screen.WishlistScreen.route, inclusive = true)
+                             navController.navigate(Screen.WishlistScreen.route)
+
 
                         }
-                        //onItemUpdated()
+
                     }
+
                 )
             }
         }
