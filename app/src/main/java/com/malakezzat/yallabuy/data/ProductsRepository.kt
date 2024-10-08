@@ -41,6 +41,13 @@ interface ProductsRepository {
     suspend fun getCustomerByEmail(customer: String): Flow<CustomerSearchRespnse>
     suspend fun getCustomerById(customer: Long): Flow<CustomerSearchRespnse>
     suspend fun getVariantById(variantId: Long): Flow<VariantResponse>
-
     suspend fun getConversionRate(): Flow<CurrencyResponse>
+
+    //user id
+    fun getUserId(): Long
+    fun setUserId(id: Long)
+
+    //user email
+    fun getUserEmail():String
+    fun setUserEmail(string:String)
 }

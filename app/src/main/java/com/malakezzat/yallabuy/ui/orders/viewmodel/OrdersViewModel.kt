@@ -30,6 +30,9 @@ class OrdersViewModel (private val repository: ProductsRepository): ViewModel() 
     }
     fun getUserByEmail(){
         val userEmail = FirebaseAuth.getInstance().currentUser?.email
+        if (userEmail != null) {
+            repository.setUserEmail(userEmail)
+        }
         viewModelScope.launch {
             if (userEmail != null) {
                 repository.getCustomerByEmail(userEmail)
@@ -45,6 +48,7 @@ class OrdersViewModel (private val repository: ProductsRepository): ViewModel() 
                     .collect { customerData ->
                         _customerDataByEmail.value = ApiState.Success(customerData) // Set success state with data
                         Log.i(TAG, "getCustomer: ${customerData.customers.get(0).id}")
+                        customerData.customers.get(0).id?.let { repository.setUserId(it) }
                     }
             }
         }
@@ -54,7 +58,7 @@ class OrdersViewModel (private val repository: ProductsRepository): ViewModel() 
     fun getAllOrdersForCustomerByID(id :Long){
         viewModelScope.launch {
             //add a temporary permanent email
-            repository.getAllOrdersForCustomerByID(7713903837366)
+            repository.getAllOrdersForCustomerByID(repository.getUserId())
                 .onStart {
                     _customerOrders.value = ApiState.Loading
                 }.catch { e->
@@ -63,7 +67,8 @@ class OrdersViewModel (private val repository: ProductsRepository): ViewModel() 
                     Log.i(TAG, "getAllOrdersForCustomerByID: error ${e.message}")
                 }.collect{customerOrders->
                     _customerOrders.value = ApiState.Success(customerOrders)
-                    Log.i(TAG, "getAllOrdersForCustomerByID: ${customerOrders.get(0).line_items}")
+                    //Log.i(TAG, "getAllOrdersForCustomerByID: ${customerOrders.get(0).note}")
+                    Log.i(TAG, "getAllOrdersForCustomerByID: ${repository.getUserId()},,,,,,${repository.getUserEmail()}")
 
                 }
         }
