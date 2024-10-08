@@ -183,7 +183,7 @@ fun BrandsList(brands: List<SmartCollection>,navController: NavController) {
             Text("Brands", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
             Text(
                 "SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
-                color = Color.Cyan
+                color = Color.Green
             )
         }
         LazyRow(
@@ -482,7 +482,7 @@ fun LatestProductsSection(products: List<Product>, navController: NavController)
             )
             Text(
                 "SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
-                color = Color.Cyan
+                color = Color.Green
             )
         }
 
@@ -699,7 +699,7 @@ fun BottomNavigationBar(navController: NavController) {
                 )
             },
             label = { Text("Profile", style = TextStyle(fontSize = 12.sp)) },
-            selected = false /*currentRoute == Screen.ProfileScreen.route*/,
+            selected =  currentRoute == Screen.SettingsScreen.route,
             onClick = {
                 if (currentRoute != Screen.SettingsScreen.route) {
                     navController.popBackStack(Screen.SettingsScreen.route, inclusive = false)

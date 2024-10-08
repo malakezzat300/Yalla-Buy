@@ -119,7 +119,7 @@ fun AddressScreen(navController: NavHostController, address: String? = null){
                     .fillMaxWidth()
                     .background(color = Color.White)
                     .padding(top = 2.dp),
-                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Green)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -133,7 +133,7 @@ fun AddressScreen(navController: NavHostController, address: String? = null){
                     .fillMaxWidth()
                     .background(color = Color.White)
                     .padding(top = 2.dp),
-                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Green)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -147,7 +147,7 @@ fun AddressScreen(navController: NavHostController, address: String? = null){
                     .fillMaxWidth()
                     .background(color = Color.White)
                     .padding(top = 2.dp),
-                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Green)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -210,7 +210,7 @@ fun AddressScreen(navController: NavHostController, address: String? = null){
                     .fillMaxWidth()
                     .background(color = Color.White)
                     .padding(top = 2.dp),
-                colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+                colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Green)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -224,7 +224,7 @@ fun AddressScreen(navController: NavHostController, address: String? = null){
                     .fillMaxWidth()
                     .background(color = Color.White)
                     .padding(top = 2.dp),
-                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Green)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = "Country", fontSize = 18.sp)
@@ -237,7 +237,7 @@ fun AddressScreen(navController: NavHostController, address: String? = null){
                     .fillMaxWidth()
                     .background(color = Color.White)
                     .padding(top = 2.dp),
-                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Cyan)
+                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Green)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Button(

@@ -76,21 +76,26 @@ interface ProductService {
     suspend fun getProductById(@Path("id") productId: Long): ProductResponse
 
     @POST("customers.json")
-    suspend fun createCustomer(
-        @Body customerRequest: CustomerRequest
-    ): CustomerResponse
+    suspend fun createCustomer(@Body customerRequest: CustomerRequest): CustomerResponse
 
     @GET("customers/search.json")
-    suspend fun getCustomerByEmail(
-        @Query("email") email: String
-    ): CustomerSearchRespnse
+    suspend fun getCustomerByEmail(@Query("email") email: String): CustomerSearchRespnse
 
     @GET("customers/search.json")
+
     suspend fun getCustomerById(
         @Query("id") email: Long
     ): CustomerSearchRespnse
 
     @GET("variants/{id}.json")
     suspend fun getVariantById(@Path("id") variantId: Long): VariantResponse
+
+    suspend fun getCustomerById(@Query("id") email: Long): CustomerSearchRespnse
+
+    //customers/207119551/orders.json
+    @GET("customers/{id}/orders.json")
+    suspend fun getAllOrdersForCustomerById(
+        @Path("id") productId: Long
+    )
 
 }

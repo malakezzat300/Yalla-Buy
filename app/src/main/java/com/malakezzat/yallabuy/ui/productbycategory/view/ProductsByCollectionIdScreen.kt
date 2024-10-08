@@ -169,7 +169,7 @@ fun LatestProductsSectionById(products: List<Product>, navController: NavControl
             )
             Text(
                 "SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
-                color = Color.Cyan
+                color = Color.Green
             )
         }
 
