@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
-class OrdersViewModel (private val repository: ProductsRepository): ViewModel() {
+class OrdersViewModel (val repository: ProductsRepository): ViewModel() {
     private val TAG = "OrdersViewModel"
     private val _customerDataByEmail = MutableStateFlow<ApiState<CustomerSearchRespnse>>(ApiState.Loading)
     val customerDataByEmail = _customerDataByEmail.asStateFlow()

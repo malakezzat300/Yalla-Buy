@@ -41,6 +41,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -76,6 +77,7 @@ import coil.compose.rememberImagePainter
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.data.sharedpref.CurrencyPreferences
+import com.malakezzat.yallabuy.data.util.CurrencyConverter
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.SmartCollection
@@ -95,7 +97,9 @@ fun HomeScreen(
     val productState by viewModel.productList.collectAsStateWithLifecycle()
     val categoriesState by viewModel.categoriesList.collectAsStateWithLifecycle()
     val brandsState by viewModel.brandsList.collectAsStateWithLifecycle()
+    //Currency
     val context = LocalContext.current
+    CurrencyConverter.initialize(context)
     LaunchedEffect(Unit) {
         Log.d(TAG, categoriesState.toString())
         viewModel.getAllProducts()
@@ -513,6 +517,9 @@ fun LatestProductsSection(products: List<Product>, navController: NavController)
 
 @Composable
 fun ProductCard(product: Product, navController: NavController) {
+    //Currency
+    val context = LocalContext.current
+    CurrencyConverter.initialize(context)
     Card(
         modifier = Modifier
             .width(150.dp)
@@ -557,7 +564,11 @@ fun ProductCard(product: Product, navController: NavController) {
                 Text(product.title, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
                 Text(product.vendor, color = AppColors.MintGreen)
                 val price = product.variants.first().price
-                Text("Price: $${price}")
+                CurrencyConverter.changeCurrency(price.toDouble())?.let{
+                    Text( text = it,
+                        style = MaterialTheme.typography.bodyMedium)
+                }
+
             }
         }
     }

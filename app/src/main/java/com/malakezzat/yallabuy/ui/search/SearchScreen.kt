@@ -39,9 +39,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.malakezzat.yallabuy.data.util.CurrencyConverter
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.theme.AppColors
@@ -55,8 +57,9 @@ fun SearchScreen(viewModel: SearchViewModel,
     val filteredProducts by viewModel.filteredProducts.collectAsState()
     var query by remember { mutableStateOf("") }
     var sliderPosition by remember { mutableStateOf(100.0f) }
-
-
+    //Currency
+    val context = LocalContext.current
+    CurrencyConverter.initialize(context)
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -83,8 +86,12 @@ fun SearchScreen(viewModel: SearchViewModel,
         Spacer(modifier = Modifier.height(16.dp))
 
         // Price slider
-
-        Text(text = "Max Price: ${sliderPosition.toInt()} EGP")
+        val price = sliderPosition.toInt()
+        CurrencyConverter.changeCurrency(price.toDouble())?.let {
+            Text(text = "Max Price: ${it} ",
+                style = MaterialTheme.typography.bodyMedium)
+        }
+        /*Text(text = "Max Price: ${sliderPosition.toInt()} ")*/
         Slider(
             value = sliderPosition,
             onValueChange = { input ->

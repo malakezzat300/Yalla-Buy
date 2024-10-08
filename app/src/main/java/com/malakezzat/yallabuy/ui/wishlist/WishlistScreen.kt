@@ -46,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -60,6 +61,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remote.ApiState
+import com.malakezzat.yallabuy.data.util.CurrencyConverter
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.LineItem
@@ -145,6 +147,8 @@ fun WishlistItem(viewModel: WishlistViewModel,
                  draftOrder: DraftOrder,
                  navController: NavController
                  ) {
+    val context = LocalContext.current
+    CurrencyConverter.initialize(context)
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -185,11 +189,16 @@ fun WishlistItem(viewModel: WishlistViewModel,
                     overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
+                val price = item.price
+                CurrencyConverter.changeCurrency(price.toDouble())?.let {
+                    Text(text = it,
+                        style = MaterialTheme.typography.bodyMedium)
+                }
+                /*Text(
                     text = item.price,
                     color = Color.Black,
                     fontSize = 14.sp
-                )
+                )*/
 
             }
             var showDialog by remember { mutableStateOf(false) }
