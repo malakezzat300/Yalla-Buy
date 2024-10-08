@@ -60,13 +60,10 @@ class CurrencyPreferences private constructor(context: Context) {
         if(targetCurrency == "EGP"){
             return String.format("%.2f %s", baseAmount, targetCurrency)
         } else {
-            val rate =
-                getExchangeRate("EGP", preferences.getString(KEY_TARGET_CURRENCY, null) ?: "EGP")
-            return if (rate != null) {
+            val rate = preferences.getFloat(KEY_EXCHANGE_RATE,1f)
+            return run {
                 val targetAmount = baseAmount * rate
                 String.format("%.2f %s", targetAmount, targetCurrency)
-            } else {
-                null
             }
         }
     }

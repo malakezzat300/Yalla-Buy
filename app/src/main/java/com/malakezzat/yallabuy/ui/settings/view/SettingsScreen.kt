@@ -48,7 +48,11 @@ fun SettingsScreen(navController: NavController) {
         //TODO delete address from api
     }
     val onCurrencyChange: (String) -> Unit = { currecny ->
-        CurrencyPreferences.getInstance(context).changeTargetCurrency(currecny)
+        //TODO logic - SharedPreferences
+        selectedCurrency = currecny
+        CurrencyPreferences.getInstance(context).changeTargetCurrency(
+            selectedCurrency!!
+        )
     }
 
     Column(modifier = Modifier.padding(16.dp)) {
