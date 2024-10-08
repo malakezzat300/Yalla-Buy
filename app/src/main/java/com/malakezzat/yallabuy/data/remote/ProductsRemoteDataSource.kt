@@ -1,7 +1,9 @@
 package com.malakezzat.yallabuy.data.remote
 
+import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
+import com.malakezzat.yallabuy.model.CustomerAddress
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
 import com.malakezzat.yallabuy.model.CustomerSearchRespnse
@@ -16,6 +18,10 @@ import com.malakezzat.yallabuy.model.ProductResponse
 import com.malakezzat.yallabuy.model.SmartCollection
 import com.malakezzat.yallabuy.model.VariantResponse
 import kotlinx.coroutines.flow.Flow
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface ProductsRemoteDataSource {
@@ -40,4 +46,11 @@ interface ProductsRemoteDataSource {
     suspend fun getCustomerById(customerId: Long): Flow<CustomerSearchRespnse>
     suspend fun getVariantById(variantId: Long): Flow<VariantResponse>
     suspend fun getConversionRate(): Flow<CurrencyResponse>
+
+    suspend fun addNewAddress(customerId: Long): Flow<CustomerAddress>
+    suspend fun getUserAddresses(customerId: Long): Flow<List<Address>>
+    suspend fun getAddressDetails(customerId: Long,addressId: Long): Flow<CustomerAddress>
+    suspend fun updateUserAddress(customerId: Long,addressId: Long): Flow<CustomerAddress>
+    suspend fun setDefaultAddress(customerId: Long,addressId: Long): Flow<CustomerAddress>
+    suspend fun deleteAddress(customerId: Long,addressId: Long)
 }

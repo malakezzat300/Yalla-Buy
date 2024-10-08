@@ -3,10 +3,12 @@ package com.malakezzat.yallabuy.data.remot
 
 import com.malakezzat.yallabuy.data.remote.coupons.DiscountCodeResponse
 import com.malakezzat.yallabuy.data.remote.coupons.priceRuleResponse
+import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.model.Brands
 import com.malakezzat.yallabuy.model.Category
 import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
+import com.malakezzat.yallabuy.model.CustomerAddress
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
 import com.malakezzat.yallabuy.model.CustomerSearchRespnse
@@ -105,4 +107,21 @@ interface ProductService {
     @GET("latest/EGP")
     suspend fun getLatestRates(): CurrencyResponse
 
+    @POST("customers/{customer_id}/addresses.json")
+    suspend fun addNewAddress(@Path("customer_id") customerId: Long): CustomerAddress
+
+    @GET("customers/{customer_id}/addresses.json")
+    suspend fun getUserAddresses(@Path("customer_id") customerId: Long): List<Address>
+
+    @GET("customers/{customer_id}/addresses/{address_id}.json")
+    suspend fun getAddressDetails(@Path("customer_id") customerId: Long,@Path("address_id") addressId: Long): CustomerAddress
+
+    @PUT("customers/{customer_id}/addresses/{address_id}.json")
+    suspend fun updateUserAddress(@Path("customer_id") customerId: Long,@Path("address_id") addressId: Long): CustomerAddress
+
+    @PUT("customers/{customer_id}/addresses/{address_id}/default.json")
+    suspend fun setDefaultAddress(@Path("customer_id") customerId: Long,@Path("address_id") addressId: Long): CustomerAddress
+
+    @DELETE("customers/{customer_id}/addresses/{address_id}.json")
+    suspend fun deleteAddress(@Path("customer_id") customerId: Long,@Path("address_id") addressId: Long)
 }

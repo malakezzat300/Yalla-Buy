@@ -23,16 +23,6 @@ data class Customer(
     val id: Long
 )
 
-data class Address(
-    val first_name: String,
-    val last_name: String,
-    val address1: String,
-    val city: String,
-    val province: String,
-    val country: String,
-    val zip: String
-)
-
 data class Save(
     val update : Boolean = true
 )

@@ -5,8 +5,10 @@ import com.malakezzat.yallabuy.data.remote.ProductsRemoteDataSource
 import com.malakezzat.yallabuy.data.remote.coupons.DiscountCode
 import com.malakezzat.yallabuy.data.remote.coupons.PriceRule
 import com.malakezzat.yallabuy.data.sharedpref.GlobalSharedPreferenceDataSource
+import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
+import com.malakezzat.yallabuy.model.CustomerAddress
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
 import com.malakezzat.yallabuy.model.CustomerSearchRespnse
@@ -119,6 +121,39 @@ class ProductsRepositoryImpl private constructor(
 
     override suspend fun getConversionRate(): Flow<CurrencyResponse> {
         return productsRemoteDataSource.getConversionRate()
+    }
+
+    override suspend fun addNewAddress(customerId: Long): Flow<CustomerAddress> {
+        return productsRemoteDataSource.addNewAddress(customerId)
+    }
+
+    override suspend fun getUserAddresses(customerId: Long): Flow<List<Address>> {
+        return productsRemoteDataSource.getUserAddresses(customerId)
+    }
+
+    override suspend fun getAddressDetails(
+        customerId: Long,
+        addressId: Long
+    ): Flow<CustomerAddress> {
+        return productsRemoteDataSource.getAddressDetails(customerId,addressId)
+    }
+
+    override suspend fun updateUserAddress(
+        customerId: Long,
+        addressId: Long
+    ): Flow<CustomerAddress> {
+        return productsRemoteDataSource.updateUserAddress(customerId,addressId)
+    }
+
+    override suspend fun setDefaultAddress(
+        customerId: Long,
+        addressId: Long
+    ): Flow<CustomerAddress> {
+        return productsRemoteDataSource.setDefaultAddress(customerId,addressId)
+    }
+
+    override suspend fun deleteAddress(customerId: Long, addressId: Long) {
+        productsRemoteDataSource.deleteAddress(customerId,addressId)
     }
 
 
