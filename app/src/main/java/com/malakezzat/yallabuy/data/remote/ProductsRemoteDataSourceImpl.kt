@@ -167,8 +167,8 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         throw e
     }
 
-    override suspend fun getConversionRate(baseCurrency: String, targetCurrency: String): Flow<CurrencyResponse> = flow {
-        val response = apiCurrency.getConversionRate(baseCurrency, targetCurrency)
+    override suspend fun getConversionRate(): Flow<CurrencyResponse> = flow {
+        val response = apiCurrency.getLatestRates()
         emit(response)
     }.catch { e ->
         e.printStackTrace()

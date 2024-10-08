@@ -38,9 +38,6 @@ private val _brandsList = MutableStateFlow<ApiState<List<SmartCollection>>>(ApiS
     private val _priceRules = MutableStateFlow<List<PriceRule>>(emptyList())
     val priceRules: StateFlow<List<PriceRule>> get() = _priceRules
 
-    private val _conversionRate = MutableStateFlow<ApiState<CurrencyResponse?>>(ApiState.Loading)
-    val conversionRate = _conversionRate.asStateFlow()
-
     init {
         getAllProducts()
         getAllCategories()
@@ -115,17 +112,4 @@ private val _brandsList = MutableStateFlow<ApiState<List<SmartCollection>>>(ApiS
         }
     }
 
-    fun getRate(baseCurrency: String, targetCurrency: String){
-        viewModelScope.launch {
-            repository.getConversionRate(baseCurrency, targetCurrency).onStart {
-                _conversionRate.value = ApiState.Loading
-            }
-                .catch { e ->
-                    _conversionRate.value = ApiState.Error(e.message ?: "Unknown error")
-                }
-                .collect { response ->
-                    _conversionRate.value = ApiState.Success(response)
-                }
-        }
-    }
 }

@@ -2,14 +2,20 @@ package com.malakezzat.yallabuy.data.sharedpref
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.malakezzat.yallabuy.model.ConversionRates
 
 class CurrencyPreferences private constructor(context: Context) {
 
     companion object {
         private const val PREFS_NAME = "currency_prefs"
         private const val KEY_EXCHANGE_RATE = "exchange_rate"
-        private const val KEY_BASE_CURRENCY = "base_currency"
-        private const val KEY_TARGET_CURRENCY = "target_currency"
+        private const val KEY_EGP = "EGP"
+        private const val KEY_USD = "USD"
+        private const val KEY_EUR = "EUR"
+        private const val KEY_AED = "AED"
+        private const val KEY_SAR = "SAR"
+        private const val KEY_CURRENCY = "Current"
+
 
         @Volatile
         private var instance: CurrencyPreferences? = null
@@ -23,40 +29,45 @@ class CurrencyPreferences private constructor(context: Context) {
 
     private val preferences: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    fun saveExchangeRate(baseCurrency: String, targetCurrency: String, rate: Double) {
+    fun saveExchangeRate(conversionRates :ConversionRates?) {
         preferences.edit().apply {
-            putString(KEY_BASE_CURRENCY, baseCurrency)
-            putString(KEY_TARGET_CURRENCY, targetCurrency)
-            putFloat(KEY_EXCHANGE_RATE, rate.toFloat())
+            putLong(KEY_EGP, conversionRates?.EGP ?: 1)
+            putFloat(KEY_USD, conversionRates?.USD?.toFloat() ?: -1f)
+            putFloat(KEY_EUR, conversionRates?.EUR?.toFloat() ?: -1f)
+            putFloat(KEY_AED, conversionRates?.AED?.toFloat() ?: -1f)
+            putFloat(KEY_SAR, conversionRates?.SAR?.toFloat() ?: -1f)
             apply()
         }
     }
 
-    fun getExchangeRate(baseCurrency: String, targetCurrency: String): Double? {
-        val savedBaseCurrency = preferences.getString(KEY_BASE_CURRENCY, "EGP")
-        val savedTargetCurrency = preferences.getString(KEY_TARGET_CURRENCY, "EGP")
+    private fun getExchangeRate(targetCurrency: String) {
+        val savedUSD = preferences.getFloat(KEY_USD, -1f).toDouble()
+        val savedEUR = preferences.getFloat(KEY_EUR, -1f).toDouble()
+        val savedAED = preferences.getFloat(KEY_AED, -1f).toDouble()
+        val savedSAR = preferences.getFloat(KEY_SAR, -1f).toDouble()
 
-        return if (savedBaseCurrency == baseCurrency && savedTargetCurrency == targetCurrency) {
-            saveExchangeRate(savedBaseCurrency, savedTargetCurrency, preferences.getFloat(KEY_EXCHANGE_RATE, -1f).toDouble())
-            preferences.getFloat(KEY_EXCHANGE_RATE, -1f).takeIf { it != -1f }?.toDouble()
-        } else {
-            null
+        return when (targetCurrency) {
+            "USD" -> preferences.edit().putFloat(KEY_EXCHANGE_RATE,savedUSD.toFloat()).apply()
+            "EUR" -> preferences.edit().putFloat(KEY_EXCHANGE_RATE,savedEUR.toFloat()).apply()
+            "AED" -> preferences.edit().putFloat(KEY_EXCHANGE_RATE,savedAED.toFloat()).apply()
+            "SAR" -> preferences.edit().putFloat(KEY_EXCHANGE_RATE,savedSAR.toFloat()).apply()
+            else -> {}
         }
     }
 
     fun changeTargetCurrency(newTargetCurrency: String) {
         preferences.edit().apply {
-            putString(KEY_TARGET_CURRENCY, newTargetCurrency)
+            putString(KEY_CURRENCY, newTargetCurrency)
             apply()
         }
-        getExchangeRate("EGP",newTargetCurrency)
+        getExchangeRate(newTargetCurrency)
     }
 
     fun getTargetCurrency() : String? {
-        return preferences.getString(KEY_TARGET_CURRENCY, "EGP")
+        return preferences.getString(KEY_CURRENCY, "EGP")
     }
 
-    fun calculateTargetAmount(baseAmount: Double, targetCurrency: String): String? {
+    fun calculateTargetAmount(baseAmount: Double, targetCurrency: String): String {
         if(targetCurrency == "EGP"){
             return String.format("%.2f %s", baseAmount, targetCurrency)
         } else {

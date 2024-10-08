@@ -117,11 +117,8 @@ class ProductsRepositoryImpl private constructor(
         return productsRemoteDataSource.getVariantById(variantId)
     }
 
-    override suspend fun getConversionRate(
-        baseCurrency: String,
-        targetCurrency: String
-    ): Flow<CurrencyResponse> {
-        return productsRemoteDataSource.getConversionRate(baseCurrency,targetCurrency)
+    override suspend fun getConversionRate(): Flow<CurrencyResponse> {
+        return productsRemoteDataSource.getConversionRate()
     }
 
 

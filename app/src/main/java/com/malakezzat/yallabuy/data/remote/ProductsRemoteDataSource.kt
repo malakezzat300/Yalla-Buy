@@ -39,5 +39,5 @@ interface ProductsRemoteDataSource {
     suspend fun getCustomerByEmai(customer: String): Flow<CustomerSearchRespnse>
     suspend fun getCustomerById(customerId: Long): Flow<CustomerSearchRespnse>
     suspend fun getVariantById(variantId: Long): Flow<VariantResponse>
-    suspend fun getConversionRate(baseCurrency: String, targetCurrency: String): Flow<CurrencyResponse>
+    suspend fun getConversionRate(): Flow<CurrencyResponse>
 }

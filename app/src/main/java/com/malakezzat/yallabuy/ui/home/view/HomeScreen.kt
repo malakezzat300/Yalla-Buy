@@ -94,26 +94,11 @@ fun HomeScreen(
     val productState by viewModel.productList.collectAsStateWithLifecycle()
     val categoriesState by viewModel.categoriesList.collectAsStateWithLifecycle()
     val brandsState by viewModel.brandsList.collectAsStateWithLifecycle()
-    val exchangeRate by viewModel.conversionRate.collectAsState()
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         Log.d(TAG, categoriesState.toString())
         viewModel.getAllProducts()
         viewModel.getAllCategories()
-        viewModel.getRate("EGP",CurrencyPreferences.getInstance(context).getTargetCurrency() ?: "EGP")
-    }
-
-    LaunchedEffect (exchangeRate) {
-        when(exchangeRate){
-            is ApiState.Error -> {}
-            ApiState.Loading -> {}
-            is ApiState.Success -> {
-                (exchangeRate as ApiState.Success).data?.let {
-                    CurrencyPreferences.getInstance(context).saveExchangeRate("EGP",CurrencyPreferences.getInstance(context).getTargetCurrency() ?: "EGP",
-                        it.conversion_rate)
-                }
-            }
-        }
     }
 
     Scaffold(

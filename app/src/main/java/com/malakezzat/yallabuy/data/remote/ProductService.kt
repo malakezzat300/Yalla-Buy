@@ -102,10 +102,7 @@ interface ProductService {
         @Path("id") customerId: Long
     ): Orders // Ensure Orders is the appropriate type to represent the response
 
-    @GET("pair/{base}/{target}")
-    suspend fun getConversionRate(
-        @Path("base") baseCurrency: String,
-        @Path("target") targetCurrency: String
-    ): CurrencyResponse
+    @GET("latest/EGP")
+    suspend fun getLatestRates(): CurrencyResponse
 
 }

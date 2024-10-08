@@ -42,5 +42,5 @@ interface ProductsRepository {
     suspend fun getCustomerById(customer: Long): Flow<CustomerSearchRespnse>
     suspend fun getVariantById(variantId: Long): Flow<VariantResponse>
 
-    suspend fun getConversionRate(baseCurrency: String, targetCurrency: String): Flow<CurrencyResponse>
+    suspend fun getConversionRate(): Flow<CurrencyResponse>
 }

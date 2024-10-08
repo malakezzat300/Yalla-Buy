@@ -46,6 +46,8 @@ import com.malakezzat.yallabuy.ui.search.SearchViewModelFactory
 import com.malakezzat.yallabuy.ui.settings.view.AddressScreen
 import com.malakezzat.yallabuy.ui.settings.view.MapScreen
 import com.malakezzat.yallabuy.ui.settings.view.SettingsScreen
+import com.malakezzat.yallabuy.ui.settings.viewmodel.SettingsViewModel
+import com.malakezzat.yallabuy.ui.settings.viewmodel.SettingsViewModelFactory
 import com.malakezzat.yallabuy.ui.shoppingcart.view.ShoppingCartScreen
 import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModel
 import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModelFactory
@@ -66,6 +68,7 @@ fun NavigationApp(
     productsByCollectionIdViewModelFactory: ProductsByCollectionIdViewModelFactory,
     wishlistViewModelFactory: WishlistViewModelFactory,
     ordersViewModelFactory: OrdersViewModelFactory,
+    settingsViewModelFactory: SettingsViewModelFactory,
     navController: NavHostController = rememberNavController()
 ) {
     val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -172,8 +175,8 @@ fun NavigationApp(
                 }
                 composable( route = Screen.SettingsScreen.route
                 ) {
-                    val viewModel: ProductInfoViewModel = viewModel(factory = productInfoViewModelFactory)
-                    SettingsScreen(navController)
+                    val viewModel: SettingsViewModel = viewModel(factory = settingsViewModelFactory)
+                    SettingsScreen(navController,viewModel)
                 }
                 composable(
                     route = Screen.AddressScreen.route,
