@@ -680,14 +680,14 @@ fun BottomNavigationBar(navController: NavController) {
                 )
             },
             label = { Text("Wishlist", style = TextStyle(fontSize = 12.sp)) },
-            selected = currentRoute == Screen.OrderScreen.route,
+            selected = false /*currentRoute == Screen.WishlistScreen.route*/,
             onClick = {
-                if (currentRoute != Screen.OrdersScreen.route) {
-                    navController.popBackStack(Screen.OrdersScreen.route, inclusive = false)
-                    navController.navigate(Screen.OrdersScreen.route) {
+                /*if (currentRoute != Screen.WishlistScreen.route) {
+                    navController.popBackStack(Screen.WishlistScreen.route, inclusive = false)
+                    navController.navigate(Screen.WishlistScreen.route) {
                         launchSingleTop = true
                     }
-                }
+                }*/
             }
         )
         BottomNavigationItem(
