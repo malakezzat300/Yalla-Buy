@@ -43,7 +43,6 @@ interface ProductsRepository {
     suspend fun getCustomerByEmail(customer: String): Flow<CustomerSearchRespnse>
     suspend fun getCustomerById(customer: Long): Flow<CustomerSearchRespnse>
     suspend fun getVariantById(variantId: Long): Flow<VariantResponse>
-
     suspend fun getConversionRate(): Flow<CurrencyResponse>
 
     suspend fun addNewAddress(customerId: Long): Flow<CustomerAddress>
@@ -52,4 +51,13 @@ interface ProductsRepository {
     suspend fun updateUserAddress(customerId: Long,addressId: Long): Flow<CustomerAddress>
     suspend fun setDefaultAddress(customerId: Long,addressId: Long): Flow<CustomerAddress>
     suspend fun deleteAddress(customerId: Long,addressId: Long)
+
+    //user id
+    fun getUserId(): Long
+    fun setUserId(id: Long)
+
+    //user email
+    fun getUserEmail():String
+    fun setUserEmail(string:String)
+
 }

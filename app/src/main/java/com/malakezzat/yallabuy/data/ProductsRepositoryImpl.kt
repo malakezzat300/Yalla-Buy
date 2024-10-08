@@ -123,6 +123,7 @@ class ProductsRepositoryImpl private constructor(
         return productsRemoteDataSource.getConversionRate()
     }
 
+
     override suspend fun addNewAddress(customerId: Long): Flow<CustomerAddress> {
         return productsRemoteDataSource.addNewAddress(customerId)
     }
@@ -154,6 +155,22 @@ class ProductsRepositoryImpl private constructor(
 
     override suspend fun deleteAddress(customerId: Long, addressId: Long) {
         productsRemoteDataSource.deleteAddress(customerId,addressId)
+
+    override fun getUserId(): Long {
+        return globalSharedPreferenceDataSource.getUserId()
+    }
+
+    override fun setUserId(id: Long) {
+        globalSharedPreferenceDataSource.setUserId(id)
+    }
+
+    override fun getUserEmail(): String {
+        return globalSharedPreferenceDataSource.getUserEmail()
+    }
+
+    override fun setUserEmail(string: String) {
+        globalSharedPreferenceDataSource.setUserEmail(string)
+
     }
 
 
