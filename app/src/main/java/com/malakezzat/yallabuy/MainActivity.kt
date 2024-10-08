@@ -19,6 +19,7 @@ import com.malakezzat.yallabuy.ui.auth.viewmodel.SignUpViewModelFactory
 import com.malakezzat.yallabuy.ui.auth.viewmodel.login.LogInViewModelFactory
 import com.malakezzat.yallabuy.ui.categories.viewmodel.CategoriesViewModelFactory
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModelFactory
+import com.malakezzat.yallabuy.ui.orders.viewmodel.OrdersViewModelFactory
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModelFactory
 import com.malakezzat.yallabuy.ui.product_info.ProductInfoViewModelFactory
 import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollectionIdViewModelFactory
@@ -44,6 +45,9 @@ class MainActivity : ComponentActivity() {
     }
     private val productsByCollectionIdViewModelFactory by lazy {
         ProductsByCollectionIdViewModelFactory(repo)
+    }
+    private val ordersViewModelFactory by lazy {
+        OrdersViewModelFactory(repo)
     }
     private val categoriesScreenViewModelFactory by lazy {
         CategoriesViewModelFactory(repo)
@@ -83,7 +87,8 @@ class MainActivity : ComponentActivity() {
                 shoppingCartViewModelFactory,
                 productInfoViewModelFactory,
                 categoriesScreenViewModelFactory,
-                productsByCollectionIdViewModelFactory
+                productsByCollectionIdViewModelFactory,
+                ordersViewModelFactory
             )
         }
         }

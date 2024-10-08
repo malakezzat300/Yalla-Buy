@@ -21,6 +21,7 @@ import com.malakezzat.yallabuy.ui.Screen
 
 class FirebaseAuthun {
     private val mAuth = FirebaseAuth.getInstance()
+    //private val userEmail = FirebaseAuth.getInstance().currentUser?.email
 //    fun signInWithEmailAndPassword(email: String, password: String, name: String) : Boolean {
 //        var isSuccess = false
 //        mAuth.createUserWithEmailAndPassword(email, password)
