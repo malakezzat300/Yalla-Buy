@@ -46,6 +46,9 @@ import com.malakezzat.yallabuy.ui.settings.view.SettingsScreen
 import com.malakezzat.yallabuy.ui.shoppingcart.view.ShoppingCartScreen
 import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModel
 import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModelFactory
+import com.malakezzat.yallabuy.ui.wishlist.WishlistScreen
+import com.malakezzat.yallabuy.ui.wishlist.WishlistViewModel
+import com.malakezzat.yallabuy.ui.wishlist.WishlistViewModelFactory
 
 @Composable
 fun NavigationApp(
@@ -58,6 +61,7 @@ fun NavigationApp(
     productInfoViewModelFactory: ProductInfoViewModelFactory,
     categoriesViewModelFactory: CategoriesViewModelFactory,
     productsByCollectionIdViewModelFactory: ProductsByCollectionIdViewModelFactory,
+    wishlistViewModelFactory: WishlistViewModelFactory,
     navController: NavHostController = rememberNavController()
 ) {
     val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -182,6 +186,10 @@ fun NavigationApp(
                     val latitude = backStackEntry.arguments?.getDouble("latitude") ?: 0.0
                     val longitude = backStackEntry.arguments?.getDouble("longitude") ?: 0.0
                     MapScreen(navController,latitude = latitude, longitude = longitude)
+                }
+                composable(Screen.WishlistScreen.route) {
+                    val viewModel: WishlistViewModel = viewModel(factory = wishlistViewModelFactory)
+                    WishlistScreen(viewModel, navController)
                 }
             }
         }

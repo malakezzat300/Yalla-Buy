@@ -1,5 +1,6 @@
 package com.malakezzat.yallabuy.ui.wishlist
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,6 +31,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,46 +50,85 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.malakezzat.yallabuy.R
+import com.malakezzat.yallabuy.data.remote.ApiState
+import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.DraftOrderRequest
+import com.malakezzat.yallabuy.model.LineItem
+import com.malakezzat.yallabuy.model.Variant
+import com.malakezzat.yallabuy.ui.search.SearchViewModel
+import com.malakezzat.yallabuy.ui.shoppingcart.view.DeleteConfirmationDialog
+import com.malakezzat.yallabuy.ui.shoppingcart.view.calculateSubtotal
+import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModel
 
-@Preview
+
 @Composable
-fun WishlistScreen() {
-    val products = listOf(
-        Product("Loop Silicone Strong Magnetic Watch", "$15.25", "$20.00", R.drawable.logo),
-        Product("M6 Smart Watch IP67 Waterproof", "$12.00", "$18.00", R.drawable.logo)
-    )
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(16.dp)
-    ) {
-        TopAppBar(
-            title = { Text(text = "Wishlist") },
-            navigationIcon = {
-                IconButton(onClick = { /* Handle back navigation */ }) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                }
-            },
-            backgroundColor = Color.White,
-            elevation = 0.dp
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        LazyColumn {
-            items(products) { product ->
-                WishlistItem(product)
+fun WishlistScreen(viewModel: WishlistViewModel, navController: NavController) {
+//    val products = listOf(
+//        Product("Loop Silicone Strong Magnetic Watch", "$15.25", "$20.00", R.drawable.logo),
+//        Product("M6 Smart Watch IP67 Waterproof", "$12.00", "$18.00", R.drawable.logo)
+//    )
+    val wishlistItems by viewModel.wishlistDraftOrder.collectAsState()
+    var isLoading by remember { mutableStateOf( false ) }
+    var orderItems by remember { mutableStateOf( emptyList<LineItem>() ) }
+    var draftOrder by remember { mutableStateOf( DraftOrder() ) }
+    var showDialog by remember { mutableStateOf(false) }
+    val variantState by viewModel.variantId.collectAsState()
+    var variant by remember { mutableStateOf(Variant()) }
+    var variantSet by remember { mutableStateOf(mutableSetOf<Variant>() ) }
+    when(wishlistItems){
+        is ApiState.Error ->{
+            isLoading = false
+           // Log.i("shoppingCartTest", "ShoppingCartScreen: draftOrder ${(shoppingCartOrder as ApiState.Error).message}")
+        }
+        ApiState.Loading -> {
+            isLoading = true
+        }
+        is ApiState.Success -> {
+            isLoading = false
+            orderItems = (wishlistItems as ApiState.Success).data.line_items
+            draftOrder = (wishlistItems as ApiState.Success).data
+            LaunchedEffect (Unit){
+                viewModel.getVariantById(orderItems.get(0).variant_id)
             }
         }
     }
+    if(orderItems.isNotEmpty()){
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
+                .padding(16.dp)
+        ) {
+            TopAppBar(
+                title = { Text(text = "Wishlist") },
+                navigationIcon = {
+                    IconButton(onClick = { /* Handle back navigation */ }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                backgroundColor = Color.White,
+                elevation = 0.dp
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            LazyColumn {
+                items(orderItems) { product ->
+                    WishlistItem(viewModel,product,draftOrder,)
+                }
+            }
+        }
+    }
+
 }
 
 @Composable
-fun WishlistItem(product: Product) {
+fun WishlistItem(viewModel: WishlistViewModel,
+                 item: LineItem,
+                 draftOrder: DraftOrder) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -101,7 +147,7 @@ fun WishlistItem(product: Product) {
         ) {
             // Product image
             Image(
-                painter = painterResource(id = product.imageRes),
+                painter = rememberAsyncImagePainter(item.properties[0].value),
                 contentDescription = null,
                 modifier = Modifier
                     .size(80.dp)
@@ -116,7 +162,7 @@ fun WishlistItem(product: Product) {
                 modifier = Modifier.weight(1f) // Let the column take available space
             ) {
                 Text(
-                    text = product.name,
+                    text = item.title,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
@@ -124,24 +170,40 @@ fun WishlistItem(product: Product) {
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = product.currentPrice,
+                    text = item.price,
                     color = Color.Black,
                     fontSize = 14.sp
                 )
 
             }
-
+            var showDialog by remember { mutableStateOf(false) }
             // Delete button
-            IconButton(onClick = { /* Handle delete */ }) {
+            IconButton(onClick = { showDialog = true }) {
                 Icon(Icons.Outlined.Delete, contentDescription = "Delete item", tint = Color.Red)
             }
+
+            if (showDialog) {
+                DeleteConfirmationDialog(
+                    showDialog = showDialog,
+                    onDismiss = { showDialog = false },
+                    onConfirmDelete = {
+                        showDialog = false
+                        if (draftOrder.line_items.size > 1) {
+                            val updatedDraftItems = draftOrder.line_items.filter { it != item }
+                            val updatedDraftOrder = draftOrder.copy(line_items = updatedDraftItems)
+                            val updatedDraftItemsRequest = DraftOrderRequest(updatedDraftOrder)
+                            draftOrder.id?.let {
+                                viewModel.updateDraftOrder(it, updatedDraftItemsRequest)
+                            }
+                        } else {
+                            draftOrder.id?.let { viewModel.deleteDraftOrder(it) }
+                        }
+                       // onItemUpdated()
+                    }
+                )
+            }
+        }
         }
     }
-}
 
-data class Product(
-    val name: String,
-    val currentPrice: String,
-    val oldPrice: String,
-    val imageRes: Int
-)
+

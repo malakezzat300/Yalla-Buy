@@ -25,6 +25,7 @@ import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollecti
 import com.malakezzat.yallabuy.ui.search.SearchViewModelFactory
 import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModelFactory
 import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
+import com.malakezzat.yallabuy.ui.wishlist.WishlistViewModelFactory
 
 class MainActivity : ComponentActivity() {
     private lateinit var googleSignInClient: GoogleSignInClient
@@ -66,6 +67,9 @@ class MainActivity : ComponentActivity() {
     private val productInfoViewModelFactory by lazy {
         ProductInfoViewModelFactory(repo)
     }
+    private val wishlistViewModelFactory by lazy {
+        WishlistViewModelFactory(repo)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -83,7 +87,8 @@ class MainActivity : ComponentActivity() {
                 shoppingCartViewModelFactory,
                 productInfoViewModelFactory,
                 categoriesScreenViewModelFactory,
-                productsByCollectionIdViewModelFactory
+                productsByCollectionIdViewModelFactory,
+                wishlistViewModelFactory
             )
         }
         }
