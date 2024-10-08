@@ -13,9 +13,11 @@ import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.ProductResponse
 import com.malakezzat.yallabuy.model.SmartCollection
+import com.malakezzat.yallabuy.model.VariantResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import retrofit2.http.Path
 
 class ProductsRemoteDataSourceImpl (var productService: ProductService):
     ProductsRemoteDataSource {
@@ -142,4 +144,15 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         Log.e(TAG, "Error creating customer ", e)
         throw e
     }
+
+    override suspend fun getVariantById(variantId: Long): Flow<VariantResponse> = flow{
+        val response = productService.getVariantById(variantId)
+        Log.i(TAG, "getVariantById: $response")
+        emit(response)
+    }.catch { e ->
+        Log.e(TAG, "Error getting Variant ", e)
+        throw e
+    }
+
+
 }

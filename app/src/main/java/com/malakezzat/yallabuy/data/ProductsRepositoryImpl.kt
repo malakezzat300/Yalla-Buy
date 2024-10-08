@@ -16,6 +16,7 @@ import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.ProductResponse
 import com.malakezzat.yallabuy.model.SmartCollection
+import com.malakezzat.yallabuy.model.VariantResponse
 import kotlinx.coroutines.flow.Flow
 
 class ProductsRepositoryImpl private constructor(
@@ -104,5 +105,9 @@ class ProductsRepositoryImpl private constructor(
     }
     override suspend fun getCustomerById(customer: Long): Flow<CustomerSearchRespnse> {
         return productsRemoteDataSource.getCustomerById(customer)
+    }
+
+    override suspend fun getVariantById(variantId: Long): Flow<VariantResponse> {
+        return productsRemoteDataSource.getVariantById(variantId)
     }
 }
