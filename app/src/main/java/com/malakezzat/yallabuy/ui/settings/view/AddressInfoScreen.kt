@@ -82,7 +82,6 @@ fun AddressInfoScreen(navController: NavHostController,viewModel: SettingsViewMo
     val userId by viewModel.userId.collectAsState()
     val deleteAddressState by viewModel.deleteAddressEvent.collectAsState("")
     var showDialog by remember { mutableStateOf(false) }
-    var showDefaultDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val sharedPreferences = LocalContext.current.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
 
@@ -218,7 +217,11 @@ fun AddressInfoScreen(navController: NavHostController,viewModel: SettingsViewMo
                         .fillMaxWidth()
                         .height(50.dp),
                     onClick = {
-                        showDefaultDialog = true
+                        userId?.let { it1 -> address.id?.let { it2 ->
+                            viewModel.setDefaultAddress(it1,
+                                it2
+                            )
+                        } }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                     shape = RoundedCornerShape(10.dp),
@@ -249,55 +252,6 @@ fun AddressInfoScreen(navController: NavHostController,viewModel: SettingsViewMo
             }
         )
     }
-
-    if (showDefaultDialog) {
-        DefaultConfirmationDialog(
-            showDialog = showDefaultDialog,
-            onDismiss = { showDefaultDialog = false },
-            onConfirmDelete = {
-                showDefaultDialog = false
-                userId?.let { it1 -> address.id?.let { it2 ->
-                    viewModel.setDefaultAddress(it1,
-                        it2
-                    )
-                } }
-            }
-        )
-    }
 }
 
-@Composable
-fun DefaultConfirmationDialog(
-    showDialog: Boolean,
-    onDismiss: () -> Unit,
-    onConfirmDelete: () -> Unit
-) {
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { onDismiss() },
-            title = {
-                Text(text = "Make Default Confirmation")
-            },
-            text = {
-                Text("Are you sure you want to Make this Address Default?")
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        onConfirmDelete()
-                        onDismiss()
-                    }
-                ) {
-                    Text("Make Default")
-                }
-            },
-            dismissButton = {
-                Button(
-                    onClick = { onDismiss() }
-                ) {
-                    Text("Cancel")
-                }
-            }
-        )
-    }
-}
+

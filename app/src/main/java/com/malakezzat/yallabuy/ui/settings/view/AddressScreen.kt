@@ -90,6 +90,7 @@ import com.malakezzat.yallabuy.model.CustomerId
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,address: String? = null){
+    var addressId by remember { mutableStateOf(0L) }
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
@@ -104,13 +105,15 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
     val addNewAddressState by viewModel.customerAddress.collectAsState()
     val addressDetails by viewModel.addressDetails.collectAsState()
     var addressState by remember { mutableStateOf(address ?: "") }
+    var saveButton by remember { mutableStateOf("Save") }
 
     val sharedPreferences = LocalContext.current.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
     LaunchedEffect(Unit) {
-        val isaddressId = address?.let { isAddressId(it) }
-        if(isaddressId == true){
+        val isAddressId = address?.let { isAddressId(it) }
+        if(isAddressId == true){
             addressState = ""
             viewModel.getAddressDetails(sharedPreferences.getLong("USER_ID", 0L),address.toLong())
+            saveButton = "Update"
         } else {
             if (address != null) {
                 addressState = address
@@ -123,6 +126,7 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
         ApiState.Loading -> {}
         is ApiState.Success -> {
             LaunchedEffect(Unit) {
+                addressId = (addressDetails as ApiState.Success).data?.customer_address?.id!!
                 firstName = (addressDetails as ApiState.Success).data?.customer_address?.first_name.toString()
                 lastName = (addressDetails as ApiState.Success).data?.customer_address?.last_name.toString()
                 phoneNumber = (addressDetails as ApiState.Success).data?.customer_address?.phone.toString()
@@ -401,7 +405,13 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                                 city = city,
                                 country = country
                             )
-                            viewModel.addNewAddress(it, AddressRequest(address1)) }
+                            if (address?.let { isAddressId(it) } == true) {
+                                viewModel.updateUserAddress(it, addressId, AddressRequest(address1))
+                            } else {
+                                viewModel.addNewAddress(it, AddressRequest(address1))
+                            }
+                        }
+
                     } else {
                         Toast.makeText(context,"Please fill all fields" ,Toast.LENGTH_SHORT).show()
                     }
@@ -412,7 +422,7 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Text(
-                    text = "Save",
+                    text = saveButton,
                     color = Color.White,
                     fontSize = 16.sp
                 )
