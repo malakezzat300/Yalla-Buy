@@ -562,7 +562,7 @@ fun ProductCard(product: Product, navController: NavController) {
 
 
 
-@Preview(showBackground = true, showSystemUi = true)
+//@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ProductCard() {
     Box(
@@ -603,7 +603,6 @@ fun ProductCard() {
     }
 }
 
-//@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -680,14 +679,14 @@ fun BottomNavigationBar(navController: NavController) {
                 )
             },
             label = { Text("Wishlist", style = TextStyle(fontSize = 12.sp)) },
-            selected = false /*currentRoute == Screen.WishlistScreen.route*/,
+            selected = currentRoute == Screen.WishlistScreen.route,
             onClick = {
-                /*if (currentRoute != Screen.WishlistScreen.route) {
+                if (currentRoute != Screen.WishlistScreen.route) {
                     navController.popBackStack(Screen.WishlistScreen.route, inclusive = false)
                     navController.navigate(Screen.WishlistScreen.route) {
                         launchSingleTop = true
                     }
-                }*/
+                }
             }
         )
         BottomNavigationItem(

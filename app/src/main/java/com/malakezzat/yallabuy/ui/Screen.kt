@@ -19,9 +19,9 @@ sealed class Screen(val route: String) {
     data object MapScreen : Screen("mapScreen/{latitude}/{longitude}") {
         fun createRoute(latitude: Float, longitude: Float) = "mapScreen/$latitude/$longitude"
     }
-
-    data object CategoriesScreen : Screen("categoriesScreen")
-    data object ProductsByCategoryScreen : Screen("productsByCategoryScreen")
-    data object ProductsByBrandScreen : Screen("productsByBrandScreen")
+    data object CategoriesScreen:Screen("categoriesScreen")
+    data object ProductsByCategoryScreen:Screen("productsByCategoryScreen")
+    data object ProductsByBrandScreen:Screen("productsByBrandScreen")
+    data object WishlistScreen:Screen("wishlistScreen")
     data object OrdersScreen : Screen("ordersScreen")
 }
