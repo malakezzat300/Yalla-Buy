@@ -10,6 +10,8 @@ import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
+import com.malakezzat.yallabuy.model.Order
+import com.malakezzat.yallabuy.model.Orders
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.ProductResponse
 import com.malakezzat.yallabuy.model.SmartCollection
@@ -65,6 +67,15 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         Log.e(TAG, "Error fetching Brands", e)
         throw e
     }
+
+    override suspend fun getAllOrdersForCustomerByID(id: Long): Flow<List<Order>> = flow {
+        val response = productService.getAllOrdersForCustomerByID(id).orders
+        emit(response)
+    }.catch { e->
+        Log.e(TAG, "Error fetching Brands", e)
+        throw e
+    }
+
 
     override suspend fun getAllDraftOrders(): Flow<DraftOrdersResponse> = flow {
         val response = productService.getAllDraftOrders()

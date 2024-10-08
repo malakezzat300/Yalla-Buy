@@ -13,6 +13,7 @@ import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
+import com.malakezzat.yallabuy.model.Order
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.ProductResponse
 import com.malakezzat.yallabuy.model.SmartCollection
@@ -56,6 +57,10 @@ class ProductsRepositoryImpl private constructor(
 
     override suspend fun getBrands(): Flow<List<SmartCollection>> {
         return productsRemoteDataSource.getBrands()
+    }
+
+    override suspend fun getAllOrdersForCustomerByID(id: Long): Flow<List<Order>> {
+        return productsRemoteDataSource.getAllOrdersForCustomerByID(id)
     }
 
 
