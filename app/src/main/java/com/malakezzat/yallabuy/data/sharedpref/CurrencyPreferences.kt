@@ -49,6 +49,7 @@ class CurrencyPreferences private constructor(context: Context) {
             putString(KEY_TARGET_CURRENCY, newTargetCurrency)
             apply()
         }
+        getExchangeRate("EGP",newTargetCurrency)
     }
 
     fun getTargetCurrency() : String? {

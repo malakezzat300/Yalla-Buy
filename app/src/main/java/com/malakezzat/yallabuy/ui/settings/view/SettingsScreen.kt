@@ -28,15 +28,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.malakezzat.yallabuy.data.sharedpref.CurrencyPreferences
 import com.malakezzat.yallabuy.ui.Screen
 
 @Composable
 fun SettingsScreen(navController: NavController) {
     val addresses: List<String> = listOf()
-    var selectedCurrency by remember { mutableStateOf("EGP") }
+    val context = LocalContext.current
+    var selectedCurrency by remember { mutableStateOf(CurrencyPreferences.getInstance(context).getTargetCurrency()) }
+
     val onAddNewAddress: () -> Unit = {
         navController.navigate(Screen.AddressScreen.createRoute(""))
     }
@@ -44,8 +48,7 @@ fun SettingsScreen(navController: NavController) {
         //TODO delete address from api
     }
     val onCurrencyChange: (String) -> Unit = { currecny ->
-        //TODO logic - SharedPreferences
-        selectedCurrency = currecny
+        CurrencyPreferences.getInstance(context).changeTargetCurrency(currecny)
     }
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -108,8 +111,10 @@ fun SettingsScreen(navController: NavController) {
             Text(text = "Currency",
                 style = MaterialTheme.typography.headlineSmall)
             Row {
-                Text(text = selectedCurrency,
-                    style = MaterialTheme.typography.headlineSmall)
+                selectedCurrency?.let {
+                    Text(text = it,
+                        style = MaterialTheme.typography.headlineSmall)
+                }
                 Spacer(modifier = Modifier.width(4.dp))
                 Icon(
                     imageVector = Icons.Default.ArrowDropDown,
