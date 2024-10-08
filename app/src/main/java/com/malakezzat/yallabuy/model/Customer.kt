@@ -28,7 +28,7 @@ data class CustomerDetails(
     val orders_count:Int=0
 )
 
-data class Addresses (
+data class Address (
 
     var id           : Int?     = null,
     var customer_id   : Int?     = null,
@@ -84,7 +84,7 @@ data class Customers (
     @SerializedName("last_order_name"              ) var lastOrderName             : String?                = null,
     @SerializedName("currency"                     ) var currency                  : String?                = null,
     @SerializedName("phone"                        ) var phone                     : String?                = null,
-    @SerializedName("addresses"                    ) var addresses                 : ArrayList<Addresses>   = arrayListOf(),
+    @SerializedName("addresses"                    ) var addresses                 : ArrayList<Address>     = arrayListOf(),
     @SerializedName("accepts_marketing"            ) var acceptsMarketing          : Boolean?               = null,
     @SerializedName("accepts_marketing_updated_at" ) var acceptsMarketingUpdatedAt : String?                = null,
     @SerializedName("marketing_opt_in_level"       ) var marketingOptInLevel       : String?                = null,
@@ -92,10 +92,15 @@ data class Customers (
     @SerializedName("email_marketing_consent"      ) var emailMarketingConsent     : EmailMarketingConsent? = EmailMarketingConsent(),
     @SerializedName("sms_marketing_consent"        ) var smsMarketingConsent       : SmsMarketingConsent?   = SmsMarketingConsent(),
     @SerializedName("admin_graphql_api_id"         ) var adminGraphqlApiId         : String?                = null,
-    @SerializedName("default_address"              ) var defaultAddress            : Addresses?        = Addresses()
+    @SerializedName("default_address"              ) var defaultAddress            : Address?               = Address()
 
 )
 
 data class CustomerSearchRespnse(
     val customers: List<Customers>
+)
+
+
+data class CustomerAddress(
+    val customer_address: Address,
 )

@@ -3,8 +3,10 @@ package com.malakezzat.yallabuy.data.remote
 import android.util.Log
 import com.malakezzat.yallabuy.data.remot.ProductService
 import com.malakezzat.yallabuy.data.remote.RetrofitHelper.apiCurrency
+import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
+import com.malakezzat.yallabuy.model.CustomerAddress
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
 import com.malakezzat.yallabuy.model.CustomerSearchRespnse
@@ -172,5 +174,53 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         emit(response)
     }.catch { e ->
         e.printStackTrace()
+    }
+
+    override suspend fun addNewAddress(customerId: Long): Flow<CustomerAddress> = flow {
+        val response = productService.addNewAddress(customerId)
+        emit(response)
+    }.catch { e ->
+        e.printStackTrace()
+    }
+
+    override suspend fun getUserAddresses(customerId: Long): Flow<List<Address>> = flow {
+        val response = productService.getUserAddresses(customerId)
+        emit(response)
+    }.catch { e ->
+        e.printStackTrace()
+    }
+
+    override suspend fun getAddressDetails(
+        customerId: Long,
+        addressId: Long
+    ): Flow<CustomerAddress> = flow {
+        val response = productService.getAddressDetails(customerId,addressId)
+        emit(response)
+    }.catch { e ->
+        e.printStackTrace()
+    }
+
+    override suspend fun updateUserAddress(
+        customerId: Long,
+        addressId: Long
+    ): Flow<CustomerAddress> = flow {
+        val response = productService.updateUserAddress(customerId,addressId)
+        emit(response)
+    }.catch { e ->
+        e.printStackTrace()
+    }
+
+    override suspend fun setDefaultAddress(
+        customerId: Long,
+        addressId: Long
+    ): Flow<CustomerAddress> = flow {
+        val response = productService.setDefaultAddress(customerId,addressId)
+        emit(response)
+    }.catch { e ->
+        e.printStackTrace()
+    }
+
+    override suspend fun deleteAddress(customerId: Long, addressId: Long) {
+        productService.deleteAddress(customerId,addressId)
     }
 }

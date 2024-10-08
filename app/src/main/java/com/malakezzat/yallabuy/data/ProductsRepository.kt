@@ -2,8 +2,10 @@ package com.malakezzat.yallabuy.data
 
 import com.malakezzat.yallabuy.data.remote.coupons.DiscountCode
 import com.malakezzat.yallabuy.data.remote.coupons.PriceRule
+import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
+import com.malakezzat.yallabuy.model.CustomerAddress
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
 import com.malakezzat.yallabuy.model.CustomerSearchRespnse
@@ -43,6 +45,13 @@ interface ProductsRepository {
     suspend fun getVariantById(variantId: Long): Flow<VariantResponse>
     suspend fun getConversionRate(): Flow<CurrencyResponse>
 
+    suspend fun addNewAddress(customerId: Long): Flow<CustomerAddress>
+    suspend fun getUserAddresses(customerId: Long): Flow<List<Address>>
+    suspend fun getAddressDetails(customerId: Long,addressId: Long): Flow<CustomerAddress>
+    suspend fun updateUserAddress(customerId: Long,addressId: Long): Flow<CustomerAddress>
+    suspend fun setDefaultAddress(customerId: Long,addressId: Long): Flow<CustomerAddress>
+    suspend fun deleteAddress(customerId: Long,addressId: Long)
+
     //user id
     fun getUserId(): Long
     fun setUserId(id: Long)
@@ -50,4 +59,5 @@ interface ProductsRepository {
     //user email
     fun getUserEmail():String
     fun setUserEmail(string:String)
+
 }
