@@ -3,6 +3,7 @@ package com.malakezzat.yallabuy.ui.settings.view
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,14 +12,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.data.sharedpref.CurrencyPreferences
+import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.settings.viewmodel.SettingsViewModel
 
@@ -46,15 +54,28 @@ fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel) {
     val context = LocalContext.current
     var selectedCurrency by remember { mutableStateOf(CurrencyPreferences.getInstance(context).getTargetCurrency()) }
     val exchangeRate by viewModel.conversionRate.collectAsState()
+    val userAddressesState by viewModel.userAddresses.collectAsState()
+    var userAddresses by remember { mutableStateOf(listOf<Address>()) }
 
     when(exchangeRate){
-        is ApiState.Error -> Log.i("currencyTest", "ShoppingCartScreen: draftOrder ${(exchangeRate as ApiState.Error).message}")
+        is ApiState.Error -> Log.i("currencyTest", "SettingsScreen: exchangeRate ${(exchangeRate as ApiState.Error).message}")
         ApiState.Loading -> {}
         is ApiState.Success -> {
                 CurrencyPreferences.getInstance(context).saveExchangeRate((exchangeRate as ApiState.Success).data?.conversion_rates)
         }
     }
 
+    when(userAddressesState){
+        is ApiState.Error -> Log.i("addressTest", "SettingsScreen: userAddressesState ${(userAddressesState as ApiState.Error).message}")
+        ApiState.Loading -> {}
+        is ApiState.Success -> {
+            userAddresses = (userAddressesState as ApiState.Success).data
+        }
+    }
+
+    LaunchedEffect(Unit){
+        viewModel.userId.value?.let { viewModel.getUserAddresses(it) }
+    }
 
     val onAddNewAddress: () -> Unit = {
         navController.navigate(Screen.AddressScreen.createRoute(""))
@@ -101,17 +122,9 @@ fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel) {
         }
         Spacer(modifier = Modifier.height(8.dp))
 
-        addresses.forEach { address ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = address)
-                Button(onClick = { onDeleteAddress(address) }) {
-                    Text(text = "Delete")
-                }
+        LazyColumn {
+            items(userAddresses.size){
+                addressItem(viewModel,userAddresses[it])
             }
         }
 
@@ -160,5 +173,83 @@ fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel) {
         }
 
 
+    }
+}
+
+
+@Composable
+fun addressItem(viewModel: SettingsViewModel,address: Address){
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp),
+        elevation = CardDefaults.cardElevation(12.dp),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "${address.first_name} ${address.last_name}",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = "${address.phone}",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Box(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "${address.address1}",
+                    modifier = Modifier.align(Alignment.CenterStart),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Box(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+
+                Row(
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                ) {
+                    IconButton(onClick = {
+                        // Handle Edit click
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit"
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    IconButton(onClick = {
+                        address.customer_id?.let { address.id?.let { it1 ->
+                            viewModel.deleteAddress(it,
+                                it1
+                            )
+                        } }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete"
+                        )
+                    }
+                }
+            }
+        }
     }
 }

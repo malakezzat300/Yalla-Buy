@@ -80,6 +80,8 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
 
     val context = LocalContext.current
 
+
+
     val fusedLocationClient = remember {
         LocationServices.getFusedLocationProviderClient(context)
     }

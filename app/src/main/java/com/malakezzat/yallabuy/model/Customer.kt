@@ -30,8 +30,8 @@ data class CustomerDetails(
 
 data class Address (
 
-    var id           : Int?     = null,
-    var customer_id   : Int?     = null,
+    var id           : Long?     = null,
+    var customer_id   : Long?     = null,
     var first_name    : String?  = null,
     var last_name     : String?  = null,
     var company      : String?  = null,
