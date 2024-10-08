@@ -44,6 +44,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.ui.Screen
+import com.malakezzat.yallabuy.ui.theme.AppColors
 
 //@Preview(showSystemUi = true)
 @Composable
@@ -76,7 +77,7 @@ fun SearchScreen(viewModel: SearchViewModel,
                 .fillMaxWidth()
                 .background(color = Color.White)
                 .padding(10.dp),
-            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Green)
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.MintGreen)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -96,8 +97,8 @@ fun SearchScreen(viewModel: SearchViewModel,
                 viewModel.onSearchQueryChanged(searchQuery, sliderPosition)
             },
             colors = SliderDefaults.colors(
-                thumbColor = Color.Green,
-                activeTrackColor = Color.Green,
+                thumbColor = AppColors.MintGreen,
+                activeTrackColor = AppColors.MintGreen,
                 inactiveTrackColor = Color.Gray
             )
         )

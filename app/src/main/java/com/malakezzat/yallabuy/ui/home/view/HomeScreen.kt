@@ -81,6 +81,7 @@ import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.SmartCollection
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
+import com.malakezzat.yallabuy.ui.theme.AppColors
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
@@ -185,7 +186,7 @@ fun BrandsList(brands: List<SmartCollection>,navController: NavController) {
             Text("Brands", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
             Text(
                 "SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
-                color = Color.Green
+                color = AppColors.MintGreen
             )
         }
         LazyRow(
@@ -484,7 +485,7 @@ fun LatestProductsSection(products: List<Product>, navController: NavController)
             )
             Text(
                 "SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
-                color = Color.Green
+                color = AppColors.MintGreen
             )
         }
 
@@ -554,7 +555,7 @@ fun ProductCard(product: Product, navController: NavController) {
                     .padding(10.dp) // Add some padding around the text
             ) {
                 Text(product.title, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
-                Text(product.vendor, color = Color.Green)
+                Text(product.vendor, color = AppColors.MintGreen)
                 val price = product.variants.first().price
                 Text("Price: $${price}")
             }
@@ -599,7 +600,7 @@ fun ProductCard() {
             modifier = Modifier.padding(top = 110.dp) // Ensure text does not overlap with the image
         ) {
             Text("productName", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
-            Text("currentPrice", color = Color.Green)
+            Text("currentPrice", color = AppColors.MintGreen)
             Text("originalPrice", textDecoration = TextDecoration.LineThrough)
         }
     }

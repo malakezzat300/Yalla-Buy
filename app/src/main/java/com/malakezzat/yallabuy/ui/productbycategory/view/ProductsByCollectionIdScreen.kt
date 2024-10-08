@@ -50,6 +50,7 @@ import com.malakezzat.yallabuy.ui.categories.view.CustomTopBarCategory
 import com.malakezzat.yallabuy.ui.home.view.LatestProductsSection
 import com.malakezzat.yallabuy.ui.home.view.TAG
 import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollectionIdViewModel
+import com.malakezzat.yallabuy.ui.theme.AppColors
 
 val TAG = "ProductsByCollectionIdS"
 @Composable
@@ -169,7 +170,7 @@ fun LatestProductsSectionById(products: List<Product>, navController: NavControl
             )
             Text(
                 "SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
-                color = Color.Green
+                color = AppColors.MintGreen
             )
         }
 
@@ -239,7 +240,7 @@ fun ProductCard(product: Product, navController: NavController) {
                     .padding(10.dp) // Add some padding around the text
             ) {
                 Text(product.title, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
-                Text(product.vendor, color = Color.Green)
+                Text(product.vendor, color = AppColors.MintGreen)
             }
         }
     }

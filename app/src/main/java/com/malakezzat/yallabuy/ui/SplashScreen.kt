@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
+import com.malakezzat.yallabuy.ui.theme.AppColors
 
 
 @Composable
@@ -41,7 +42,7 @@ fun SplashScreen(navController: NavController) {
             progress = progress
         )
         //Spacer(modifier = Modifier.height(16.dp)) // Optional spacing between animation and text
-        Text("Welcome to YallaBuy", fontSize = 24.sp, color = Color.Green, fontWeight = FontWeight.Normal)
+        Text("Welcome to YallaBuy", fontSize = 24.sp, color = AppColors.MintGreen, fontWeight = FontWeight.Normal)
     }
 
     LaunchedEffect(Unit) {

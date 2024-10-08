@@ -26,6 +26,7 @@ import androidx.navigation.NavController
 import com.malakezzat.paymenttest2.model.FakeData
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
+import com.malakezzat.yallabuy.ui.theme.AppColors
 
 
 @Composable
@@ -75,7 +76,7 @@ fun OrderScreen(viewModel: PaymentViewModel,
         }
 
         if (orderResponse != null) {
-            Text("Order Created: ${orderResponse?.id}", color = Color.Green)
+            Text("Order Created: ${orderResponse?.id}", color = AppColors.MintGreen)
             if(isLoading) {
                 navController.navigate(
                     Screen.CheckoutScreen.route.replace(

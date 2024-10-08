@@ -71,6 +71,7 @@ import com.malakezzat.yallabuy.model.LineItem
 import com.malakezzat.yallabuy.model.Variant
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModel
+import com.malakezzat.yallabuy.ui.theme.AppColors
 import kotlinx.coroutines.delay
 import kotlin.math.round
 
@@ -246,7 +247,7 @@ fun CustomTopBar(sheetState: ModalBottomSheetState,navController : NavController
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium
                 ),
-                color = Color.Green
+                color = AppColors.MintGreen
             )
         }
     }
@@ -639,7 +640,7 @@ fun VoucherBottomSheet(onApplyDiscount: (discount: Double) -> Unit) {
             if (discountApplied) {
                 Text(
                     text = discountMessage,
-                    color = Color.Green,
+                    color = AppColors.MintGreen,
                     fontSize = 14.sp,
                     modifier = Modifier.padding(top = 8.dp)
                 )

@@ -10,7 +10,7 @@ import com.malakezzat.yallabuy.R
 
 
 val customFontFamily = FontFamily(
-    Font(R.font.discovera)
+    Font(R.font.allen_sans_regular)
 )
 // Set of Material typography styles to start with
 val Typography = Typography(

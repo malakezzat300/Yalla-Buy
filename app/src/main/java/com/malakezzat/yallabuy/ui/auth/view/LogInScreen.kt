@@ -47,6 +47,7 @@ import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.firebase.FirebaseAuthun
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.auth.viewmodel.login.LogInViewModel
+import com.malakezzat.yallabuy.ui.theme.AppColors
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
@@ -64,7 +65,7 @@ fun LogInScreen(viewModel: LogInViewModel,
             .fillMaxSize()
             .padding(10.dp)
             .background(Color.White),
-//        horizontalAlignment = Alignment.CenterHorizontally,
+       //horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         val context = LocalContext.current
@@ -72,35 +73,28 @@ fun LogInScreen(viewModel: LogInViewModel,
 
             ) {
 
-            Text(text = "Login",
+            Text(text = "Welcome Back!",
                 fontSize = 35.sp,
                 color = Color.Black,
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier
+                    .padding(8.dp)
             )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(text = "Don’t have an account?")
-                TextButton(onClick = {navController.navigate(Screen.SignUpScreen.route) }) {
-                    Text(text = " Signup", color = Color.Green)
-                }
-            }
+
 //            Spacer(modifier = Modifier.height(8.dp))
         }
-
-
         Spacer(modifier = Modifier.height(16.dp))
+        // Email Input
         Text(text = "Email", fontSize = 18.sp, modifier = Modifier.padding(8.dp))
-
         OutlinedTextField(
             value = email,
             onValueChange = {input -> email = input },
-            //label = { Text(text = "Full Name") },
-            shape = RoundedCornerShape(10.dp),
+            shape = RoundedCornerShape(30.dp),
             modifier = Modifier
                 .fillMaxWidth()
+                .height(75.dp)
                 .background(color = Color.White)
                 .padding(10.dp),
-            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Green)
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.MintGreen)
         )
 
         Text(text = "Password", fontSize = 18.sp, modifier = Modifier.padding(8.dp))
@@ -108,9 +102,10 @@ fun LogInScreen(viewModel: LogInViewModel,
         OutlinedTextField(
             value = password,
             onValueChange = { input -> password = input },
-            shape = RoundedCornerShape(10.dp),
+            shape = RoundedCornerShape(30.dp),
             modifier = Modifier
                 .fillMaxWidth()
+                .height(75.dp)
                 .background(color = Color.White)
                 .padding(10.dp),
             visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
@@ -127,7 +122,7 @@ fun LogInScreen(viewModel: LogInViewModel,
                 }
             },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password),
-            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = Color.Green)
+            colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.MintGreen)
 
 
         )
@@ -179,7 +174,7 @@ fun LogInScreen(viewModel: LogInViewModel,
                 }
 
             },
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(30.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Black,        // Default background color
                 contentColor = Color.White,         // Text color
@@ -197,6 +192,13 @@ fun LogInScreen(viewModel: LogInViewModel,
                 Text(text = "Login", fontSize = 20.sp)
             }
 
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(text = "Don’t have an account?")
+            TextButton(onClick = {navController.navigate(Screen.SignUpScreen.route) }) {
+                Text(text = " Signup", color = AppColors.MintGreen)
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -231,7 +233,7 @@ fun LogInScreenPreview(
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(text = "Don’t have an account?")
                 TextButton(onClick = {/*navController.navigate(Screen.SignUpScreen.route) */}) {
-                    Text(text = " Signup", color = Color.Green)
+                    Text(text = " Signup", color = AppColors.MintGreen)
                 }
             }
 //            Spacer(modifier = Modifier.height(8.dp))
