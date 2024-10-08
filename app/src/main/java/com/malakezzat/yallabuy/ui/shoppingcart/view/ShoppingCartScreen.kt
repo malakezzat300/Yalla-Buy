@@ -583,17 +583,17 @@ fun VoucherBottomSheet(onApplyDiscount: (discount: Double) -> Unit) {
             Button(
                 onClick = {
                     if (voucherCode.endsWith("YALLABUY10")) {
-                        val discount = 0.10 //
+                        val discount = 0.10
                         onApplyDiscount(discount)
                         discountMessage = "10% discount applied!"
                         discountApplied = true
                     } else if (voucherCode.endsWith("YALLABUY30")) {
-                    val discount = 0.30 //
-                    onApplyDiscount(discount)
-                    discountMessage = "30% discount applied!"
-                    discountApplied = true
+                        val discount = 0.30
+                        onApplyDiscount(discount)
+                        discountMessage = "30% discount applied!"
+                        discountApplied = true
                     } else if (voucherCode.endsWith("YALLABUY50")) {
-                        val discount = 0.50 //
+                        val discount = 0.50
                         onApplyDiscount(discount)
                         discountMessage = "50% discount applied!"
                         discountApplied = true
@@ -606,7 +606,8 @@ fun VoucherBottomSheet(onApplyDiscount: (discount: Double) -> Unit) {
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                shape = RoundedCornerShape(10.dp)
+                shape = RoundedCornerShape(10.dp),
+                enabled = !discountApplied
             ) {
                 Text(
                     text = "Apply Voucher",
