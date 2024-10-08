@@ -1,5 +1,6 @@
 package com.malakezzat.yallabuy.ui.home.viewmodel
 
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,11 +8,14 @@ import com.malakezzat.yallabuy.data.ProductsRepository
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.data.remote.coupons.DiscountCode
 import com.malakezzat.yallabuy.data.remote.coupons.PriceRule
+import com.malakezzat.yallabuy.data.sharedpref.CurrencyPreferences
+import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.SmartCollection
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -33,6 +37,9 @@ private val _brandsList = MutableStateFlow<ApiState<List<SmartCollection>>>(ApiS
 
     private val _priceRules = MutableStateFlow<List<PriceRule>>(emptyList())
     val priceRules: StateFlow<List<PriceRule>> get() = _priceRules
+
+    private val _conversionRate = MutableStateFlow<ApiState<CurrencyResponse?>>(ApiState.Loading)
+    val conversionRate = _conversionRate.asStateFlow()
 
     init {
         getAllProducts()
@@ -105,6 +112,20 @@ private val _brandsList = MutableStateFlow<ApiState<List<SmartCollection>>>(ApiS
             repository.getDiscountCodes(priceRuleId).collect { discountCodes ->
                 _discountCodes.value = discountCodes
             }
+        }
+    }
+
+    fun getRate(baseCurrency: String, targetCurrency: String){
+        viewModelScope.launch {
+            repository.getConversionRate(baseCurrency, targetCurrency).onStart {
+                _conversionRate.value = ApiState.Loading
+            }
+                .catch { e ->
+                    _conversionRate.value = ApiState.Error(e.message ?: "Unknown error")
+                }
+                .collect { response ->
+                    _conversionRate.value = ApiState.Success(response)
+                }
         }
     }
 }

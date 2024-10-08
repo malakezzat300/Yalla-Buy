@@ -75,6 +75,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remote.ApiState
+import com.malakezzat.yallabuy.data.sharedpref.CurrencyPreferences
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.SmartCollection
@@ -93,12 +94,28 @@ fun HomeScreen(
     val productState by viewModel.productList.collectAsStateWithLifecycle()
     val categoriesState by viewModel.categoriesList.collectAsStateWithLifecycle()
     val brandsState by viewModel.brandsList.collectAsStateWithLifecycle()
+    val exchangeRate by viewModel.conversionRate.collectAsState()
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         Log.d(TAG, categoriesState.toString())
         viewModel.getAllProducts()
         viewModel.getAllCategories()
+        viewModel.getRate("EGP",CurrencyPreferences.getInstance(context).getTargetCurrency() ?: "EGP")
     }
+
+    LaunchedEffect (exchangeRate) {
+        when(exchangeRate){
+            is ApiState.Error -> {}
+            ApiState.Loading -> {}
+            is ApiState.Success -> {
+                (exchangeRate as ApiState.Success).data?.let {
+                    CurrencyPreferences.getInstance(context).saveExchangeRate("EGP",CurrencyPreferences.getInstance(context).getTargetCurrency() ?: "EGP",
+                        it.conversion_rate)
+                }
+            }
+        }
+    }
+
     Scaffold(
         topBar = { CustomTopBar(navController) },
         containerColor = Color.White,

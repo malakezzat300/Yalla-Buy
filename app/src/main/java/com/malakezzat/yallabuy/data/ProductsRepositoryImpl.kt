@@ -5,6 +5,7 @@ import com.malakezzat.yallabuy.data.remote.ProductsRemoteDataSource
 import com.malakezzat.yallabuy.data.remote.coupons.DiscountCode
 import com.malakezzat.yallabuy.data.remote.coupons.PriceRule
 import com.malakezzat.yallabuy.data.sharedpref.GlobalSharedPreferenceDataSource
+import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
@@ -115,4 +116,13 @@ class ProductsRepositoryImpl private constructor(
     override suspend fun getVariantById(variantId: Long): Flow<VariantResponse> {
         return productsRemoteDataSource.getVariantById(variantId)
     }
+
+    override suspend fun getConversionRate(
+        baseCurrency: String,
+        targetCurrency: String
+    ): Flow<CurrencyResponse> {
+        return productsRemoteDataSource.getConversionRate(baseCurrency,targetCurrency)
+    }
+
+
 }

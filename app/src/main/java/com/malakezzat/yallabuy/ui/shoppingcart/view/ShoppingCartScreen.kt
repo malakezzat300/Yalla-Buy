@@ -63,6 +63,8 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.malakezzat.yallabuy.data.ProductsRepository
 import com.malakezzat.yallabuy.data.remote.ApiState
+import com.malakezzat.yallabuy.data.sharedpref.CurrencyPreferences
+import com.malakezzat.yallabuy.data.util.CurrencyConverter
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.LineItem
@@ -262,6 +264,7 @@ fun ShoppingItem(
     val coroutineScope = rememberCoroutineScope()
     var showDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    CurrencyConverter.initialize(context)
 
     Card(
         modifier = Modifier
@@ -307,10 +310,12 @@ fun ShoppingItem(
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
                     )
-                    Text(
-                        text = item.price,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
+                    CurrencyConverter.changeCurrency(item.price.toDouble())?.let {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
                 }
 
                 Row(

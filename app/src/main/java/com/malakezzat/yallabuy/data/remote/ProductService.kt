@@ -5,6 +5,7 @@ import com.malakezzat.yallabuy.data.remote.coupons.DiscountCodeResponse
 import com.malakezzat.yallabuy.data.remote.coupons.priceRuleResponse
 import com.malakezzat.yallabuy.model.Brands
 import com.malakezzat.yallabuy.model.Category
+import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
@@ -101,6 +102,10 @@ interface ProductService {
         @Path("id") customerId: Long
     ): Orders // Ensure Orders is the appropriate type to represent the response
 
-
+    @GET("pair/{base}/{target}")
+    suspend fun getConversionRate(
+        @Path("base") baseCurrency: String,
+        @Path("target") targetCurrency: String
+    ): CurrencyResponse
 
 }

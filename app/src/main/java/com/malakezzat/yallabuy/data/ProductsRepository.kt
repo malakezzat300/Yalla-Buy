@@ -2,6 +2,7 @@ package com.malakezzat.yallabuy.data
 
 import com.malakezzat.yallabuy.data.remote.coupons.DiscountCode
 import com.malakezzat.yallabuy.data.remote.coupons.PriceRule
+import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
@@ -41,4 +42,5 @@ interface ProductsRepository {
     suspend fun getCustomerById(customer: Long): Flow<CustomerSearchRespnse>
     suspend fun getVariantById(variantId: Long): Flow<VariantResponse>
 
+    suspend fun getConversionRate(baseCurrency: String, targetCurrency: String): Flow<CurrencyResponse>
 }
