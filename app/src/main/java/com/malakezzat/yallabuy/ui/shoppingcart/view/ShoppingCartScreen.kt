@@ -87,6 +87,7 @@ fun ShoppingCartScreen(
     val visibleItems = remember { mutableStateListOf<LineItem>(*draftOrder.line_items.toTypedArray()) }
     var subtotal by remember { mutableDoubleStateOf(0.0) }
     var discountAmount by remember { mutableDoubleStateOf(0.0) }
+    var discountSaved by remember { mutableDoubleStateOf(0.0) }
     var total by remember { mutableDoubleStateOf(0.0) }
     val variantState by viewModel.variantId.collectAsState()
     var variant by remember { mutableStateOf(Variant()) }
@@ -117,24 +118,21 @@ fun ShoppingCartScreen(
                 viewModel.getVariantById(orderItems.get(0).variant_id)
             }
             subtotal = calculateSubtotal(orderItems)
-            LaunchedEffect (Unit) {
-                total = subtotal
-            }
+
         }
     }
 
+    LaunchedEffect (subtotal,discountSaved) {
+        val percentage = 1 - discountSaved
+        total = round(subtotal * percentage)
+        discountAmount = round(subtotal * ( 1 - percentage))
+    }
 
     ModalBottomSheetLayout(
         sheetState = bottomSheetState,
         sheetContent = {
             VoucherBottomSheet{ discount ->
-                if(discount != 0.0){
-                    val percentage = 1 - discount
-                    total = round(subtotal * percentage)
-                    discountAmount = round(subtotal * ( 1 - percentage))
-                } else {
-                    total = subtotal
-                }
+                discountSaved = discount
             }
         },
         content = {
