@@ -87,10 +87,12 @@ fun ShoppingCartScreen(
     val visibleItems = remember { mutableStateListOf<LineItem>(*draftOrder.line_items.toTypedArray()) }
     var subtotal by remember { mutableDoubleStateOf(0.0) }
     var discountAmount by remember { mutableDoubleStateOf(0.0) }
+    var discountSaved by remember { mutableDoubleStateOf(0.0) }
     var total by remember { mutableDoubleStateOf(0.0) }
     val variantState by viewModel.variantId.collectAsState()
     var variant by remember { mutableStateOf(Variant()) }
     var variantSet by remember { mutableStateOf(mutableSetOf<Variant>() ) }
+    var itemsCount by remember { mutableIntStateOf(0) }
 
     when(variantState){
         is ApiState.Error -> Log.i("shoppingCartTest", "ShoppingCartScreen: draftOrder ${(variantState as ApiState.Error).message}")
@@ -117,24 +119,25 @@ fun ShoppingCartScreen(
                 viewModel.getVariantById(orderItems.get(0).variant_id)
             }
             subtotal = calculateSubtotal(orderItems)
-            LaunchedEffect (Unit) {
-                total = subtotal
-            }
+
         }
     }
 
+    LaunchedEffect(orderItems){
+        itemsCount = orderItems.size
+    }
+
+    LaunchedEffect (subtotal,discountSaved) {
+        val percentage = 1 - discountSaved
+        total = round(subtotal * percentage)
+        discountAmount = round(subtotal * ( 1 - percentage))
+    }
 
     ModalBottomSheetLayout(
         sheetState = bottomSheetState,
         sheetContent = {
             VoucherBottomSheet{ discount ->
-                if(discount != 0.0){
-                    val percentage = 1 - discount
-                    total = round(subtotal * percentage)
-                    discountAmount = round(subtotal * ( 1 - percentage))
-                } else {
-                    total = subtotal
-                }
+                discountSaved = discount
             }
         },
         content = {
@@ -178,7 +181,8 @@ fun ShoppingCartScreen(
                                     .padding(16.dp),
                                 subtotal.toString(),
                                 discountAmount.toString(),
-                                total.toString()
+                                total.toString(),
+                                itemsCount
                             )
                         }
                     }
@@ -259,108 +263,68 @@ fun ShoppingItem(
     var showDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    Row(
+    Card(
         modifier = Modifier
             .padding(8.dp)
-            .fillMaxWidth()
-            .height(140.dp)
+            .fillMaxHeight(),
+        shape = RoundedCornerShape(18.dp),
+        elevation = CardDefaults.cardElevation(12.dp),
     ) {
-        Card(
+        Row(
             modifier = Modifier
-                .weight(1.2f)
                 .padding(8.dp)
-                .fillMaxHeight(),
-            shape = RoundedCornerShape(12.dp),
-            elevation = CardDefaults.cardElevation(12.dp),
+                .fillMaxWidth()
+                .height(140.dp)
         ) {
-            Image(
+            Card(
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .clip(shape = RoundedCornerShape(10)),
-                painter = rememberAsyncImagePainter(item.properties[0].value),
-                contentDescription = "ad",
-                contentScale = ContentScale.FillBounds,
-            )
-        }
-
-        Column(
-            modifier = Modifier
-                .padding(4.dp)
-                .weight(2f)
-                .fillMaxHeight(),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column {
-                Text(
-                    text = item.title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
-                )
-                Text(
-                    text = item.price,
-                    style = MaterialTheme.typography.bodyMedium,
+                    .weight(1.2f)
+                    .padding(8.dp)
+                    .fillMaxHeight(),
+                shape = RoundedCornerShape(12.dp),
+                elevation = CardDefaults.cardElevation(12.dp),
+            ) {
+                Image(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .clip(shape = RoundedCornerShape(10)),
+                    painter = rememberAsyncImagePainter(item.properties[0].value),
+                    contentDescription = "ad",
+                    contentScale = ContentScale.FillBounds,
                 )
             }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .weight(2f)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                // Minus Button
-                IconButton(
-                    onClick = {
-                        val newQuantity = (item.quantity - 1).coerceAtLeast(1)
-                        item.quantity = newQuantity
-                        if(item.quantity == 1){
-                            Toast.makeText(context, "Min Limit reached", Toast.LENGTH_SHORT).show()
-                        }
-
-                        val updatedDraftItems = draftOrder.line_items.map { currentItem ->
-                            if (currentItem == item) {
-                                currentItem.copy(quantity = newQuantity)
-                            } else {
-                                currentItem
-                            }
-                        }
-                        val updatedDraftOrder = draftOrder.copy(line_items = updatedDraftItems)
-                        val updatedDraftItemsRequest = DraftOrderRequest(updatedDraftOrder)
-
-                        coroutineScope.launch {
-                            delay(200)
-                            draftOrder.id?.let {
-                                viewModel.updateDraftOrder(it, updatedDraftItemsRequest)
-                            }
-                        }
-                        onItemUpdated()
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_minus),
-                        contentDescription = "minus",
+                Column {
+                    Text(
+                        text = item.title,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
+                    )
+                    Text(
+                        text = item.price,
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
 
-                Text(
-                    text = item.quantity.toString(),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
-
-                // Plus Button
-                IconButton(
-                    onClick = {
-                        if(subtotal <= 1000) {
-                            val newQuantity = (item.quantity + 1).coerceAtMost(
-                                checkMaxQuantity(
-                                    item.variant_id,
-                                    variantSet
-                                )
-                            )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    // Minus Button
+                    IconButton(
+                        onClick = {
+                            val newQuantity = (item.quantity - 1).coerceAtLeast(1)
                             item.quantity = newQuantity
-                            if (item.quantity == checkMaxQuantity(item.variant_id, variantSet)) {
-                                Toast.makeText(context, "Max Limit reached", Toast.LENGTH_SHORT)
-                                    .show()
+                            if (item.quantity == 1) {
+                                Toast.makeText(context, "Min Limit reached", Toast.LENGTH_SHORT).show()
                             }
 
                             val updatedDraftItems = draftOrder.line_items.map { currentItem ->
@@ -380,30 +344,78 @@ fun ShoppingItem(
                                 }
                             }
                             onItemUpdated()
-                        } else {
-                            Toast.makeText(context, "Maximum payment reached", Toast.LENGTH_SHORT)
-                                .show()
                         }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_minus),
+                            contentDescription = "minus",
+                        )
                     }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_add),
-                        contentDescription = "add",
+
+                    Text(
+                        text = item.quantity.toString(),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
                     )
-                }
 
-                Spacer(modifier = Modifier.width(16.dp))
+                    // Plus Button
+                    IconButton(
+                        onClick = {
+                            if (subtotal <= 1000) {
+                                val newQuantity = (item.quantity + 1).coerceAtMost(
+                                    checkMaxQuantity(
+                                        item.variant_id,
+                                        variantSet
+                                    )
+                                )
+                                item.quantity = newQuantity
+                                if (item.quantity == checkMaxQuantity(item.variant_id, variantSet)) {
+                                    Toast.makeText(context, "Max Limit reached", Toast.LENGTH_SHORT)
+                                        .show()
+                                }
 
-                IconButton(
-                    onClick = {
-                        showDialog = true
+                                val updatedDraftItems = draftOrder.line_items.map { currentItem ->
+                                    if (currentItem == item) {
+                                        currentItem.copy(quantity = newQuantity)
+                                    } else {
+                                        currentItem
+                                    }
+                                }
+                                val updatedDraftOrder = draftOrder.copy(line_items = updatedDraftItems)
+                                val updatedDraftItemsRequest = DraftOrderRequest(updatedDraftOrder)
+
+                                coroutineScope.launch {
+                                    delay(200)
+                                    draftOrder.id?.let {
+                                        viewModel.updateDraftOrder(it, updatedDraftItemsRequest)
+                                    }
+                                }
+                                onItemUpdated()
+                            } else {
+                                Toast.makeText(context, "Maximum payment reached", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_add),
+                            contentDescription = "add",
+                        )
                     }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_delete),
-                        contentDescription = "Delete",
-                        tint = Color.Red
-                    )
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    IconButton(
+                        onClick = {
+                            showDialog = true
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_delete),
+                            contentDescription = "Delete",
+                            tint = Color.Red
+                        )
+                    }
                 }
             }
         }
@@ -437,7 +449,8 @@ fun ShoppingView(
     modifier: Modifier,
     subtotal : String,
     discount: String,
-    total : String
+    total : String,
+    itemsCount : Int
 ) {
     Box(
         modifier = modifier
@@ -495,7 +508,7 @@ fun ShoppingView(
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Text(
-                    text = "Checkout",
+                    text = "Checkout ($itemsCount)",
                     color = Color.White,
                     fontSize = 16.sp
                 )
@@ -585,17 +598,17 @@ fun VoucherBottomSheet(onApplyDiscount: (discount: Double) -> Unit) {
             Button(
                 onClick = {
                     if (voucherCode.endsWith("YALLABUY10")) {
-                        val discount = 0.10 //
+                        val discount = 0.10
                         onApplyDiscount(discount)
                         discountMessage = "10% discount applied!"
                         discountApplied = true
                     } else if (voucherCode.endsWith("YALLABUY30")) {
-                    val discount = 0.30 //
-                    onApplyDiscount(discount)
-                    discountMessage = "30% discount applied!"
-                    discountApplied = true
+                        val discount = 0.30
+                        onApplyDiscount(discount)
+                        discountMessage = "30% discount applied!"
+                        discountApplied = true
                     } else if (voucherCode.endsWith("YALLABUY50")) {
-                        val discount = 0.50 //
+                        val discount = 0.50
                         onApplyDiscount(discount)
                         discountMessage = "50% discount applied!"
                         discountApplied = true
@@ -608,7 +621,8 @@ fun VoucherBottomSheet(onApplyDiscount: (discount: Double) -> Unit) {
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                shape = RoundedCornerShape(10.dp)
+                shape = RoundedCornerShape(10.dp),
+                enabled = !discountApplied
             ) {
                 Text(
                     text = "Apply Voucher",
