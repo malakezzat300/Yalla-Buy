@@ -1,5 +1,6 @@
 package com.malakezzat.yallabuy.data.remote
 
+import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
@@ -38,4 +39,5 @@ interface ProductsRemoteDataSource {
     suspend fun getCustomerByEmai(customer: String): Flow<CustomerSearchRespnse>
     suspend fun getCustomerById(customerId: Long): Flow<CustomerSearchRespnse>
     suspend fun getVariantById(variantId: Long): Flow<VariantResponse>
+    suspend fun getConversionRate(): Flow<CurrencyResponse>
 }

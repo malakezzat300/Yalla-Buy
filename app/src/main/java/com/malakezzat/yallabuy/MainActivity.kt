@@ -24,6 +24,7 @@ import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModelFactory
 import com.malakezzat.yallabuy.ui.product_info.ProductInfoViewModelFactory
 import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollectionIdViewModelFactory
 import com.malakezzat.yallabuy.ui.search.SearchViewModelFactory
+import com.malakezzat.yallabuy.ui.settings.viewmodel.SettingsViewModelFactory
 import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModelFactory
 import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
 import com.malakezzat.yallabuy.ui.wishlist.WishlistViewModelFactory
@@ -74,6 +75,9 @@ class MainActivity : ComponentActivity() {
     private val wishlistViewModelFactory by lazy {
         WishlistViewModelFactory(repo)
     }
+    private val settingsViewModelFactory by lazy {
+        SettingsViewModelFactory(repo)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -93,7 +97,8 @@ class MainActivity : ComponentActivity() {
                 categoriesScreenViewModelFactory,
                 productsByCollectionIdViewModelFactory,
                 wishlistViewModelFactory,
-                ordersViewModelFactory
+                ordersViewModelFactory,
+                settingsViewModelFactory,
             )
         }
         }

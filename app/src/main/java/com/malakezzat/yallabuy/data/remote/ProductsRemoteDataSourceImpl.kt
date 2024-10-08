@@ -2,6 +2,8 @@ package com.malakezzat.yallabuy.data.remote
 
 import android.util.Log
 import com.malakezzat.yallabuy.data.remot.ProductService
+import com.malakezzat.yallabuy.data.remote.RetrofitHelper.apiCurrency
+import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
@@ -165,5 +167,10 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         throw e
     }
 
-
+    override suspend fun getConversionRate(): Flow<CurrencyResponse> = flow {
+        val response = apiCurrency.getLatestRates()
+        emit(response)
+    }.catch { e ->
+        e.printStackTrace()
+    }
 }

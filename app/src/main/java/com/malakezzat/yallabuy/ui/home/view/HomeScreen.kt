@@ -75,6 +75,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remote.ApiState
+import com.malakezzat.yallabuy.data.sharedpref.CurrencyPreferences
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.SmartCollection
@@ -99,6 +100,7 @@ fun HomeScreen(
         viewModel.getAllProducts()
         viewModel.getAllCategories()
     }
+
     Scaffold(
         topBar = { CustomTopBar(navController) },
         containerColor = Color.White,
