@@ -13,6 +13,7 @@ import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
+import com.malakezzat.yallabuy.model.Orders
 import com.malakezzat.yallabuy.model.ProductResponse
 import com.malakezzat.yallabuy.model.ProductsResponse
 import com.malakezzat.yallabuy.model.VariantResponse
@@ -82,20 +83,24 @@ interface ProductService {
     suspend fun getCustomerByEmail(@Query("email") email: String): CustomerSearchRespnse
 
     @GET("customers/search.json")
-
-    suspend fun getCustomerById(
-        @Query("id") email: Long
-    ): CustomerSearchRespnse
+    suspend fun getCustomerById(@Query("id") email: Long): CustomerSearchRespnse
 
     @GET("variants/{id}.json")
     suspend fun getVariantById(@Path("id") variantId: Long): VariantResponse
 
-    //suspend fun getCustomerById(@Query("id") email: Long): CustomerSearchRespnse
 
     //customers/207119551/orders.json
-    @GET("customers/{id}/orders.json")
+    /*@GET("customers/{id}/orders.json")
     suspend fun getAllOrdersForCustomerById(
         @Path("id") productId: Long
-    )
+    )*/
+
+    // Function to retrieve all orders for a specific customer by their ID
+    @GET("customers/{id}/orders.json")
+    suspend fun getAllOrdersForCustomerByID(
+        @Path("id") customerId: Long
+    ): Orders // Ensure Orders is the appropriate type to represent the response
+
+
 
 }
