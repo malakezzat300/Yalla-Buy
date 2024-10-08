@@ -1,6 +1,7 @@
 package com.malakezzat.yallabuy.ui.settings.view
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,8 +47,10 @@ import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.data.sharedpref.CurrencyPreferences
 import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.model.CustomerId
+import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.settings.viewmodel.SettingsViewModel
+import com.malakezzat.yallabuy.ui.shoppingcart.view.DeleteConfirmationDialog
 
 @Composable
 fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel) {
@@ -58,9 +61,22 @@ fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel) {
     val userAddressesState by viewModel.userAddresses.collectAsState()
     var userAddresses by remember { mutableStateOf(listOf<Address>()) }
     val userId by viewModel.userId.collectAsState()
+    val deleteAddressState by viewModel.deleteAddressEvent.collectAsState("")
 
     LaunchedEffect(Unit) {
         viewModel.getUserId()
+    }
+
+    val messageState = viewModel.deleteAddressEvent.collectAsState(initial = "")
+
+    LaunchedEffect(Unit) {
+        viewModel.deleteAddressEvent.collect { message ->
+            if(message.contains("422")){
+                Toast.makeText(context, "Cannot Delete The Default Address", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     when(exchangeRate){
@@ -75,12 +91,14 @@ fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel) {
         is ApiState.Error -> Log.i("addressTest", "SettingsScreen: userAddressesState ${(userAddressesState as ApiState.Error).message}")
         ApiState.Loading -> {}
         is ApiState.Success -> {
-            userAddresses = (userAddressesState as ApiState.Success).data
+            userAddresses = (userAddressesState as ApiState.Success).data.addresses
+            Log.i("addressTest", "SettingsScreen: $userAddresses")
         }
     }
 
     LaunchedEffect(Unit){
         viewModel.userId.value?.let { viewModel.getUserAddresses(it) }
+
     }
 
     val onAddNewAddress: () -> Unit = {
@@ -105,36 +123,6 @@ fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Row( modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween){
-            Text(text = "Address",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.align(Alignment.CenterVertically))
-            Spacer(modifier = Modifier.width(50.dp))
-
-            Button(
-                onClick = onAddNewAddress
-                ,
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Text(
-                    text = "Add new",
-                    color = Color.White,
-                    fontSize = 16.sp
-                )
-            }
-
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-
-        LazyColumn {
-            items(userAddresses.size){
-                addressItem(viewModel,userAddresses[it],userId)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         var expanded by remember { mutableStateOf(false) }
         val currencies = listOf("EGP", "USD", "EUR", "AED", "SAR")
@@ -178,6 +166,37 @@ fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel) {
             }
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row( modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween){
+            Text(text = "Address",
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.align(Alignment.CenterVertically))
+            Spacer(modifier = Modifier.width(50.dp))
+
+            Button(
+                onClick = onAddNewAddress
+                ,
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Text(
+                    text = "Add new",
+                    color = Color.White,
+                    fontSize = 16.sp
+                )
+            }
+
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+
+        LazyColumn {
+            items(userAddresses.size){
+                addressItem(viewModel,userAddresses[it],userId)
+            }
+        }
+
 
     }
 }
@@ -185,6 +204,7 @@ fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel) {
 
 @Composable
 fun addressItem(viewModel: SettingsViewModel,address: Address,userId : Long?){
+    var showDialog by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
@@ -243,11 +263,7 @@ fun addressItem(viewModel: SettingsViewModel,address: Address,userId : Long?){
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     IconButton(onClick = {
-                        userId?.let { address.id?.let { it1 ->
-                            viewModel.deleteAddress(it,
-                                it1
-                            )
-                        } }
+                        showDialog = true
                     }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
@@ -257,5 +273,19 @@ fun addressItem(viewModel: SettingsViewModel,address: Address,userId : Long?){
                 }
             }
         }
+    }
+    if (showDialog) {
+        DeleteConfirmationDialog(
+            showDialog = showDialog,
+            onDismiss = { showDialog = false },
+            onConfirmDelete = {
+                showDialog = false
+                userId?.let { address.id?.let { it1 ->
+                    viewModel.deleteAddress(it,
+                        it1
+                    )
+                } }
+            }
+        )
     }
 }

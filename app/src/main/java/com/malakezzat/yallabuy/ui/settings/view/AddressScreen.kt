@@ -191,7 +191,14 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
             Text(text = "Phone Number", fontSize = 18.sp)
             OutlinedTextField(
                 value = phoneNumber,
-                onValueChange = { input -> phoneNumber = input },
+                onValueChange = { input ->
+                    val regex = Regex("^0(1[0125])?\\d{0,8}$")
+                    if (regex.matches(input) || input.isEmpty()) {
+                        phoneNumber = input
+                    } else {
+                        Toast.makeText(context, "Enter a vaild number", Toast.LENGTH_SHORT).show()
+                    }
+                },
                 label = { Text(text = "Phone Number") },
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier

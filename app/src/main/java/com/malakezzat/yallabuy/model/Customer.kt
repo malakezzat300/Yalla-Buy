@@ -54,6 +54,10 @@ data class CustomerId (
     val id: Long
 )
 
+data class AddressResponse(
+    val addresses : List<Address>
+)
+
 data class AddressRequest(
     val address : Address
 )

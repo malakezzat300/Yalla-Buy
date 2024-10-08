@@ -5,6 +5,7 @@ import com.malakezzat.yallabuy.data.remot.ProductService
 import com.malakezzat.yallabuy.data.remote.RetrofitHelper.apiCurrency
 import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.model.AddressRequest
+import com.malakezzat.yallabuy.model.AddressResponse
 import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.CustomerAddress
@@ -184,7 +185,7 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         e.printStackTrace()
     }
 
-    override suspend fun getUserAddresses(customerId: Long): Flow<List<Address>> = flow {
+    override suspend fun getUserAddresses(customerId: Long): Flow<AddressResponse> = flow {
         val response = productService.getUserAddresses(customerId)
         emit(response)
     }.catch { e ->

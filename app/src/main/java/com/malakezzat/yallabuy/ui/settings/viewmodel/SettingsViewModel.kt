@@ -7,6 +7,7 @@ import com.malakezzat.yallabuy.data.ProductsRepository
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.model.AddressRequest
+import com.malakezzat.yallabuy.model.AddressResponse
 import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomerAddress
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,7 +26,7 @@ class SettingsViewModel(private val repository: ProductsRepository): ViewModel()
     val conversionRate = _conversionRate.asStateFlow()
 
 
-    private val _userAddresses = MutableStateFlow<ApiState<List<Address>>>(ApiState.Loading)
+    private val _userAddresses = MutableStateFlow<ApiState<AddressResponse>>(ApiState.Loading)
     val userAddresses = _userAddresses.asStateFlow()
 
     private val _addressDetails = MutableStateFlow<ApiState<CustomerAddress?>>(ApiState.Loading)
@@ -34,8 +35,8 @@ class SettingsViewModel(private val repository: ProductsRepository): ViewModel()
     private val _customerAddress = MutableStateFlow<ApiState<CustomerAddress?>>(ApiState.Loading)
     val customerAddress= _customerAddress.asStateFlow()
 
-    private val _deleteAddressEvent = MutableSharedFlow<Unit>()
-    val deleteAddressEvent: SharedFlow<Unit> = _deleteAddressEvent.asSharedFlow()
+    private val _deleteAddressEvent = MutableSharedFlow<String>()
+    val deleteAddressEvent: SharedFlow<String> = _deleteAddressEvent.asSharedFlow()
 
 
     private val _userId = MutableStateFlow<Long?>(0)
@@ -137,8 +138,11 @@ class SettingsViewModel(private val repository: ProductsRepository): ViewModel()
         viewModelScope.launch {
             try {
                 repository.deleteAddress(customerId, addressId)
+                getUserAddresses(customerId)
+                _deleteAddressEvent.emit("Address has been Deleted")
             } catch (e: Exception) {
                 Log.i("addressTest", "deleteAddress: $e")
+                _deleteAddressEvent.emit("$e")
             }
         }
     }

@@ -7,6 +7,7 @@ import com.malakezzat.yallabuy.data.remote.coupons.PriceRule
 import com.malakezzat.yallabuy.data.sharedpref.GlobalSharedPreferenceDataSource
 import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.model.AddressRequest
+import com.malakezzat.yallabuy.model.AddressResponse
 import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.CustomerAddress
@@ -128,7 +129,7 @@ class ProductsRepositoryImpl private constructor(
         return productsRemoteDataSource.addNewAddress(customerId,address)
     }
 
-    override suspend fun getUserAddresses(customerId: Long): Flow<List<Address>> {
+    override suspend fun getUserAddresses(customerId: Long): Flow<AddressResponse> {
         return productsRemoteDataSource.getUserAddresses(customerId)
     }
 
