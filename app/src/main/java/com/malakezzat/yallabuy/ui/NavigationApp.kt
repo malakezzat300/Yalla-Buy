@@ -99,9 +99,13 @@ fun NavigationApp(
                     val viewModel: CategoriesViewModel = viewModel(factory = categoriesViewModelFactory)
                     CategoriesScreen(viewModel = viewModel, navController)
                 }
-                composable(Screen.OrderScreen.route) {
+                composable(Screen.OrdersScreen.route) {
                     val viewModel: OrdersViewModel = viewModel(factory = ordersViewModelFactory)
                     OrdersScreen(viewModel = viewModel, navController)
+                }
+                composable(Screen.OrderScreen.route) {
+                    val viewModel: PaymentViewModel = viewModel(factory = paymentViewModelFactory)
+                    OrderScreen(viewModel, navController)
                 }
                 composable("${Screen.ProductsByCategoryScreen.route}/{categoryId}/{body_html}") { backStackEntry ->
                     val categoryId = backStackEntry.arguments?.getString("categoryId")
@@ -123,10 +127,7 @@ fun NavigationApp(
                     val viewModel: LogInViewModel = viewModel(factory = logInViewModelFactory)
                     LogInScreen(viewModel, navController)
                 }
-                composable(Screen.OrderScreen.route) {
-                    val viewModel: PaymentViewModel = viewModel(factory = paymentViewModelFactory)
-                    OrderScreen(viewModel, navController)
-                }
+
                 composable(
                     route = Screen.CheckoutScreen.route,
                     arguments = listOf(navArgument("orderId") { type = NavType.StringType })

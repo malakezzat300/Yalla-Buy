@@ -24,5 +24,4 @@ sealed class Screen(val route: String) {
     data object ProductsByCategoryScreen : Screen("productsByCategoryScreen")
     data object ProductsByBrandScreen : Screen("productsByBrandScreen")
     data object OrdersScreen : Screen("ordersScreen")
-
 }
