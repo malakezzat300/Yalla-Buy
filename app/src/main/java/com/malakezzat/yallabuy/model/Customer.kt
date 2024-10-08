@@ -1,6 +1,8 @@
 package com.malakezzat.yallabuy.model
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+
 
 data class Customerr (
     val first_name: String?,
@@ -116,4 +118,10 @@ data class CustomerSearchRespnse(
 
 data class CustomerAddress(
     val customer_address: Address,
+)
+
+data class AddressUpdateRequest(
+    val customer_id: Long,
+    val id: Long,
+    val default: Boolean = true
 )

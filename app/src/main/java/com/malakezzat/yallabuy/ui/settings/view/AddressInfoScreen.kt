@@ -61,14 +61,69 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavHostController
+import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.Address
+import com.malakezzat.yallabuy.model.AddressRequest
+import com.malakezzat.yallabuy.ui.Screen
+import com.malakezzat.yallabuy.ui.settings.viewmodel.SettingsViewModel
+import com.malakezzat.yallabuy.ui.shoppingcart.view.DeleteConfirmationDialog
 import com.malakezzat.yallabuy.ui.theme.AppColors
 
 
 @Composable
-fun AddressInfoScreen(navController: NavHostController, address: Address){
+fun AddressInfoScreen(navController: NavHostController,viewModel: SettingsViewModel, addressId: String){
+
+    val addressState by viewModel.addressDetails.collectAsState()
+    var address by remember { mutableStateOf(Address()) }
+    val userId by viewModel.userId.collectAsState()
+    val deleteAddressState by viewModel.deleteAddressEvent.collectAsState("")
+    var showDialog by remember { mutableStateOf(false) }
+    var showDefaultDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val sharedPreferences = LocalContext.current.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
+
+
+    LaunchedEffect(Unit) {
+        viewModel.getUserId()
+    }
+
+    LaunchedEffect(userId){
+
+        viewModel.userId.value?.let { viewModel.getAddressDetails(it,addressId.toLong()) }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.deleteAddressEvent.collect { message ->
+            if(message.contains("422")){
+                Toast.makeText(context, "Cannot Delete The Default Address", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    val messageState = viewModel.defaultAddressEvent.collectAsState(initial = "")
+
+    LaunchedEffect(Unit) {
+        viewModel.defaultAddressEvent.collect { message ->
+            if(message.contains("422")){
+                Toast.makeText(context, "Cannot Delete The Default Address", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    when(addressState){
+        is ApiState.Error -> Log.i("addressTest", "AddressInfoScreen: ${(addressState as ApiState.Error).message}")
+        ApiState.Loading -> {}
+        is ApiState.Success -> address = (addressState as ApiState.Success).data?.customer_address ?: Address()
+    }
+
     LazyColumn(modifier = Modifier.padding(16.dp)) {
         item{
             Text(
@@ -76,44 +131,55 @@ fun AddressInfoScreen(navController: NavHostController, address: Address){
                 style = MaterialTheme.typography.headlineMedium,
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "First Name", fontSize = 18.sp)
+            Text(text = "First Name", fontSize = 18.sp,fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(2.dp))
             address.first_name?.let { Text(text = it, fontSize = 18.sp) }
 
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Last Name", fontSize = 18.sp)
+            Text(text = "Last Name", fontSize = 18.sp,fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(2.dp))
             address.last_name?.let { Text(text = it, fontSize = 18.sp) }
 
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Phone Number", fontSize = 18.sp)
+            Text(text = "Phone Number", fontSize = 18.sp,fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(2.dp))
             address.phone?.let { Text(text = it, fontSize = 18.sp) }
 
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Address", fontSize = 18.sp,)
+            Text(text = "Address", fontSize = 18.sp,fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(2.dp))
             address.address1?.let { Text(text = it, fontSize = 18.sp,) }
 
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "City", fontSize = 18.sp)
+            Text(text = "City", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(2.dp))
             address.city?.let { Text(text = it, fontSize = 18.sp) }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(text = "Country", fontSize = 18.sp)
+            Text(text = "Country", fontSize = 18.sp,fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(2.dp))
             address.country?.let { Text(text = it, fontSize = 18.sp) }
 
             Spacer(modifier = Modifier.height(8.dp))
+
+            Text(text = "Default", fontSize = 18.sp,fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(2.dp))
+            address.default?.let { Text(text = it.toString(), fontSize = 18.sp) }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                onClick = { /* Action for button click */ },
+                onClick = {
+                    address.id?.let {
+                    navController.navigate( Screen.AddressScreen.createRoute(it) )
+                    }
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                shape = RoundedCornerShape(10.dp)
+                shape = RoundedCornerShape(10.dp),
             ) {
                 Text(
                     text = "Edit",
@@ -121,8 +187,117 @@ fun AddressInfoScreen(navController: NavHostController, address: Address){
                     fontSize = 16.sp
                 )
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            address.default?.let {
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    onClick = {
+                        showDialog = true
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                    shape = RoundedCornerShape(10.dp),
+                    enabled = !it
+                ) {
+                    Text(
+                        text = "Delete",
+                        color = Color.White,
+                        fontSize = 16.sp
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            address.default?.let { isDefault ->
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    onClick = {
+                        showDefaultDialog = true
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                    shape = RoundedCornerShape(10.dp),
+                    enabled = !isDefault
+                ) {
+                    Text(
+                        text = "Make Default",
+                        color = Color.White,
+                        fontSize = 16.sp
+                    )
+                }
+            }
         }
+    }
+
+    if (showDialog) {
+        DeleteConfirmationDialog(
+            showDialog = showDialog,
+            onDismiss = { showDialog = false },
+            onConfirmDelete = {
+                showDialog = false
+                userId?.let { address.id?.let { it1 ->
+                    viewModel.deleteAddress(it,
+                        it1
+                    )
+                } }
+                navController.navigateUp()
+            }
+        )
+    }
+
+    if (showDefaultDialog) {
+        DefaultConfirmationDialog(
+            showDialog = showDefaultDialog,
+            onDismiss = { showDefaultDialog = false },
+            onConfirmDelete = {
+                showDefaultDialog = false
+                userId?.let { it1 -> address.id?.let { it2 ->
+                    viewModel.setDefaultAddress(it1,
+                        it2
+                    )
+                } }
+            }
+        )
     }
 }
 
-
+@Composable
+fun DefaultConfirmationDialog(
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    onConfirmDelete: () -> Unit
+) {
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { onDismiss() },
+            title = {
+                Text(text = "Make Default Confirmation")
+            },
+            text = {
+                Text("Are you sure you want to Make this Address Default?")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onConfirmDelete()
+                        onDismiss()
+                    }
+                ) {
+                    Text("Make Default")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { onDismiss() }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+}

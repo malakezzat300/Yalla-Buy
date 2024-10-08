@@ -46,14 +46,12 @@ import androidx.navigation.NavController
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.data.sharedpref.CurrencyPreferences
 import com.malakezzat.yallabuy.model.Address
-import com.malakezzat.yallabuy.model.CustomerId
-import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.settings.viewmodel.SettingsViewModel
 import com.malakezzat.yallabuy.ui.shoppingcart.view.DeleteConfirmationDialog
 
 @Composable
-fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel) {
+fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel,address: Address) {
     val addresses: List<String> = listOf()
     val context = LocalContext.current
     var selectedCurrency by remember { mutableStateOf(CurrencyPreferences.getInstance(context).getTargetCurrency()) }
@@ -193,7 +191,7 @@ fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel) {
 
         LazyColumn {
             items(userAddresses.size){
-                addressItem(viewModel,userAddresses[it],userId)
+                addressItem(navController,viewModel,userAddresses[it],userId)
             }
         }
 
@@ -203,15 +201,18 @@ fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel) {
 
 
 @Composable
-fun addressItem(viewModel: SettingsViewModel,address: Address,userId : Long?){
+fun addressItem(navController: NavController,viewModel: SettingsViewModel,address: Address,userId : Long?){
     var showDialog by remember { mutableStateOf(false) }
-
+    val context = LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp),
+            .padding(10.dp)
+            .clickable {
+                navController.navigate(Screen.AddressInfoScreen.createRoute(address.id))
+            },
         elevation = CardDefaults.cardElevation(12.dp),
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(8.dp),
     ) {
         Column(
             modifier = Modifier

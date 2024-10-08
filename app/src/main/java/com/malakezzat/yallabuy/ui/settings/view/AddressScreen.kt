@@ -93,7 +93,6 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
-    var addressState by remember { mutableStateOf(address ?: "") }
     var city by remember { mutableStateOf("") }
     var country by remember { mutableStateOf("") }
     var permissionGranted by remember { mutableStateOf(false) }
@@ -103,6 +102,36 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
     var cities by remember { mutableStateOf(emptyList<String>()) }
     val userId by viewModel.userId.collectAsState()
     val addNewAddressState by viewModel.customerAddress.collectAsState()
+    val addressDetails by viewModel.addressDetails.collectAsState()
+    var addressState by remember { mutableStateOf(address ?: "") }
+
+    val sharedPreferences = LocalContext.current.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
+    LaunchedEffect(Unit) {
+        val isaddressId = address?.let { isAddressId(it) }
+        if(isaddressId == true){
+            addressState = ""
+            viewModel.getAddressDetails(sharedPreferences.getLong("USER_ID", 0L),address.toLong())
+        } else {
+            if (address != null) {
+                addressState = address
+            }
+        }
+    }
+
+    when(addressDetails){
+        is ApiState.Error -> Log.i("addressTest", "Error: ${(addressDetails as ApiState.Error).message}")
+        ApiState.Loading -> {}
+        is ApiState.Success -> {
+            LaunchedEffect(Unit) {
+                firstName = (addressDetails as ApiState.Success).data?.customer_address?.first_name.toString()
+                lastName = (addressDetails as ApiState.Success).data?.customer_address?.last_name.toString()
+                phoneNumber = (addressDetails as ApiState.Success).data?.customer_address?.phone.toString()
+                addressState= (addressDetails as ApiState.Success).data?.customer_address?.address1.toString()
+                city = (addressDetails as ApiState.Success).data?.customer_address?.city.toString()
+                country = (addressDetails as ApiState.Success).data?.customer_address?.country.toString()
+            }
+        }
+    }
 
     val context = LocalContext.current
 
@@ -515,4 +544,8 @@ fun getCountries(context: Context): List<String> {
     val countriesWithCities: Map<String, List<String>> = Gson().fromJson(json, type)
 
     return countriesWithCities.keys.toList()
+}
+
+fun isAddressId(input: String): Boolean {
+    return input.toLongOrNull() != null
 }

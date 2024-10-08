@@ -38,6 +38,8 @@ class SettingsViewModel(private val repository: ProductsRepository): ViewModel()
     private val _deleteAddressEvent = MutableSharedFlow<String>()
     val deleteAddressEvent: SharedFlow<String> = _deleteAddressEvent.asSharedFlow()
 
+    private val _defaultAddressEvent = MutableSharedFlow<String>()
+    val defaultAddressEvent: SharedFlow<String> = _defaultAddressEvent.asSharedFlow()
 
     private val _userId = MutableStateFlow<Long?>(0)
     val userId: StateFlow<Long?> = _userId.asStateFlow()
@@ -123,13 +125,13 @@ class SettingsViewModel(private val repository: ProductsRepository): ViewModel()
     fun setDefaultAddress(customerId: Long, addressId: Long) {
         viewModelScope.launch {
             try {
-                _customerAddress.emit(ApiState.Loading)
+
                 repository.setDefaultAddress(customerId, addressId)
-                    .collect { defaultAddress ->
-                        _customerAddress.emit(ApiState.Success(defaultAddress))
-                    }
+                _defaultAddressEvent.emit("The address has been set default")
+                getAddressDetails(customerId,addressId)
             } catch (e: Exception) {
-                _customerAddress.emit(ApiState.Error(e.message ?: "Unknown Error"))
+                Log.i("addressTest", "setDefaultAddress: $e")
+                _defaultAddressEvent.emit("$e")
             }
         }
     }
