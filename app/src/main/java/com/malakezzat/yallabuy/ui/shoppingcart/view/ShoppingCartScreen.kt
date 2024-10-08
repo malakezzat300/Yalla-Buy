@@ -458,6 +458,9 @@ fun ShoppingView(
     total : String,
     itemsCount : Int
 ) {
+    val context = LocalContext.current
+    CurrencyConverter.initialize(context)
+
     Box(
         modifier = modifier
 
@@ -476,7 +479,8 @@ fun ShoppingView(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(text = "Subtotal", style = MaterialTheme.typography.bodyLarge)
-                Text(text = subtotal, style = MaterialTheme.typography.bodyLarge)
+                CurrencyConverter.changeCurrency(subtotal.toDouble())
+                    ?.let { Text(text = it, style = MaterialTheme.typography.bodyLarge) }
             }
 
             Row(
@@ -484,7 +488,8 @@ fun ShoppingView(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(text = "Discount", style = MaterialTheme.typography.bodyLarge)
-                Text(text = discount, style = MaterialTheme.typography.bodyLarge)
+                CurrencyConverter.changeCurrency(discount.toDouble())
+                    ?.let { Text(text = it, style = MaterialTheme.typography.bodyLarge) }
             }
 
             Row(
@@ -496,11 +501,13 @@ fun ShoppingView(
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
-                Text(
-                    text = total,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
+                CurrencyConverter.changeCurrency(total.toDouble())?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
 
             Button(
