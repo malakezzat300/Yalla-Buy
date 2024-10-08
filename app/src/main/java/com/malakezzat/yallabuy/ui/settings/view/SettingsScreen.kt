@@ -45,6 +45,7 @@ import androidx.navigation.NavController
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.data.sharedpref.CurrencyPreferences
 import com.malakezzat.yallabuy.model.Address
+import com.malakezzat.yallabuy.model.CustomerId
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.settings.viewmodel.SettingsViewModel
 
@@ -56,6 +57,11 @@ fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel) {
     val exchangeRate by viewModel.conversionRate.collectAsState()
     val userAddressesState by viewModel.userAddresses.collectAsState()
     var userAddresses by remember { mutableStateOf(listOf<Address>()) }
+    val userId by viewModel.userId.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.getUserId()
+    }
 
     when(exchangeRate){
         is ApiState.Error -> Log.i("currencyTest", "SettingsScreen: exchangeRate ${(exchangeRate as ApiState.Error).message}")
@@ -124,7 +130,7 @@ fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel) {
 
         LazyColumn {
             items(userAddresses.size){
-                addressItem(viewModel,userAddresses[it])
+                addressItem(viewModel,userAddresses[it],userId)
             }
         }
 
@@ -178,7 +184,7 @@ fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel) {
 
 
 @Composable
-fun addressItem(viewModel: SettingsViewModel,address: Address){
+fun addressItem(viewModel: SettingsViewModel,address: Address,userId : Long?){
 
     Card(
         modifier = Modifier
@@ -237,7 +243,7 @@ fun addressItem(viewModel: SettingsViewModel,address: Address){
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     IconButton(onClick = {
-                        address.customer_id?.let { address.id?.let { it1 ->
+                        userId?.let { address.id?.let { it1 ->
                             viewModel.deleteAddress(it,
                                 it1
                             )

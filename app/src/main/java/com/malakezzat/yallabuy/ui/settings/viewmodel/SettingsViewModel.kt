@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.malakezzat.yallabuy.data.ProductsRepository
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.Address
+import com.malakezzat.yallabuy.model.AddressRequest
 import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomerAddress
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -61,11 +62,11 @@ class SettingsViewModel(private val repository: ProductsRepository): ViewModel()
 
 
 
-    fun addNewAddress(customerId: Long) {
+    fun addNewAddress(customerId: Long,address: AddressRequest) {
         viewModelScope.launch {
             try {
                 _customerAddress.emit(ApiState.Loading)
-                repository.addNewAddress(customerId)
+                repository.addNewAddress(customerId,address)
                     .collect { newAddress ->
                         _customerAddress.emit(ApiState.Success(newAddress))
                     }
@@ -104,11 +105,11 @@ class SettingsViewModel(private val repository: ProductsRepository): ViewModel()
         }
     }
 
-    fun updateUserAddress(customerId: Long, addressId: Long) {
+    fun updateUserAddress(customerId: Long, addressId: Long,address: AddressRequest) {
         viewModelScope.launch {
             try {
                 _customerAddress.emit(ApiState.Loading)
-                repository.updateUserAddress(customerId, addressId)
+                repository.updateUserAddress(customerId, addressId, address)
                     .collect { updatedAddress ->
                         _customerAddress.emit(ApiState.Success(updatedAddress))
                     }

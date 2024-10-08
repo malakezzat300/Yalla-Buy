@@ -45,10 +45,19 @@ data class Address (
     var name         : String?  = null,
     var province_code : String?  = null,
     var country_code  : String?  = null,
-    var country_name  : String?  = null,
+    var country_name  : String?  = country,
     var default      : Boolean? = null
 
 )
+
+data class CustomerId (
+    val id: Long
+)
+
+data class AddressRequest(
+    val address : Address
+)
+
 data class EmailMarketingConsent (
 
     var state            : String? = null,
@@ -75,7 +84,7 @@ data class Customers (
     @SerializedName("orders_count"                 ) var ordersCount               : Int?                   = null,
     @SerializedName("state"                        ) var state                     : String?                = null,
     @SerializedName("total_spent"                  ) var totalSpent                : String?                = null,
-    @SerializedName("last_order_id"                ) var lastOrderId               : Int?                   = null,
+    @SerializedName("last_order_id"                ) var lastOrderId               : Long?                   = null,
     @SerializedName("note"                         ) var note                      : String?                = null,
     @SerializedName("verified_email"               ) var verifiedEmail             : Boolean?               = null,
     @SerializedName("multipass_identifier"         ) var multipassIdentifier       : String?                = null,
