@@ -63,11 +63,12 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import com.malakezzat.yallabuy.ui.settings.viewmodel.SettingsViewModel
 import com.malakezzat.yallabuy.ui.theme.AppColors
 
 
 @Composable
-fun AddressScreen(navController: NavHostController, address: String? = null){
+fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,address: String? = null){
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
