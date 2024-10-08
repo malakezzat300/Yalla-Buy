@@ -102,6 +102,7 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
     var expandedCountry by remember { mutableStateOf(false) }
     var cities by remember { mutableStateOf(emptyList<String>()) }
     val userId by viewModel.userId.collectAsState()
+    val addNewAddressState by viewModel.customerAddress.collectAsState()
 
     val context = LocalContext.current
 
@@ -114,6 +115,17 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
     LaunchedEffect(country) {
         if (country.isNotEmpty()) {
             cities = getCitiesFromCountries(context, country)
+        }
+    }
+
+    when(addNewAddressState){
+        is ApiState.Error -> Toast.makeText(context, "Error: ${(addNewAddressState as ApiState.Error).message}", Toast.LENGTH_SHORT).show()
+        ApiState.Loading -> {}
+        is ApiState.Success -> {
+            LaunchedEffect(Unit) {
+                Toast.makeText(context, "Address has been added", Toast.LENGTH_SHORT).show()
+                navController.navigateUp()
+            }
         }
     }
 
@@ -343,7 +355,6 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                 onClick = {
                     if(firstName.isNotBlank() && lastName.isNotBlank() && phoneNumber.isNotBlank()
                         && addressState.isNotBlank() && city.isNotBlank() && country.isNotBlank()) {
-                        Log.i("addressTest", "AddressScreen: $userId")
                         userId?.let {
                             val address1 = Address(
                                 customer_id = it,
@@ -354,7 +365,7 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                                 city = city,
                                 country = country
                             )
-                            viewModel.addNewAddress(123, AddressRequest(address1)) }
+                            viewModel.addNewAddress(it, AddressRequest(address1)) }
                     } else {
                         Toast.makeText(context,"Please fill all fields" ,Toast.LENGTH_SHORT).show()
                     }
