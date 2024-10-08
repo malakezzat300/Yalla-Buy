@@ -25,6 +25,9 @@ import com.malakezzat.yallabuy.ui.home.view.BottomNavigationBar
 import com.malakezzat.yallabuy.ui.home.view.HomeScreen
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModelFactory
+import com.malakezzat.yallabuy.ui.orders.view.OrdersScreen
+import com.malakezzat.yallabuy.ui.orders.viewmodel.OrdersViewModel
+import com.malakezzat.yallabuy.ui.orders.viewmodel.OrdersViewModelFactory
 import com.malakezzat.yallabuy.ui.payment.view.CheckoutView
 import com.malakezzat.yallabuy.ui.payment.view.OrderScreen
 import com.malakezzat.yallabuy.ui.payment.view.PaymentScreen
@@ -62,6 +65,7 @@ fun NavigationApp(
     categoriesViewModelFactory: CategoriesViewModelFactory,
     productsByCollectionIdViewModelFactory: ProductsByCollectionIdViewModelFactory,
     wishlistViewModelFactory: WishlistViewModelFactory,
+    ordersViewModelFactory: OrdersViewModelFactory,
     navController: NavHostController = rememberNavController()
 ) {
     val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -99,6 +103,14 @@ fun NavigationApp(
                     val viewModel: CategoriesViewModel = viewModel(factory = categoriesViewModelFactory)
                     CategoriesScreen(viewModel = viewModel, navController)
                 }
+                composable(Screen.OrdersScreen.route) {
+                    val viewModel: OrdersViewModel = viewModel(factory = ordersViewModelFactory)
+                    OrdersScreen(viewModel = viewModel, navController)
+                }
+                composable(Screen.OrderScreen.route) {
+                    val viewModel: PaymentViewModel = viewModel(factory = paymentViewModelFactory)
+                    OrderScreen(viewModel, navController)
+                }
                 composable("${Screen.ProductsByCategoryScreen.route}/{categoryId}/{body_html}") { backStackEntry ->
                     val categoryId = backStackEntry.arguments?.getString("categoryId")
                     val bodyHtml = backStackEntry.arguments?.getString("body_html")
@@ -119,10 +131,7 @@ fun NavigationApp(
                     val viewModel: LogInViewModel = viewModel(factory = logInViewModelFactory)
                     LogInScreen(viewModel, navController)
                 }
-                composable(Screen.OrderScreen.route) {
-                    val viewModel: PaymentViewModel = viewModel(factory = paymentViewModelFactory)
-                    OrderScreen(viewModel, navController)
-                }
+
                 composable(
                     route = Screen.CheckoutScreen.route,
                     arguments = listOf(navArgument("orderId") { type = NavType.StringType })
