@@ -286,7 +286,7 @@ fun EmptyWishlistScreen(navController: NavController) {
             onClick = { navController.navigate(Screen.CategoriesScreen.route) },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-            shape = RoundedCornerShape(16.dp)
+            shape = RoundedCornerShape(20.dp)
         ) {
             Text(text = "Explore Categories", color = Color.White)
         }

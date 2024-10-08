@@ -159,6 +159,19 @@ fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel) {
             }
         }
 
-
+        Spacer(modifier = Modifier.height(36.dp))
+        Button(
+            onClick = { navController.navigate(Screen.OrdersScreen.route) },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+            shape = RoundedCornerShape(10.dp)
+        ) {
+            Text(
+                text = "Hager",
+                color = Color.White,
+                fontSize = 16.sp
+            )
+        }
     }
+
 }
