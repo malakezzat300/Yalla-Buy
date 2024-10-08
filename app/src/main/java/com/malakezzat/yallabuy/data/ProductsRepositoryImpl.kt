@@ -154,7 +154,8 @@ class ProductsRepositoryImpl private constructor(
     }
 
     override suspend fun deleteAddress(customerId: Long, addressId: Long) {
-        productsRemoteDataSource.deleteAddress(customerId,addressId)
+        productsRemoteDataSource.deleteAddress(customerId, addressId)
+    }
 
     override fun getUserId(): Long {
         return globalSharedPreferenceDataSource.getUserId()

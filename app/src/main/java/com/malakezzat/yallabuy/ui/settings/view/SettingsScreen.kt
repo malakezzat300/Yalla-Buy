@@ -63,7 +63,6 @@ fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel) {
         //TODO delete address from api
     }
     val onCurrencyChange: (String) -> Unit = { currecny ->
-        //TODO logic - SharedPreferences
         selectedCurrency = currecny
         CurrencyPreferences.getInstance(context).changeTargetCurrency(
             selectedCurrency!!
