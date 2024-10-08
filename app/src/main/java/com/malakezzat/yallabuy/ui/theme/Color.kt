@@ -6,9 +6,9 @@ val Purple80 = Color(0xFF21D4B4) //VibrantTeal
 val PurpleGrey80 = Color(0xFFA3F2E3) //BrightMintGreenLight
 val Pink80 = Color(0xFF4CBAA5) //BrightMintGreenDark
 
-val Purple40 = Color(0xFFE67E89) //WarmRose
-val PurpleGrey40 = Color(0xFFF1A6AB) //WarmRoseLight
-val Pink40 = Color(0xFFC35D67) //WarmRoseDark
+val Purple40 = Color(0xFF4CBAA5) //BrightMintGreenDark
+val PurpleGrey40 = Color(0xFF6F7384) //DarkGray
+val Pink40 = Color(0xFF9FA6B3) //DarkGrayLight
 
 // New Colors
 val VibrantTeal = Color(0xFF21D4B4)

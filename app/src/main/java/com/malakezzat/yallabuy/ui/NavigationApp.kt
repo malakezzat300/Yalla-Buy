@@ -185,8 +185,8 @@ fun NavigationApp(
                     )
                     ) { backStackEntry ->
                     val address = backStackEntry.arguments?.getString("address") ?: " "
-                    val viewModel: ShoppingCartViewModel = viewModel(factory = shoppingCartViewModelFactory)
-                    AddressScreen(navController,address)
+                    val viewModel: SettingsViewModel = viewModel(factory = settingsViewModelFactory)
+                    AddressScreen(navController,viewModel,address)
                 }
                 composable(
                     route = Screen.MapScreen.route,

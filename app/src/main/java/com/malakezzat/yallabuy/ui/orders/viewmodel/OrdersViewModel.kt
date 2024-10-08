@@ -58,7 +58,7 @@ class OrdersViewModel (val repository: ProductsRepository): ViewModel() {
     fun getAllOrdersForCustomerByID(id :Long){
         viewModelScope.launch {
             //add a temporary permanent email
-            repository.getAllOrdersForCustomerByID(repository.getUserId())
+            repository.getAllOrdersForCustomerByID(7713903837366)
                 .onStart {
                     _customerOrders.value = ApiState.Loading
                 }.catch { e->
@@ -67,7 +67,7 @@ class OrdersViewModel (val repository: ProductsRepository): ViewModel() {
                     Log.i(TAG, "getAllOrdersForCustomerByID: error ${e.message}")
                 }.collect{customerOrders->
                     _customerOrders.value = ApiState.Success(customerOrders)
-                    //Log.i(TAG, "getAllOrdersForCustomerByID: ${customerOrders.get(0).note}")
+                    Log.i(TAG, "getAllOrdersForCustomerByID: ${customerOrders.get(0).line_items}")
                     Log.i(TAG, "getAllOrdersForCustomerByID: ${repository.getUserId()},,,,,,${repository.getUserEmail()}")
 
                 }
