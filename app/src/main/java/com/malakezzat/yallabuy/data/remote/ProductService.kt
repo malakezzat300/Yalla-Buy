@@ -88,6 +88,7 @@ interface ProductService {
     @GET("variants/{id}.json")
     suspend fun getVariantById(@Path("id") variantId: Long): VariantResponse
 
+
     //customers/207119551/orders.json
     /*@GET("customers/{id}/orders.json")
     suspend fun getAllOrdersForCustomerById(
