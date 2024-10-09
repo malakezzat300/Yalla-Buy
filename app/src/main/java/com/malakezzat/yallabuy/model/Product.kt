@@ -20,7 +20,9 @@ data class Variant(
     val price: String = "",
     val sku: String = "",
     val inventory_quantity  : Long = 0,
-    val product_id : Long =0
+    val product_id : Long =0,
+    val option1 : String,
+    val option2 : String
 )
 data class Option( val id :Long,
     val product_id : Long ,
