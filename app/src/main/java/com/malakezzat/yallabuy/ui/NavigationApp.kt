@@ -40,6 +40,9 @@ import com.malakezzat.yallabuy.ui.productbycategory.view.ProductsByBrandScreen
 import com.malakezzat.yallabuy.ui.productbycategory.view.ProductsByCategoryScreen
 import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollectionIdViewModel
 import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollectionIdViewModelFactory
+import com.malakezzat.yallabuy.ui.profile.view.ProfileScreen
+import com.malakezzat.yallabuy.ui.profile.viewmodel.ProfileScreenViewModel
+import com.malakezzat.yallabuy.ui.profile.viewmodel.ProfileScreenViewModelFactory
 import com.malakezzat.yallabuy.ui.search.SearchScreen
 import com.malakezzat.yallabuy.ui.search.SearchViewModel
 import com.malakezzat.yallabuy.ui.search.SearchViewModelFactory
@@ -69,6 +72,7 @@ fun NavigationApp(
     wishlistViewModelFactory: WishlistViewModelFactory,
     ordersViewModelFactory: OrdersViewModelFactory,
     settingsViewModelFactory: SettingsViewModelFactory,
+    profileScreenViewModelFactory: ProfileScreenViewModelFactory,
     navController: NavHostController = rememberNavController()
 ) {
     val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -109,6 +113,10 @@ fun NavigationApp(
                 composable(Screen.OrdersScreen.route) {
                     val viewModel: OrdersViewModel = viewModel(factory = ordersViewModelFactory)
                     OrdersScreen(viewModel = viewModel, navController)
+                }
+                composable(Screen.ProfileScreen.route) {
+                    val viewModel: ProfileScreenViewModel = viewModel(factory = profileScreenViewModelFactory)
+                    ProfileScreen(viewModel = viewModel, navController)
                 }
                 composable(Screen.OrderScreen.route) {
                     val viewModel: PaymentViewModel = viewModel(factory = paymentViewModelFactory)
