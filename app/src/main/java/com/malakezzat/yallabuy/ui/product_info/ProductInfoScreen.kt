@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,6 +37,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 
@@ -293,12 +295,14 @@ fun ProductInfoScreen(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
+                        .height(1500.dp)
                         .padding(top = 200.dp)
                 ) {
                     item {
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .height(1000.dp)
                                 .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
                                 .border(1.dp, shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp), color = AppColors.Teal)
                             ,
@@ -345,12 +349,19 @@ fun ProductInfoScreen(
                                 })
                                 // Product Description
                                 val sizes = product.options.get(0).values
-                                SizeCirclesRow(sizes, onSizeChange = {s -> size = s})
+                                SizeCirclesRow(sizes, onSizeChange = {s -> size = s
+                                    for(item in product.variants){
+                                        if((item.option1 == size)&&(item.option2==color)){
+                                            price=item.price
+                                        }
+                                    }
+                                })
                                 Text(
                                     text = "Description",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 18.sp
                                 )
+                                Spacer(Modifier.height(8.dp))
                                 Text(
                                     text = product.body_html,
                                     style = MaterialTheme.typography.bodyMedium,
@@ -386,6 +397,11 @@ fun ProductInfoScreen(
 @Composable
 fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : String,oldDraftOrder : DraftOrder){
     var clicked by remember { mutableStateOf(false) }
+    for(item in oldDraftOrder.line_items){
+        if(product.id == item.product_id){
+            clicked=true
+        }
+    }
     IconButton(onClick = {
         clicked=true
         val properties = listOf(Property(name = "imageUrl",value = product.image.src))
@@ -479,7 +495,10 @@ fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,o
                     val draftOrder =
                         DraftOrder(note = "shoppingCart", line_items = lineItems, email = email)
                     val draftOrderRequest = DraftOrderRequest(draftOrder)
-                    oldDraftOrder.id?.let { viewModel.updateDraftOrder(it, draftOrderRequest)
+                    oldDraftOrder.id?.let {
+
+                        viewModel.updateDraftOrder(it, draftOrderRequest)
+
                     }
 
                 }
@@ -489,9 +508,11 @@ fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,o
             border = BorderStroke(1.dp, AppColors.Teal)
 
         ) {
+
             Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = AppColors.Teal)
             Spacer(modifier = Modifier.width(4.dp))
             Text(text = "Add To Cart", color = AppColors.Teal)
+
         }
     }
 }
