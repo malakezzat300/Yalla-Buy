@@ -38,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -246,48 +247,45 @@ fun addressItem(navController: NavController,viewModel: SettingsViewModel,addres
                 )
 
             }
-//            if(address.default) {
 
-//            }
             Spacer(modifier = Modifier.height(8.dp))
 
-            Box(
-                modifier = Modifier.fillMaxWidth()
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-
-                Row(
-                    modifier = Modifier.align(Alignment.CenterEnd),
-                    horizontalArrangement = Arrangement.SpaceBetween
-
+                Column(
+                    modifier = Modifier.align(Alignment.CenterVertically)
                 ) {
-                    Row {
+                    if(address.default == true) {
                         Text(
-                            text = "Actions:",
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(end = 8.dp)
-                                .align(Alignment.Bottom)
+                            text = "Default Address",
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
-                    Row {
-                        IconButton(onClick = {
-                            // Handle Edit click
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = "Edit"
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        IconButton(onClick = {
-                            showDialog = true
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete"
-                            )
-                        }
-                    }
+                }
 
+                Row {
+                    IconButton(onClick = {
+                        address.id?.let {
+                            navController.navigate( Screen.AddressScreen.createRoute(it) )
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit"
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    IconButton(onClick = {
+                        showDialog = true
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete"
+                        )
+                    }
                 }
             }
         }
