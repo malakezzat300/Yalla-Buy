@@ -2,9 +2,11 @@ package com.malakezzat.yallabuy.ui.product_info
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,11 +29,13 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.sharp.Favorite
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 
@@ -48,9 +52,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -62,7 +69,8 @@ import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.LineItem
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.*
-
+import com.malakezzat.yallabuy.ui.CustomTopBar
+import com.malakezzat.yallabuy.ui.theme.AppColors
 
 
 //@Composable
@@ -222,9 +230,14 @@ fun ProductInfoScreen(
     LaunchedEffect(key1 = productId) {
         viewModel.getProductById(productId)
     }
-
+    Scaffold(
+        topBar = { CustomTopBar(navController,"",Color.White) },
+        containerColor = Color.White,
+        content = { paddingValues ->
     // Main UI layout
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize()
+         .padding(paddingValues)
+    ) {
         // Loading and Error State Handling
         when (productState) {
             is ApiState.Loading -> {
@@ -235,18 +248,23 @@ fun ProductInfoScreen(
             is ApiState.Success -> {
                 val product = (productState as ApiState.Success<Product>).data
                 LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp) // Space between items
+                    modifier = Modifier.fillMaxWidth()
+                    ,
+                    //horizontalArrangement = Arrangement.spacedBy(8.dp) // Space between items
                 ) {
                     items(product.images) { product ->
-                        Image(
-                            painter = rememberAsyncImagePainter(product.src),
-                            contentDescription = null,
-                            contentScale = ContentScale.FillHeight,
-                            modifier = Modifier
-                                .width(350.dp)
-                                .height(200.dp)
-                        )
+                       // Box (){
+                            Image(
+                                painter = rememberAsyncImagePainter(product.src),
+                                contentDescription = null,
+                                contentScale = ContentScale.FillHeight,
+                                modifier = Modifier
+                                    .width(400.dp)
+                                    .height(200.dp)
+                                    .align(Alignment.Center)
+                            )
+                        //}
+
                     }
                 }
 
@@ -279,6 +297,7 @@ fun ProductInfoScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)),
+                            shadowElevation = 3.dp,
                             color = Color.White
                         ) {
                             Column(
@@ -306,6 +325,8 @@ fun ProductInfoScreen(
                                 val colors = product.options.get(1).values // Example list of color names
                                 ColorCirclesRow(colorNames = colors)
                                 // Product Description
+                                val sizes = product.options.get(0).values
+                                SizeCirclesRow(sizes)
                                 Text(
                                     text = "Description",
                                     fontWeight = FontWeight.Bold,
@@ -339,6 +360,7 @@ fun ProductInfoScreen(
             }
         }
     }
+        })
 }
 
 
@@ -392,7 +414,8 @@ fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : Str
 @Composable
 fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,oldDraftOrder : DraftOrder) {
     Row(modifier = Modifier.fillMaxWidth()) {
-        OutlinedButton(onClick = {
+        OutlinedButton(
+             onClick = {
             val properties = listOf(Property(name = "imageUrl", value = product.image.src))
             Log.i("propertiesTest", "AddToCart: $properties")
             if (oldDraftOrder.id == 0L) {
@@ -440,16 +463,21 @@ fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,o
 
                 }
             }
-        }, modifier = Modifier.weight(1f)) {
-            Icon(Icons.Default.ShoppingCart, contentDescription = null)
+        }, modifier = Modifier.weight(1f),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.Teal),
+            border = BorderStroke(1.dp, AppColors.Teal)
+
+        ) {
+            Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = AppColors.Teal)
             Spacer(modifier = Modifier.width(4.dp))
-            Text(text = "Add To Cart")
+            Text(text = "Add To Cart", color = AppColors.Teal)
         }
     }
 }
 
 @Composable
 fun ColorCirclesRow(colorNames: List<String>) {
+    Text(text = "Available Colors:")
     LazyRow(
         modifier = Modifier
             .padding(16.dp)
@@ -463,7 +491,8 @@ fun ColorCirclesRow(colorNames: List<String>) {
                     .size(40.dp)  // Set the size for each circle
                     .padding(4.dp)
                     .background(color = color, shape = CircleShape)
-                    .border(2.dp, shape = CircleShape, color = Color.Black)// Make the background a circle
+                    .border(0.5.dp, shape = CircleShape, color = Color.Black)// Make the background a circle
+                    .clickable {  }
             )
         }
     }
@@ -487,6 +516,32 @@ fun getColorFromName(colorName: String): Color {
     }
 }
 
+@Composable
+fun SizeCirclesRow(Itemsizes: List<String>) {
+   Text(text = "Available Sizes:")
+    LazyRow(
+        modifier = Modifier
+            .padding(16.dp)
+            .height(60.dp) // Adjust the height if needed
+    ) {
+        items(Itemsizes.size) { index ->
+           // Log.i("color", "ColorCirclesRow: ${colorNames[index]}")
+            Box(
+                modifier = Modifier
+                    .size(60.dp)  // Set the size for each circle
+                    .padding(4.dp)
+                    .background(color = Color.White, shape = RectangleShape)
+                    .border(0.5.dp, shape = CircleShape, color = Color.Black)// Make the background a circle
+                    .clickable {  }
+            ){
+                if(Itemsizes[index] != "size"){
+                    Text(text = Itemsizes[index], textAlign = TextAlign.Center, fontSize = 14.sp,
+                        modifier = Modifier.align(Alignment.Center) )
+                }
+            }
+        }
+    }
+}
 @Composable
 fun ProductInfoSection(product: Product) {
     //Currency
@@ -525,8 +580,4 @@ fun ProductInfoSection(product: Product) {
         }
     }
 
-}
-@Composable
-fun ProductInfoScreenPreview(){
-    // ProductInfoScreen(Product(0,"","","","","", em,),NavController(LocalContext.current))
 }
