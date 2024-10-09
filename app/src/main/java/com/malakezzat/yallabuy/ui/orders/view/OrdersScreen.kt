@@ -215,6 +215,7 @@ fun CompletedOrdersScreen(orders: List<Order>) {
                 Text(
                     text = "Completed Orders",
                     style = MaterialTheme.typography.headlineMedium,
+                    color = AppColors.Teal,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
