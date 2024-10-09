@@ -18,7 +18,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 import com.malakezzat.yallabuy.R
+import com.malakezzat.yallabuy.data.firebase.FirebaseAuthun
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.profile.viewmodel.ProfileScreenViewModel
 import com.malakezzat.yallabuy.ui.theme.AppColors
@@ -39,7 +41,7 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
                     .background(Color(0xFF00C4B4)) // Your specified color for upper part
                     .padding(16.dp),
             ) {
-                UserInfoSection()
+                UserInfoSection(navController)
             }
 
                 //Spacer(modifier = Modifier.height(16.dp))
@@ -53,7 +55,11 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
             {
                 Column(modifier = Modifier.padding(start = 8.dp, top = 20.dp)) {
                     SectionWithPadding(title = "Personal Information") {
-                        ProfileItem(icon = R.drawable.ic_shipping_address, title = "Settings",{navController.navigate(Screen.SettingsScreen.route)})
+                        ProfileItem(icon = R.drawable.ic_shipping_address, title = "Settings") {
+                            navController.navigate(
+                                Screen.SettingsScreen.route
+                            )
+                        }
                         //ProfileItem(icon = R.drawable.ic_payment_method, title = "Payment Method")
                         ProfileItem(icon = R.drawable.ic_order_history, title = "Order History",{})
                     }
@@ -62,9 +68,21 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
 
                     // Support & Information Section
                     SectionWithPadding(title = "Support & Information") {
-                        ProfileItem(icon = R.drawable.ic_privacy_policy, title = "Privacy Policy",{navController.navigate(Screen.PrivacyPolicy.route)})
-                        ProfileItem(icon = R.drawable.ic_terms_conditions, title = "Terms & Conditions",{})
-                        ProfileItem(icon = R.drawable.ic_faq, title = "FAQs",{})
+                        ProfileItem(icon = R.drawable.ic_privacy_policy, title = "Privacy Policy") {
+                            navController.navigate(
+                                Screen.PrivacyPolicy.route
+                            )
+                        }
+                        ProfileItem(icon = R.drawable.ic_terms_conditions, title = "Terms & Conditions") {
+                            navController.navigate(
+                                Screen.TermsConditions.route
+                            )
+                        }
+                        ProfileItem(icon = R.drawable.ic_faq, title = "FAQs") {
+                            navController.navigate(
+                                Screen.Faqs.route
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -94,7 +112,7 @@ fun SectionWithPadding(title: String, content: @Composable ColumnScope.() -> Uni
     }
 }
 @Composable
-fun UserInfoSection() {
+fun UserInfoSection(navController: NavController) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -130,7 +148,12 @@ fun UserInfoSection() {
 
         IconButton(
             onClick = {
-                // Handle log out action
+                FirebaseAuth.getInstance().signOut()
+                navController.navigate(Screen.LogInScreen.route) {
+                    popUpTo(navController.graph.startDestinationId) {
+                        inclusive = true // Remove all previous screens from the back stack
+                    }
+                }
             }
         ) {
             Icon(

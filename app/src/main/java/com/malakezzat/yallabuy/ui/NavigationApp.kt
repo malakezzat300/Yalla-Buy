@@ -40,8 +40,10 @@ import com.malakezzat.yallabuy.ui.productbycategory.view.ProductsByBrandScreen
 import com.malakezzat.yallabuy.ui.productbycategory.view.ProductsByCategoryScreen
 import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollectionIdViewModel
 import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollectionIdViewModelFactory
+import com.malakezzat.yallabuy.ui.profile.view.FAQScreen
 import com.malakezzat.yallabuy.ui.profile.view.PrivacyPolicyScreen
 import com.malakezzat.yallabuy.ui.profile.view.ProfileScreen
+import com.malakezzat.yallabuy.ui.profile.view.TermsScreen
 import com.malakezzat.yallabuy.ui.profile.viewmodel.ProfileScreenViewModel
 import com.malakezzat.yallabuy.ui.profile.viewmodel.ProfileScreenViewModelFactory
 import com.malakezzat.yallabuy.ui.search.SearchScreen
@@ -122,14 +124,12 @@ fun NavigationApp(
                 composable(Screen.PrivacyPolicy.route) {
                     PrivacyPolicyScreen(navController)
                 }
-//                composable(Screen.ProfileScreen.route) {
-//                    val viewModel: ProfileScreenViewModel = viewModel(factory = profileScreenViewModelFactory)
-//                    ProfileScreen(viewModel = viewModel, navController)
-//                }
-//                composable(Screen.ProfileScreen.route) {
-//                    val viewModel: ProfileScreenViewModel = viewModel(factory = profileScreenViewModelFactory)
-//                    ProfileScreen(viewModel = viewModel, navController)
-//                }
+                composable(Screen.TermsConditions.route) {
+                    TermsScreen(navController)
+                }
+                composable(Screen.Faqs.route) {
+                    FAQScreen(navController)
+                }
                 composable(Screen.OrderScreen.route) {
                     val viewModel: PaymentViewModel = viewModel(factory = paymentViewModelFactory)
                     OrderScreen(viewModel, navController)
