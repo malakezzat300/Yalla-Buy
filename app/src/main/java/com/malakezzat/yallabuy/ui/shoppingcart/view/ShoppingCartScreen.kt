@@ -190,7 +190,8 @@ fun ShoppingCartScreen(
                                 subtotal.toString(),
                                 discountAmount.toString(),
                                 total.toString(),
-                                itemsCount
+                                itemsCount,
+                                navController
                             )
                         }
                     }
@@ -462,7 +463,8 @@ fun ShoppingView(
     subtotal : String,
     discount: String,
     total : String,
-    itemsCount : Int
+    itemsCount : Int,
+    navController: NavController
 ) {
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
@@ -517,7 +519,7 @@ fun ShoppingView(
             }
 
             Button(
-                onClick = { /* Action for button click */ },
+                onClick = { navController.navigate(Screen.PaymentMethodScreen.route) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp)

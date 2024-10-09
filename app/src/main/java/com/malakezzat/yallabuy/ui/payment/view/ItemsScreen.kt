@@ -1,11 +1,9 @@
-package com.malakezzat.yallabuy.ui.wishlist
+package com.malakezzat.yallabuy.ui.payment.view
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,14 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -46,20 +37,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remote.ApiState
@@ -69,18 +54,16 @@ import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.LineItem
 import com.malakezzat.yallabuy.model.Variant
 import com.malakezzat.yallabuy.ui.Screen
-import com.malakezzat.yallabuy.ui.home.view.TAG
-import com.malakezzat.yallabuy.ui.search.SearchViewModel
-import com.malakezzat.yallabuy.ui.shoppingcart.view.DeleteConfirmationDialog
-import com.malakezzat.yallabuy.ui.shoppingcart.view.calculateSubtotal
-import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModel
-import com.malakezzat.yallabuy.ui.theme.AppColors
+import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
+import com.malakezzat.yallabuy.ui.wishlist.DeleteConfirmationDialog2
+import com.malakezzat.yallabuy.ui.wishlist.EmptyWishlistScreen
+import com.malakezzat.yallabuy.ui.wishlist.WishlistViewModel
 
 
 @Composable
-fun WishlistScreen(viewModel: WishlistViewModel, navController: NavController) {
+fun ItemsScreen(viewModel: PaymentViewModel, navController: NavController) {
 
-    val wishlistItems by viewModel.wishlistDraftOrder.collectAsStateWithLifecycle()
+    val wishlistItems by viewModel.shoppingCartDraftOrder.collectAsStateWithLifecycle()
     var isLoading by remember { mutableStateOf( false ) }
     var orderItems by remember { mutableStateOf( emptyList<LineItem>() ) }
     var draftOrder by remember { mutableStateOf( DraftOrder() ) }
@@ -98,7 +81,7 @@ fun WishlistScreen(viewModel: WishlistViewModel, navController: NavController) {
         is ApiState.Error ->{
             isLoading = false
 
-           // Log.i("shoppingCartTest", "ShoppingCartScreen: draftOrder ${(shoppingCartOrder as ApiState.Error).message}")
+            // Log.i("shoppingCartTest", "ShoppingCartScreen: draftOrder ${(shoppingCartOrder as ApiState.Error).message}")
         }
         ApiState.Loading -> {
             isLoading = true
@@ -123,9 +106,9 @@ fun WishlistScreen(viewModel: WishlistViewModel, navController: NavController) {
                 .padding(16.dp)
         ) {
             TopAppBar(
-                title = { Text(text = "Wishlist") },
+                title = { Text(text = "Items") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigate(Screen.HomeScreen.route) }) {
+                    IconButton(onClick = { navController.navigate(Screen.CheckoutScreen.route) }) {
                         Image(
                             painter = painterResource(id = R.drawable.back_arrow),
                             contentDescription = "Search Icon",
@@ -141,31 +124,27 @@ fun WishlistScreen(viewModel: WishlistViewModel, navController: NavController) {
 
             LazyColumn {
                 items(orderItems) { product ->
-                    WishlistItem(viewModel,product,draftOrder,navController)
-                  //  orderItems = orderItems.filter { it != product }
+                    Item(viewModel,product,draftOrder,navController)
                 }
             }
-        }
-    }else{
-        if(!isLoading){
-            EmptyWishlistScreen(navController)
         }
     }
 
 }
 
 @Composable
-fun WishlistItem(viewModel: WishlistViewModel,
+fun Item(viewModel: PaymentViewModel,
                  item: LineItem,
                  draftOrder: DraftOrder,
                  navController: NavController
-                 ) {
+) {
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp) // Adjust height as needed
+            .height(120.dp)
             .padding(8.dp)
             .clickable { navController.navigate("${Screen.ProductInfScreen.route}/${item.product_id}") },
         shape = RoundedCornerShape(16.dp),
@@ -177,9 +156,8 @@ fun WishlistItem(viewModel: WishlistViewModel,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically // Align items vertically
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Product image
             Image(
                 painter = rememberAsyncImagePainter(item.properties[0].value),
                 contentDescription = null,
@@ -187,13 +165,13 @@ fun WishlistItem(viewModel: WishlistViewModel,
                     .size(80.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(Color.LightGray)
+
             )
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            // Product details
             Column(
-                modifier = Modifier.weight(1f) // Let the column take available space
+                modifier = Modifier.weight(1f)
             ) {
                 Text(
                     text = item.title,
@@ -208,17 +186,14 @@ fun WishlistItem(viewModel: WishlistViewModel,
                     Text(text = it,
                         style = MaterialTheme.typography.bodyMedium)
                 }
-                /*Text(
-                    text = item.price,
-                    color = Color.Black,
-                    fontSize = 14.sp
-                )*/
-
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = "quantity : ${item.quantity}",
+                    style = MaterialTheme.typography.bodyMedium)
             }
             var showDialog by remember { mutableStateOf(false) }
-            // Delete button
+
             IconButton(onClick = { showDialog = true }) {
-                Icon(Icons.Outlined.Delete, contentDescription = "Delete item", tint = Color.Red)
+                Icon(painter = painterResource(R.drawable.ic_delete), contentDescription = "Delete item", tint = Color.Red)
             }
 
             if (showDialog) {
@@ -236,8 +211,8 @@ fun WishlistItem(viewModel: WishlistViewModel,
                             }
                         } else {
                             draftOrder.id?.let { viewModel.deleteDraftOrder(it) }
-                            navController.popBackStack(Screen.WishlistScreen.route, inclusive = true)
-                             navController.navigate(Screen.WishlistScreen.route)
+                            navController.popBackStack(Screen.ShoppingScreen.route, inclusive = true)
+                            navController.navigate(Screen.ShoppingScreen.route)
 
 
                         }
@@ -247,89 +222,5 @@ fun WishlistItem(viewModel: WishlistViewModel,
                 )
             }
         }
-        }
-    }
-
-@Composable
-fun EmptyWishlistScreen(navController: NavController) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.emptylist),
-            contentDescription = null,
-            modifier = Modifier
-                .size(200.dp)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-
-        Text(
-            text = "Your wishlist is empty",
-            color = AppColors.Rose,
-            style = MaterialTheme.typography.headlineLarge,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Subtext
-        Text(
-            text = "Tap heart button to start saving your favorite items",
-            style = MaterialTheme.typography.bodyMedium,
-            color = AppColors.GrayDark,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(32.dp))
-        Button(
-            onClick = { navController.navigate(Screen.CategoriesScreen.route) },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = AppColors.Rose),
-            shape = RoundedCornerShape(20.dp)
-        ) {
-            Text(text = "Explore Categories", color = Color.White)
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-    }
-}
-@Composable
-fun DeleteConfirmationDialog2(
-    showDialog: Boolean,
-    onDismiss: () -> Unit,
-    onConfirmDelete: () -> Unit
-) {
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { onDismiss() },
-            title = {
-                Text(text = "Delete Confirmation")
-            },
-            text = {
-                Text("Are you sure you want to delete this item? This action cannot be undone.")
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        onConfirmDelete()
-                        onDismiss()
-                    }
-                ) {
-                    Text("Delete")
-                }
-            },
-            dismissButton = {
-                Button(
-                    onClick = { onDismiss() }
-                ) {
-                    Text("Cancel")
-                }
-            }
-        )
     }
 }

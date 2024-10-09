@@ -8,8 +8,6 @@ sealed class Screen(val route: String) {
     data object SignUpScreen : Screen("signUpScreen")
     data object LogInScreen : Screen("logInScreen")
     data object OrderScreen : Screen("orderScreen")
-    data object CheckoutScreen : Screen("checkoutScreen/{orderId}")
-    data object PaymentScreen : Screen("payment_screen/{paymentKey}")
     data object SearchScreen : Screen("searchScreen")
     data object ShoppingScreen : Screen("shoppingScreen")
     data object ProductInfScreen : Screen("productInfo")
@@ -18,12 +16,15 @@ sealed class Screen(val route: String) {
         fun createRoute(address: String) = "addressScreen/$address"
         fun createRoute(addressId : Long) = "addressScreen/$addressId"
     }
+
     data object AddressInfoScreen : Screen("addressInfoScreen/{address}") {
         fun createRoute(address: Long?) = "addressInfoScreen/$address"
     }
+
     data object MapScreen : Screen("mapScreen/{latitude}/{longitude}") {
         fun createRoute(latitude: Float, longitude: Float) = "mapScreen/$latitude/$longitude"
     }
+
     data object CategoriesScreen:Screen("categoriesScreen")
     data object ProductsByCategoryScreen:Screen("productsByCategoryScreen")
     data object ProductsByBrandScreen:Screen("productsByBrandScreen")
@@ -33,5 +34,8 @@ sealed class Screen(val route: String) {
     data object Faqs : Screen("faqs")
     data object PrivacyPolicy : Screen("privacypolicy")
     data object TermsConditions : Screen("terms&conditions")
-
+    data object PaymentMethodScreen : Screen("paymentMethodScreen")
+    data object CheckoutScreen : Screen("checkoutScreen")
+    data object ItemsScreen : Screen("itemsScreen")
+    data object OrderPlacedScreen : Screen("orderPlacedScreen")
 }

@@ -81,6 +81,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.model.AddressRequest
@@ -106,6 +110,7 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
     val addressDetails by viewModel.addressDetails.collectAsState()
     var addressState by remember { mutableStateOf(address ?: "") }
     var saveButton by remember { mutableStateOf("Save") }
+    var screenTitle by remember { mutableStateOf("New Address") }
 
     val sharedPreferences = LocalContext.current.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
     LaunchedEffect(Unit) {
@@ -114,6 +119,7 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
             addressState = ""
             viewModel.getAddressDetails(sharedPreferences.getLong("USER_ID", 0L),address.toLong())
             saveButton = "Update"
+            screenTitle = "Edit Address"
         } else {
             if (address != null) {
                 addressState = address
@@ -192,36 +198,17 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                 text = "New Address",
                 style = MaterialTheme.typography.headlineMedium,
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "First Name", fontSize = 18.sp)
-            OutlinedTextField(
-                value = firstName,
-                onValueChange = { input -> firstName = input },
-                label = { Text(text = "First Name") },
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = Color.White)
-                    .padding(top = 2.dp),
-                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.MintGreen)
-            )
 
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Last Name", fontSize = 18.sp)
-            OutlinedTextField(
-                value = lastName,
-                onValueChange = { input -> lastName = input },
-                label = { Text(text = "Last Name") },
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = Color.White)
-                    .padding(top = 2.dp),
-                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.MintGreen)
+            Text(
+                text = buildAnnotatedString {
+                    append("Phone Number ")
+                    withStyle(style = SpanStyle(color = Color.Red, fontWeight = FontWeight.Bold, fontSize = 24.sp)) {
+                        append("*")
+                    }
+                },
+                fontSize = 18.sp
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Phone Number", fontSize = 18.sp)
             OutlinedTextField(
                 value = phoneNumber,
                 onValueChange = { input ->
@@ -246,27 +233,35 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "Address",
+                Text(
+                    text = buildAnnotatedString {
+                        append("Address ")
+                        withStyle(style = SpanStyle(color = Color.Red, fontWeight = FontWeight.Bold, fontSize = 24.sp)) {
+                            append("*")
+                        }
+                    },
                     fontSize = 18.sp,
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )
+//                Text(text = "Address",
+//                    fontSize = 18.sp,
+//                    modifier = Modifier.align(Alignment.CenterVertically)
+//                )
                 Row {
-                    Button(
-                        onClick = {
-                            val latitude = 27.18039285293778
-                            val longitude = 31.186714348461493
-                            navController.navigate("mapScreen/$latitude/$longitude")
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                        shape = RoundedCornerShape(10.dp)
-                    ) {
-                        Text(
-                            text = "Map",
-                            color = Color.White,
-                            fontSize = 16.sp
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
+//                    Button(
+//                        onClick = {
+//
+//                        },
+//                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+//                        shape = RoundedCornerShape(10.dp)
+//                    ) {
+//                        Text(
+//                            text = "Map",
+//                            color = Color.White,
+//                            fontSize = 16.sp
+//                        )
+//                    }
+//                    Spacer(modifier = Modifier.width(8.dp))
                     Button(
                         onClick = {
                             if (ContextCompat.checkSelfPermission(
@@ -305,10 +300,62 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = buildAnnotatedString {
+                    append("Country ")
+                    withStyle(style = SpanStyle(color = Color.Red, fontWeight = FontWeight.Bold, fontSize = 24.sp)) {
+                        append("*")
+                    }
+                },
+                fontSize = 18.sp,
+            )
+            ExposedDropdownMenuBox(
+                expanded = expandedCountry,
+                onExpandedChange = { expandedCountry = !expandedCountry }
+            ) {
+                TextField(
+                    value = country,
+                    onValueChange = { /* No change here since it's readOnly */ },
+                    readOnly = true,
+                    label = { Text(text = "Country") },
+                    trailingIcon = {
+                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                    },
+                    colors = TextFieldDefaults.textFieldColors(
+                        unfocusedIndicatorColor = Color.Green
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expandedCountry,
+                    onDismissRequest = { expandedCountry = false }
+                ) {
+                    countries.forEach { countryOption ->
+                        DropdownMenuItem(onClick = {
+                            country = countryOption
+                            expandedCountry = false
+                        }) {
+                            Text(text = countryOption)
+                        }
+                    }
+                }
+            }
 
 
-            Text(text = "City", fontSize = 18.sp)
 
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = buildAnnotatedString {
+                    append("City ")
+                    withStyle(style = SpanStyle(color = Color.Red, fontWeight = FontWeight.Bold, fontSize = 24.sp)) {
+                        append("*")
+                    }
+                },
+                fontSize = 18.sp,
+            )
             ExposedDropdownMenuBox(
                 expanded = expandedCity,
                 onExpandedChange = { if (cities.isEmpty()) {
@@ -348,44 +395,42 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                 }
             }
 
+
             Spacer(modifier = Modifier.height(8.dp))
-
-            Text(text = "Country", fontSize = 18.sp)
-
-            ExposedDropdownMenuBox(
-                expanded = expandedCountry,
-                onExpandedChange = { expandedCountry = !expandedCountry }
-            ) {
-                TextField(
-                    value = country,
-                    onValueChange = { /* No change here since it's readOnly */ },
-                    readOnly = true,
-                    label = { Text(text = "Country") },
-                    trailingIcon = {
-                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-                    },
-                    colors = TextFieldDefaults.textFieldColors(
-                        unfocusedIndicatorColor = Color.Green
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor()
-                )
-
-                ExposedDropdownMenu(
-                    expanded = expandedCountry,
-                    onDismissRequest = { expandedCountry = false }
-                ) {
-                    countries.forEach { countryOption ->
-                        DropdownMenuItem(onClick = {
-                            country = countryOption
-                            expandedCountry = false
-                        }) {
-                            Text(text = countryOption)
-                        }
+            Text(text = "First Name", fontSize = 18.sp)
+            OutlinedTextField(
+                value = firstName,
+                onValueChange = { input ->
+                    if (input.all { it.isLetter()  }) {
+                        firstName = input
                     }
-                }
-            }
+                },
+                label = { Text(text = "First Name") },
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = Color.White)
+                    .padding(top = 2.dp),
+                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.MintGreen)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "Last Name", fontSize = 18.sp)
+            OutlinedTextField(
+                value = lastName,
+                onValueChange = { input ->
+                    if (input.all { it.isLetter() }) {
+                        lastName = input
+                    }
+                },
+                label = { Text(text = "Last Name") },
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = Color.White)
+                    .padding(top = 2.dp),
+                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.MintGreen)
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
             Button(
@@ -393,7 +438,7 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                     .fillMaxWidth()
                     .height(50.dp),
                 onClick = {
-                    if(firstName.isNotBlank() && lastName.isNotBlank() && phoneNumber.isNotBlank()
+                    if(phoneNumber.isNotBlank()
                         && addressState.isNotBlank() && city.isNotBlank() && country.isNotBlank()) {
                         userId?.let {
                             val address1 = Address(

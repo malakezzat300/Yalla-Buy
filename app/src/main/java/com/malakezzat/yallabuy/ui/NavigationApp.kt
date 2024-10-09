@@ -28,9 +28,10 @@ import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModelFactory
 import com.malakezzat.yallabuy.ui.orders.view.OrdersScreen
 import com.malakezzat.yallabuy.ui.orders.viewmodel.OrdersViewModel
 import com.malakezzat.yallabuy.ui.orders.viewmodel.OrdersViewModelFactory
-import com.malakezzat.yallabuy.ui.payment.view.CheckoutView
-import com.malakezzat.yallabuy.ui.payment.view.OrderScreen
-import com.malakezzat.yallabuy.ui.payment.view.PaymentScreen
+import com.malakezzat.yallabuy.ui.payment.view.CheckoutScreen
+import com.malakezzat.yallabuy.ui.payment.view.ItemsScreen
+import com.malakezzat.yallabuy.ui.payment.view.OrderPlacedScreen
+import com.malakezzat.yallabuy.ui.payment.view.PaymentMethodScreen
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModelFactory
 import com.malakezzat.yallabuy.ui.product_info.ProductInfoScreen
@@ -101,7 +102,8 @@ fun NavigationApp(
         }
         ) { paddingValues ->
 
-            NavHost(navController = navController, startDestination = Screen.ShoppingScreen.route, Modifier.padding(paddingValues)) {
+            NavHost(navController = navController, startDestination = Screen.SplashScreen.route, Modifier.padding(paddingValues)) {
+              
                 composable(Screen.SplashScreen.route) {
                     SplashScreen(navController)
                 }
@@ -116,6 +118,9 @@ fun NavigationApp(
                 composable(Screen.OrdersScreen.route) {
                     val viewModel: OrdersViewModel = viewModel(factory = ordersViewModelFactory)
                     OrdersScreen(viewModel = viewModel, navController)
+                }
+                composable(Screen.OrderPlacedScreen.route) {
+                    OrderPlacedScreen(navController)
                 }
                 composable(Screen.ProfileScreen.route) {
                     val viewModel: ProfileScreenViewModel = viewModel(factory = profileScreenViewModelFactory)
@@ -154,26 +159,23 @@ fun NavigationApp(
                     val viewModel: LogInViewModel = viewModel(factory = logInViewModelFactory)
                     LogInScreen(viewModel, navController)
                 }
-
                 composable(
                     route = Screen.CheckoutScreen.route,
-                    arguments = listOf(navArgument("orderId") { type = NavType.StringType })
-                ) { backStackEntry ->
-                    val orderId = backStackEntry.arguments?.getString("orderId") ?: return@composable
+                ) {
                     val viewModel: PaymentViewModel = viewModel(factory = paymentViewModelFactory)
-                    CheckoutView(viewModel, navController, orderId)
+                    CheckoutScreen(viewModel, navController)
                 }
                 composable(
-                    route = Screen.PaymentScreen.route,
-                    arguments = listOf(navArgument("paymentKey") { type = NavType.StringType })
-                ) { backStackEntry ->
-                    val paymentKey = backStackEntry.arguments?.getString("paymentKey")
-                    PaymentScreen(
-                        onPaymentSuccess = { /* Handle success */ },
-                        viewModel = viewModel(factory = paymentViewModelFactory),
-                        navController = navController,
-                        paymentKey = paymentKey
-                    )
+                    route = Screen.PaymentMethodScreen.route
+                ) {
+                    val viewModel : PaymentViewModel = viewModel(factory = paymentViewModelFactory)
+                    PaymentMethodScreen(viewModel,navController)
+                }
+                composable(
+                    route = Screen.ItemsScreen.route
+                ) {
+                    val viewModel : PaymentViewModel = viewModel(factory = paymentViewModelFactory)
+                    ItemsScreen(viewModel,navController)
                 }
                 composable(Screen.SearchScreen.route) {
                     val viewModel: SearchViewModel = viewModel(factory = searchViewModelFactory)
