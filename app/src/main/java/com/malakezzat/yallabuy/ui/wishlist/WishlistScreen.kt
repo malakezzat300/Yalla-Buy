@@ -74,6 +74,7 @@ import com.malakezzat.yallabuy.ui.search.SearchViewModel
 import com.malakezzat.yallabuy.ui.shoppingcart.view.DeleteConfirmationDialog
 import com.malakezzat.yallabuy.ui.shoppingcart.view.calculateSubtotal
 import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModel
+import com.malakezzat.yallabuy.ui.theme.AppColors
 
 
 @Composable
@@ -268,7 +269,8 @@ fun EmptyWishlistScreen(navController: NavController) {
 
         Text(
             text = "Your wishlist is empty",
-            style = MaterialTheme.typography.headlineMedium,
+            color = AppColors.Rose,
+            style = MaterialTheme.typography.headlineLarge,
             textAlign = TextAlign.Center
         )
 
@@ -278,14 +280,14 @@ fun EmptyWishlistScreen(navController: NavController) {
         Text(
             text = "Tap heart button to start saving your favorite items",
             style = MaterialTheme.typography.bodyMedium,
-            color = Color.Gray,
+            color = AppColors.GrayDark,
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(32.dp))
         Button(
             onClick = { navController.navigate(Screen.CategoriesScreen.route) },
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+            colors = ButtonDefaults.buttonColors(containerColor = AppColors.Rose),
             shape = RoundedCornerShape(20.dp)
         ) {
             Text(text = "Explore Categories", color = Color.White)
