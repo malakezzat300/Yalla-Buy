@@ -119,7 +119,9 @@ fun ShoppingCartScreen(
             orderItems = (shoppingCartOrder as ApiState.Success).data.line_items
             draftOrder = (shoppingCartOrder as ApiState.Success).data
             LaunchedEffect (Unit){
-                viewModel.getVariantById(orderItems.get(0).variant_id)
+                if(orderItems.isNotEmpty()) {
+                    viewModel.getVariantById(orderItems.get(0).variant_id)
+                }
             }
             subtotal = calculateSubtotal(orderItems)
 
