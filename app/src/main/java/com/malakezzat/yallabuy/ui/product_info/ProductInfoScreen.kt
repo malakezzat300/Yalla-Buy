@@ -1,6 +1,7 @@
 package com.malakezzat.yallabuy.ui.product_info
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -437,7 +438,9 @@ fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,o
                     val draftOrder =
                         DraftOrder(note = "shoppingCart", line_items = lineItems, email = email)
                     val draftOrderRequest = DraftOrderRequest(draftOrder)
-                    oldDraftOrder.id?.let { viewModel.updateDraftOrder(it, draftOrderRequest) }
+                    oldDraftOrder.id?.let { viewModel.updateDraftOrder(it, draftOrderRequest)
+                    }
+
                 }
             }
         }, modifier = Modifier.weight(1f)) {
