@@ -135,10 +135,6 @@ fun NavigationApp(
                 composable(Screen.Faqs.route) {
                     FAQScreen(navController)
                 }
-                composable(Screen.OrderScreen.route) {
-                    val viewModel: PaymentViewModel = viewModel(factory = paymentViewModelFactory)
-                    OrderScreen(viewModel, navController)
-                }
                 composable("${Screen.ProductsByCategoryScreen.route}/{categoryId}/{body_html}") { backStackEntry ->
                     val categoryId = backStackEntry.arguments?.getString("categoryId")
                     val bodyHtml = backStackEntry.arguments?.getString("body_html")
