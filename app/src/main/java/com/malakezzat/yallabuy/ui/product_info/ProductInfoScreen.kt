@@ -209,7 +209,8 @@ fun ProductInfoScreen(
     var shoppingCartDraftOrder by remember { mutableStateOf(DraftOrder(0L, "", listOf(), "")) }
     var wishListDraftOrder by remember { mutableStateOf(DraftOrder(0L, "", listOf(), "")) }
 
-
+    var color by remember { mutableStateOf("") }
+    var size by remember { mutableStateOf("") }
 
     when (draftOrderId) {
         is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(draftOrderId as ApiState.Error).message}")
@@ -316,7 +317,13 @@ fun ProductInfoScreen(
                                 )
                                 Spacer(modifier = Modifier.height(10.dp))
                                 // Product Price
-                                val price = product.variants.get(0).price
+                                var price = product.variants.get(0).price
+                                for(item in product.variants){
+                                    if((item.option1 == size)&&(item.option2==color)){
+                                        price=item.price
+                                    }
+                                }
+
                                 CurrencyConverter.changeCurrency(price.toDouble())?.let {
                                     Text(
                                         text = it,
@@ -329,10 +336,16 @@ fun ProductInfoScreen(
 
 
                                 val colors = product.options.get(1).values
-                                ColorCirclesRow(colorNames = colors)
+                                ColorCirclesRow(colorNames = colors, onColorChange = {c ->  color = c
+                                    for(item in product.variants){
+                                        if((item.option1 == size)&&(item.option2==color)){
+                                            price=item.price
+                                        }
+                                    }
+                                })
                                 // Product Description
                                 val sizes = product.options.get(0).values
-                                SizeCirclesRow(sizes)
+                                SizeCirclesRow(sizes, onSizeChange = {s -> size = s})
                                 Text(
                                     text = "Description",
                                     fontWeight = FontWeight.Bold,
@@ -484,7 +497,8 @@ fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,o
 }
 
 @Composable
-fun ColorCirclesRow(colorNames: List<String>) {
+fun ColorCirclesRow(colorNames: List<String> ,onColorChange: (String) -> Unit
+) {
     var colorSelection by remember { mutableStateOf(0) }
     Text(text = "Available Colors:")
     LazyRow(
@@ -501,7 +515,9 @@ fun ColorCirclesRow(colorNames: List<String>) {
                         .padding(4.dp)
                         .background(color = color, shape = CircleShape)
                         .border(0.5.dp, shape = CircleShape, color = Color.Black)
-                        .clickable { colorSelection=index }
+                        .clickable { colorSelection=index
+                                    onColorChange(colorNames[colorSelection])
+                        }
                 )
             }
             else{
@@ -511,11 +527,11 @@ fun ColorCirclesRow(colorNames: List<String>) {
                         .padding(4.dp)
                         .background(color = color, shape = CircleShape)
                         .border(0.5.dp, shape = CircleShape, color = Color.Gray)
-                        .clickable { colorSelection=index }
+                        .clickable { colorSelection=index
+                            onColorChange(colorNames[colorSelection])
+                        }
                 )
             }
-
-//            Log.i("color", "ColorCirclesRow: ${colorNames[index]}")
 
         }
     }
@@ -540,7 +556,7 @@ fun getColorFromName(colorName: String): Color {
 }
 
 @Composable
-fun SizeCirclesRow(Itemsizes: List<String>) {
+fun SizeCirclesRow(Itemsizes: List<String>,onSizeChange: (String) -> Unit) {
     var sizeSelection by remember { mutableStateOf(0) }
    Text(text = "Available Sizes:")
     LazyRow(
@@ -557,7 +573,9 @@ fun SizeCirclesRow(Itemsizes: List<String>) {
                             .padding(4.dp)
                             .background(color = Color.White, shape = RectangleShape)
                             .border(0.5.dp, shape = CircleShape, color = Color.Black)
-                            .clickable { sizeSelection=index }
+                            .clickable { sizeSelection=index
+                                onSizeChange(Itemsizes[sizeSelection])
+                            }
                     ){
 
                         Text(text = Itemsizes[index], textAlign = TextAlign.Center, fontSize = 14.sp,
@@ -570,7 +588,9 @@ fun SizeCirclesRow(Itemsizes: List<String>) {
                             .padding(4.dp)
                             .background(color = Color.White, shape = RectangleShape)
                             .border(0.5.dp, shape = CircleShape, color = Color.Gray)
-                            .clickable { sizeSelection=index }
+                            .clickable { sizeSelection=index
+                                        onSizeChange(Itemsizes[sizeSelection])
+                            }
                     ){
 
                         Text(text = Itemsizes[index], textAlign = TextAlign.Center, fontSize = 14.sp,
