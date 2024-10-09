@@ -164,7 +164,7 @@ fun WishlistItem(viewModel: WishlistViewModel,
             .fillMaxWidth()
             .height(120.dp) // Adjust height as needed
             .padding(8.dp)
-            .clickable { navController.navigate("${Screen.ProductInfScreen.route}/${item.variant_id}") },
+            .clickable { navController.navigate("${Screen.ProductInfScreen.route}/${item.product_id}") },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),

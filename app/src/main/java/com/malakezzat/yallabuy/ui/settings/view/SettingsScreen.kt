@@ -35,6 +35,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.malakezzat.yallabuy.data.firebase.FirebaseAuthun
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.data.sharedpref.CurrencyPreferences
 import com.malakezzat.yallabuy.ui.Screen
@@ -157,8 +158,29 @@ fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel) {
                     }
                 }
             }
+
         }
 
+        Spacer(modifier = Modifier.width(4.dp))
 
+        Button(
+            onClick = { FirebaseAuthun().logOut()
+                        navController.navigate(Screen.LogInScreen.route)
+                      },
+            modifier = Modifier
+                .padding(end = 8.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+        ) {
+            Text(text = "Log out", color = Color.White)
+        }
+
+        Button(
+            onClick = {   },
+            modifier = Modifier
+                .padding(end = 8.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+        ) {
+            Text(text = "Hagor", color = Color.White)
+        }
     }
 }

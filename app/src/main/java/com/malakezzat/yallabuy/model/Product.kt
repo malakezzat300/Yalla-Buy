@@ -18,7 +18,8 @@ data class Variant(
     val title: String = "",
     val price: String = "",
     val sku: String = "",
-    val inventory_quantity  : Long = 0
+    val inventory_quantity  : Long = 0,
+    val product_id : Long =0
 )
 
 data class Image(

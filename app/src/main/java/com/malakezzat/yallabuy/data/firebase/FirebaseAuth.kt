@@ -67,12 +67,7 @@ class FirebaseAuthun {
 //        return isSuccess
 //    }
 
-    fun signInWithEmailAndPassword(
-        email: String,
-        password: String,
-        name: String,
-        onSuccess: () -> Unit,
-        onError: (String) -> Unit
+    fun signInWithEmailAndPassword(email: String, password: String, name: String, onSuccess: () -> Unit, onError: (String) -> Unit
     ) {
         mAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
@@ -117,11 +112,7 @@ class FirebaseAuthun {
                 }
             }
     }
-    fun logInWithEmailAndPassword(
-        email: String,
-        password: String,
-        onSuccess: () -> Unit,
-        onError: (String) -> Unit
+    fun logInWithEmailAndPassword(email: String, password: String, onSuccess: () -> Unit, onError: (String) -> Unit
     ) {
         mAuth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->

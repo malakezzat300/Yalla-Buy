@@ -2,21 +2,38 @@ package com.malakezzat.yallabuy.ui.product_info
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 
@@ -31,14 +48,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
+import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.data.util.CurrencyConverter
 import com.malakezzat.yallabuy.model.Customer
@@ -158,13 +181,18 @@ fun ProductInfoSection(product: Product) {
         LazyRow {
             items(product.images) { imageUrl ->
                // product.images.firstOrNull()?.let { image ->
+                Box(modifier = Modifier.fillMaxWidth()
+                ) {
                     Image(
                         painter = rememberAsyncImagePainter(imageUrl.src),
                         contentDescription = null,
                         modifier = Modifier
-                            .size(300.dp)
-                            .padding(4.dp)
+                            .width(400.dp)
+                            .height(300.dp)
+
                     )
+                }
+
               //  }
             }
         }
@@ -228,19 +256,20 @@ fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : Str
         val properties = listOf(Property(name = "imageUrl",value = product.image.src))
         Log.i("propertiesTest", "AddToCart: $properties")
         if(oldDraftOrder.id == 0L) {
-            val lineItems = listOf(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties))
+            val lineItems = listOf(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties,product.id?:0))
             val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
             val draftOrderRequest = DraftOrderRequest(draftOrder)
             viewModel.createDraftOrder(draftOrderRequest)
         } else {
-            if(!oldDraftOrder.line_items.contains(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties))) {
+            if(!oldDraftOrder.line_items.contains(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties,product.id?:0))) {
                 val lineItems = oldDraftOrder.line_items + listOf(
                     LineItem(
                         product.title,
                         product.variants[0].price,
                         product.variants[0].id,
                         1,
-                        properties = properties
+                        properties = properties,
+                        product.id?:0
                     )
                 )
                 val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
@@ -259,19 +288,20 @@ fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,o
             val properties = listOf(Property(name = "imageUrl",value = product.image.src))
             Log.i("propertiesTest", "AddToCart: $properties")
             if(oldDraftOrder.id == 0L) {
-                val lineItems = listOf(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties))
+                val lineItems = listOf(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties,product.id?:0))
                 val draftOrder = DraftOrder(note = "shoppingCart", line_items = lineItems, email = email)
                 val draftOrderRequest = DraftOrderRequest(draftOrder)
                 viewModel.createDraftOrder(draftOrderRequest)
             } else {
-                if(!oldDraftOrder.line_items.contains(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties))) {
+                if(!oldDraftOrder.line_items.contains(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties,product.id?:0))) {
                     val lineItems = oldDraftOrder.line_items + listOf(
                         LineItem(
                             product.title,
                             product.variants[0].price,
                             product.variants[0].id,
                             1,
-                            properties = properties
+                            properties = properties,
+                            product.id?:0
                         )
                     )
                     val draftOrder = DraftOrder(note = "shoppingCart", line_items = lineItems, email = email)
@@ -296,8 +326,304 @@ fun NavigationButtons(navController: NavController) {
         }
     }
 }
-
+@Preview
 @Composable
 fun ProductInfoScreenPreview(){
-   // ProductInfoScreen(Product(0,"","","","","", em,),NavController(LocalContext.current))
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(Color.White)
+//            .padding(16.dp)
+//    ) {
+//        TopAppBar(
+//            title = { Text("Product Details") },
+//            navigationIcon = {
+//                IconButton(onClick = { /*navController.popBackStack()*/ }) {
+//                    Icon(painterResource(id = R.drawable.ic_back), contentDescription = "Back")
+//                }
+//            },
+//            actions = {
+//                IconButton(onClick = { /* favorite logic */ }) {
+//                    Icon(painterResource(id = R.drawable.wishlist), contentDescription = "Favorite")
+//                }
+//            }
+//        )
+//
+//        Spacer(modifier = Modifier.height(16.dp))
+//
+//        // Product Image
+//        Image(
+//            painter = rememberAsyncImagePainter("https://your-image-url"),
+//            contentDescription = null,
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .aspectRatio(1f)
+//                .clip(RoundedCornerShape(16.dp))
+//                .background(Color.LightGray)
+//        )
+//
+//        Spacer(modifier = Modifier.height(16.dp))
+//
+//        // Product title and price
+//        Text(
+//            text = "Loop Silicone Strong Magnetic Watch",
+//            fontSize = 22.sp,
+//            fontWeight = FontWeight.Bold
+//        )
+//
+//        Row(
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            Icon(
+//                painter = painterResource(id = R.drawable.wishlist),
+//                contentDescription = "Star Icon",
+//                tint = Color.Yellow,
+//                modifier = Modifier.size(16.dp)
+//            )
+//            Text(text = "4.5 (2,495 reviews)", fontSize = 14.sp)
+//        }
+//
+//        Spacer(modifier = Modifier.height(8.dp))
+//
+//        Row(
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            Text(
+//                text = "$15.25",
+//                fontSize = 20.sp,
+//                fontWeight = FontWeight.Bold,
+//                color = Color.Green
+//            )
+//            Spacer(modifier = Modifier.width(8.dp))
+//            Text(
+//                text = "$20.00",
+//                fontSize = 16.sp,
+//                textDecoration = TextDecoration.LineThrough,
+//                color = Color.Gray
+//            )
+//        }
+//
+//        Spacer(modifier = Modifier.height(8.dp))
+//
+//        // Color options
+//        Row(
+//            modifier = Modifier.padding(vertical = 8.dp)
+//        ) {
+//            listOf(Color.Black, Color.Blue, Color.Gray).forEach { color ->
+//                Box(
+//                    modifier = Modifier
+//                        .size(40.dp)
+//                        .clip(CircleShape)
+//                        .background(color)
+//                        .clickable { /* select color */ }
+//                        .padding(8.dp)
+//                )
+//                Spacer(modifier = Modifier.width(8.dp))
+//            }
+//        }
+//
+//        Spacer(modifier = Modifier.height(16.dp))
+//
+//        // Quantity Selector
+//        Row(
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            IconButton(onClick = { /* decrease quantity */ }) {
+//                Icon(Icons.Default.Remove, contentDescription = "Decrease")
+//            }
+//            Text(text = "1", fontSize = 16.sp)
+//            IconButton(onClick = { /* increase quantity */ }) {
+//                Icon(Icons.Default.Add, contentDescription = "Increase")
+//            }
+//        }
+//
+//        Spacer(modifier = Modifier.height(16.dp))
+//
+//        // Buttons
+//        Row(
+//            horizontalArrangement = Arrangement.SpaceBetween,
+//            modifier = Modifier.fillMaxWidth()
+//        ) {
+//            Button(
+//                onClick = { /* Buy now action */ },
+//                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+//                modifier = Modifier.weight(1f).padding(end = 8.dp)
+//            ) {
+//                Text("Buy Now", color = Color.White)
+//            }
+//            Button(
+//                onClick = { /* Add to cart action */ },
+//                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
+//                modifier = Modifier.weight(1f)
+//            ) {
+//                Text("Add To Cart", color = Color.White)
+//            }
+//        }
+//    }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
+        // Top Bar
+        TopAppBar(
+            title = { },
+            navigationIcon = {
+                IconButton(onClick = { /* Handle back press */ }) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                }
+            },
+            actions = {
+                IconButton(onClick = { /* Handle favorite */ }) {
+                    Icon(Icons.Default.FavoriteBorder, contentDescription = "Favorite")
+                }
+            },
+            backgroundColor = Color.White,
+            elevation = 0.dp
+        )
+
+        // Product Image with carousel
+        Box(modifier = Modifier.fillMaxWidth()) {
+            // Image Placeholder
+            Image(
+                painter = rememberAsyncImagePainter("https://via.placeholder.com/300"),
+                contentDescription = "Product Image",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
+            )
+
+            // Image Indicator (dots)
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(8.dp)
+            ) {
+                repeat(5) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(if (it == 0) Color.Gray else Color.LightGray)
+                            .padding(4.dp)
+                    )
+                }
+            }
+        }
+
+        // Product Title and Info
+        Column(modifier = Modifier.padding(16.dp) ) {
+            Text(
+                text = "Loop Silicone Strong Magnetic Watch",
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Bold
+            )
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    Icons.Filled.Star,
+                    contentDescription = "Rating Star",
+                    tint = Color(0xFFFFD700), // Gold color
+                    modifier = Modifier.size(16.dp)
+                )
+                Text(
+                    text = "4.5 (2,495 reviews)",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "$15.25",
+                    style = MaterialTheme.typography.bodySmall.copy(color = Color.Green),
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "$20.00",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        textDecoration = TextDecoration.LineThrough,
+                        color = Color.Gray
+                    )
+                )
+            }
+        }
+
+        // Color Options
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            listOf(Color.Black, Color.Blue, Color.Gray, Color.Cyan, Color.Cyan).forEach { color ->
+                Box(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(color)
+                        .border(
+                            width = 1.dp,
+                            color = if (color == Color.Black) Color.Blue else Color.Transparent,
+                            shape = CircleShape
+                        )
+                        .clickable { /* Handle color selection */ }
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Quantity Selector
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "Quantity", style = MaterialTheme.typography.bodyMedium)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = { /* Decrease quantity */ }) {
+                    Icon(Icons.Default.Remove, contentDescription = "Decrease")
+                }
+                Text(text = "1", style = MaterialTheme.typography.bodyMedium)
+                IconButton(onClick = { /* Increase quantity */ }) {
+                    Icon(Icons.Default.Add, contentDescription = "Increase")
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Action Buttons (Buy Now and Add to Cart)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Button(
+                onClick = { /* Handle Buy Now */ },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+            ) {
+                Text(text = "Buy Now", color = Color.White)
+            }
+
+            Button(
+                onClick = { /* Handle Add to Cart */ },
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+            ) {
+                Text(text = "Add to Cart", color = Color.White)
+            }
+        }
+    }
 }
