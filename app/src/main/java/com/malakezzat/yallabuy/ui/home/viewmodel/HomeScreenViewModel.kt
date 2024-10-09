@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.malakezzat.yallabuy.data.ProductsRepository
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.data.remote.coupons.DiscountCode
@@ -11,6 +12,8 @@ import com.malakezzat.yallabuy.data.remote.coupons.PriceRule
 import com.malakezzat.yallabuy.data.sharedpref.CurrencyPreferences
 import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
+import com.malakezzat.yallabuy.model.CustomerSearchRespnse
+import com.malakezzat.yallabuy.model.Order
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.SmartCollection
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,11 +41,15 @@ private val _brandsList = MutableStateFlow<ApiState<List<SmartCollection>>>(ApiS
     private val _priceRules = MutableStateFlow<List<PriceRule>>(emptyList())
     val priceRules: StateFlow<List<PriceRule>> get() = _priceRules
 
+    private val _customerDataByEmail = MutableStateFlow<ApiState<CustomerSearchRespnse>>(ApiState.Loading)
+    val customerDataByEmail = _customerDataByEmail.asStateFlow()
+
     init {
         getAllProducts()
         getAllCategories()
         fetchPriceRules()
         getBrands()
+        getUserByEmail()
     }
 
     // Fetch all products
@@ -108,6 +115,34 @@ private val _brandsList = MutableStateFlow<ApiState<List<SmartCollection>>>(ApiS
         viewModelScope.launch {
             repository.getDiscountCodes(priceRuleId).collect { discountCodes ->
                 _discountCodes.value = discountCodes
+            }
+        }
+    }
+
+
+
+    fun getUserByEmail(){
+        val userEmail = FirebaseAuth.getInstance().currentUser?.email
+        if (userEmail != null) {
+            repository.setUserEmail(userEmail)
+        }
+        viewModelScope.launch {
+            if (userEmail != null) {
+                repository.getCustomerByEmail(userEmail)
+                    .onStart {
+                        _customerDataByEmail.value = ApiState.Loading // Set loading state
+                    }
+                    .catch { e ->
+                        _customerDataByEmail.value = ApiState.Error(e.message ?: "Unknown error")
+                        // _errorMessage.value = e.message // Set error message
+                        Log.i(TAG, "getCustomer: error ${e.message}")
+
+                    }
+                    .collect { customerData ->
+                        _customerDataByEmail.value = ApiState.Success(customerData) // Set success state with data
+                        customerData.customers.get(0).id?.let { repository.setUserId(it) }
+                        Log.i(TAG, "getCustomer:  ${repository.getUserId()}")
+                    }
             }
         }
     }

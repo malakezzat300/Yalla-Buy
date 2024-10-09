@@ -6,13 +6,14 @@ import com.malakezzat.yallabuy.data.remote.coupons.DiscountCode
 import com.malakezzat.yallabuy.data.remote.coupons.PriceRule
 import com.malakezzat.yallabuy.data.sharedpref.GlobalSharedPreferenceDataSource
 import com.malakezzat.yallabuy.model.Address
+import com.malakezzat.yallabuy.model.AddressRequest
+import com.malakezzat.yallabuy.model.AddressResponse
 import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.CustomerAddress
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
 import com.malakezzat.yallabuy.model.CustomerSearchRespnse
-import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
@@ -124,11 +125,11 @@ class ProductsRepositoryImpl private constructor(
     }
 
 
-    override suspend fun addNewAddress(customerId: Long): Flow<CustomerAddress> {
-        return productsRemoteDataSource.addNewAddress(customerId)
+    override suspend fun addNewAddress(customerId: Long,address: AddressRequest): Flow<CustomerAddress> {
+        return productsRemoteDataSource.addNewAddress(customerId,address)
     }
 
-    override suspend fun getUserAddresses(customerId: Long): Flow<List<Address>> {
+    override suspend fun getUserAddresses(customerId: Long): Flow<AddressResponse> {
         return productsRemoteDataSource.getUserAddresses(customerId)
     }
 
@@ -141,9 +142,10 @@ class ProductsRepositoryImpl private constructor(
 
     override suspend fun updateUserAddress(
         customerId: Long,
-        addressId: Long
+        addressId: Long,
+        address: AddressRequest,
     ): Flow<CustomerAddress> {
-        return productsRemoteDataSource.updateUserAddress(customerId,addressId)
+        return productsRemoteDataSource.updateUserAddress(customerId,addressId,address)
     }
 
     override suspend fun setDefaultAddress(

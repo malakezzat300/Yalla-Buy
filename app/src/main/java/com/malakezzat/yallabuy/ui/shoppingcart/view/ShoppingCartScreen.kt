@@ -119,7 +119,9 @@ fun ShoppingCartScreen(
             orderItems = (shoppingCartOrder as ApiState.Success).data.line_items
             draftOrder = (shoppingCartOrder as ApiState.Success).data
             LaunchedEffect (Unit){
-                viewModel.getVariantById(orderItems.get(0).variant_id)
+                if(orderItems.isNotEmpty()) {
+                    viewModel.getVariantById(orderItems.get(0).variant_id)
+                }
             }
             subtotal = calculateSubtotal(orderItems)
 
@@ -167,10 +169,11 @@ fun ShoppingCartScreen(
                                 if(orderItems.isNotEmpty()){
                                     items(orderItems.size) { index ->
                                         val orderItem = orderItems[index]
-                                        ShoppingItem(viewModel,orderItem,draftOrder,variantSet,subtotal){
+                                        ShoppingItem(viewModel,orderItem,draftOrder,variantSet,subtotal,{
                                             subtotal = calculateSubtotal(orderItems)
                                             total = subtotal
-                                        }
+                                        },
+                                        navController)
 
                                     }
                                 }
@@ -260,7 +263,8 @@ fun ShoppingItem(
     draftOrder: DraftOrder,
     variantSet: Set<Variant>,
     subtotal : Double,
-    onItemUpdated: () -> Unit
+    onItemUpdated: () -> Unit,
+    navController: NavController
 ) {
     val coroutineScope = rememberCoroutineScope()
     var showDialog by remember { mutableStateOf(false) }
@@ -442,6 +446,8 @@ fun ShoppingItem(
                     }
                 } else {
                     draftOrder.id?.let { viewModel.deleteDraftOrder(it) }
+                    navController.popBackStack(Screen.ShoppingScreen.route, inclusive = true)
+                    navController.navigate(Screen.ShoppingScreen.route)
                 }
                 onItemUpdated()
             }
