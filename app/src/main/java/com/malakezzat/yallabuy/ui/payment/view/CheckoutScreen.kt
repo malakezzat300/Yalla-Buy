@@ -123,7 +123,9 @@ fun CheckoutScreen(viewModel: PaymentViewModel,navController: NavController) {
                 contentDescription = "Back",
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable { /* Navigate back */ }
+                    .clickable {
+                        navController.navigateUp()
+                    }
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(
@@ -138,7 +140,9 @@ fun CheckoutScreen(viewModel: PaymentViewModel,navController: NavController) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable {  }
+                .clickable {
+                    navController.navigate(Screen.ItemsScreen.route)
+                }
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -189,7 +193,12 @@ fun CheckoutScreen(viewModel: PaymentViewModel,navController: NavController) {
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = { /* Place order action */ },
+            onClick = {
+                draftOrder.id?.let {
+                    viewModel.finalizeDraftOrder(it)
+                    //navController.navigate(Screen.OrderPlacedScreen.route)
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),

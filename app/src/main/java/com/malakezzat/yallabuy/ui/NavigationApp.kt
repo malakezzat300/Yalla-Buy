@@ -29,7 +29,7 @@ import com.malakezzat.yallabuy.ui.orders.view.OrdersScreen
 import com.malakezzat.yallabuy.ui.orders.viewmodel.OrdersViewModel
 import com.malakezzat.yallabuy.ui.orders.viewmodel.OrdersViewModelFactory
 import com.malakezzat.yallabuy.ui.payment.view.CheckoutScreen
-import com.malakezzat.yallabuy.ui.payment.view.OrderScreen
+import com.malakezzat.yallabuy.ui.payment.view.ItemsScreen
 import com.malakezzat.yallabuy.ui.payment.view.PaymentMethodScreen
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModelFactory
@@ -118,10 +118,6 @@ fun NavigationApp(
                     val viewModel: ProfileScreenViewModel = viewModel(factory = profileScreenViewModelFactory)
                     ProfileScreen(viewModel = viewModel, navController)
                 }
-                composable(Screen.OrderScreen.route) {
-                    val viewModel: PaymentViewModel = viewModel(factory = paymentViewModelFactory)
-                    OrderScreen(viewModel, navController)
-                }
                 composable("${Screen.ProductsByCategoryScreen.route}/{categoryId}/{body_html}") { backStackEntry ->
                     val categoryId = backStackEntry.arguments?.getString("categoryId")
                     val bodyHtml = backStackEntry.arguments?.getString("body_html")
@@ -150,9 +146,15 @@ fun NavigationApp(
                 }
                 composable(
                     route = Screen.PaymentMethodScreen.route
-                ) { backStackEntry ->
+                ) {
                     val viewModel : PaymentViewModel = viewModel(factory = paymentViewModelFactory)
                     PaymentMethodScreen(viewModel,navController)
+                }
+                composable(
+                    route = Screen.ItemsScreen.route
+                ) {
+                    val viewModel : PaymentViewModel = viewModel(factory = paymentViewModelFactory)
+                    ItemsScreen(viewModel,navController)
                 }
                 composable(Screen.SearchScreen.route) {
                     val viewModel: SearchViewModel = viewModel(factory = searchViewModelFactory)

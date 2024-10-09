@@ -10,6 +10,7 @@ import com.malakezzat.yallabuy.model.AddressRequest
 import com.malakezzat.yallabuy.model.AddressResponse
 import com.malakezzat.yallabuy.model.CustomerAddress
 import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.VariantResponse
@@ -172,5 +173,44 @@ class PaymentViewModel(private val repository: ProductsRepository) : ViewModel()
         }
     }
 
+    fun updateDraftOrder(draftOrderId: Long, draftOrder: DraftOrderRequest) {
+        viewModelScope.launch {
+            repository.updateDraftOrder(draftOrderId, draftOrder)
+                .onStart {
+                    _singleDraftOrders.value = ApiState.Loading
+                }
+                .catch { e ->
+                    _singleDraftOrders.value = ApiState.Error(e.message ?: "Failed to update draft order")
+                }
+                .collect { response ->
+                    _singleDraftOrders.value = ApiState.Success(response)
+                    getDraftOrders()
+                }
+        }
+    }
 
+    fun deleteDraftOrder(draftOrderId: Long) {
+        viewModelScope.launch {
+            try {
+                repository.deleteDraftOrder(draftOrderId)
+                getDraftOrders()
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to delete draft order: ${e.message}")
+            }
+        }
+    }
+
+    fun getVariantById(variantId : Long){
+        viewModelScope.launch {
+            repository.getVariantById(variantId).onStart {
+                _variantId.value = ApiState.Loading
+            }
+                .catch { e ->
+                    _variantId.value = ApiState.Error(e.message ?: "Unknown error")
+                }
+                .collect { customerResponse ->
+                    _variantId.value = ApiState.Success(customerResponse)
+                }
+        }
+    }
 }
