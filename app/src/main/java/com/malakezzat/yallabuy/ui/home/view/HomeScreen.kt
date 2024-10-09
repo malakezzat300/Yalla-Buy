@@ -3,6 +3,7 @@ package com.malakezzat.yallabuy.ui.home.view
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -55,6 +56,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -496,13 +498,13 @@ fun LatestProductsSection(products: List<Product>, navController: NavController)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(400.dp)
+                .height(3650.dp)
         ) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
+                horizontalArrangement = Arrangement.spacedBy(7.dp),
+                verticalArrangement = Arrangement.spacedBy(5.dp),
                 contentPadding = PaddingValues(0.dp)
 
             ) {
@@ -520,47 +522,42 @@ fun ProductCard(product: Product, navController: NavController) {
     //Currency
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
+    // Create the scroll state directly in the Composable
+    val scrollState = rememberScrollState()
+
     Card(
         modifier = Modifier
-            .width(150.dp)
+            .size(235.dp)
+            .padding(2.dp)
             .clickable {
                 navController.navigate("${Screen.ProductInfScreen.route}/${product.id}")
             },
         shape = RoundedCornerShape(30.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
 
     ) {
-        Box {
+        Column(
+            modifier = Modifier.padding(8.dp)
+                .verticalScroll(scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             // Background image of the product
             product.images.firstOrNull()?.let { image ->
+                // Determine animation value based on scroll position
+                val offsetY = animateFloatAsState(targetValue = -scrollState.value / 4f)
+
                 Image(
                     painter = rememberAsyncImagePainter(image.src),
                     contentDescription = "Product Image",
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                        .clip(RoundedCornerShape(30.dp)), // Clip the image to match the card shape
-                    contentScale = ContentScale.Crop
+                        .size(120.dp)
+                        .clip(RoundedCornerShape(16.dp)) // Clip the image to match the card shape
+                        .graphicsLayer(translationY = offsetY.value), // Add image movement
+
+                    contentScale = ContentScale.Fit
                 )
             }
-
-            // Wishlist icon positioned at the top right corner
-            Image(
-                painter = painterResource(id = R.drawable.wishlist),
-                contentDescription = "wishlist",
-                modifier = Modifier
-                    .size(40.dp)
-                    .align(Alignment.TopEnd)
-                    .padding(5.dp)
-            )
-
-            // Column for product details
-            Column(
-                modifier = Modifier
-                    .padding(top = 110.dp) // Ensure text does not overlap with the image
-                    .padding(10.dp) // Add some padding around the text
-            ) {
                 Text(product.title, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
                 Text(product.vendor, color = AppColors.MintGreen)
                 val price = product.variants.first().price
@@ -569,7 +566,7 @@ fun ProductCard(product: Product, navController: NavController) {
                         style = MaterialTheme.typography.bodyMedium)
                 }
 
-            }
+
         }
     }
 }
