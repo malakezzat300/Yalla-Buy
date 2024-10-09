@@ -10,7 +10,8 @@ data class Product(
     val tags: String,
     val images: List<Image> = listOf(),  // Assuming Image is a separate data class for images.
     val image: Image,
-    val variants: List<Variant> = listOf() // Add this for variants.
+    val variants: List<Variant> = listOf() ,// Add this for variants.
+    val options : List<Option>
 )
 
 data class Variant(
@@ -21,7 +22,11 @@ data class Variant(
     val inventory_quantity  : Long = 0,
     val product_id : Long =0
 )
-
+data class Option( val id :Long,
+    val product_id : Long ,
+    val name : String,
+    val values : List<String>
+)
 data class Image(
     val id: Long,
     val src: String // URL of the product image
