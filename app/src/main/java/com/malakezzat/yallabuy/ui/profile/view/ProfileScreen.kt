@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.malakezzat.yallabuy.R
+import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.profile.viewmodel.ProfileScreenViewModel
 
 @Composable
@@ -42,25 +43,25 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
 
             // Personal Information Section
             SectionWithPadding(title = "Personal Information") {
-                ProfileItem(icon = R.drawable.ic_shipping_address, title = "Settings")
+                ProfileItem(icon = R.drawable.ic_shipping_address, title = "Settings",{navController.navigate(Screen.SettingsScreen.route)})
                 //ProfileItem(icon = R.drawable.ic_payment_method, title = "Payment Method")
-                ProfileItem(icon = R.drawable.ic_order_history, title = "Order History")
+                ProfileItem(icon = R.drawable.ic_order_history, title = "Order History",{})
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Support & Information Section
             SectionWithPadding(title = "Support & Information") {
-                ProfileItem(icon = R.drawable.ic_privacy_policy, title = "Privacy Policy")
-                ProfileItem(icon = R.drawable.ic_terms_conditions, title = "Terms & Conditions")
-                ProfileItem(icon = R.drawable.ic_faq, title = "FAQs")
+                ProfileItem(icon = R.drawable.ic_privacy_policy, title = "Privacy Policy",{})
+                ProfileItem(icon = R.drawable.ic_terms_conditions, title = "Terms & Conditions",{})
+                ProfileItem(icon = R.drawable.ic_faq, title = "FAQs",{})
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Account Management Section
             SectionWithPadding(title = "Account Management") {
-                ProfileItem(icon = R.drawable.ic_change_password, title = "Change Password")
+                ProfileItem(icon = R.drawable.ic_change_password, title = "Change Password",{})
                 //DarkThemeToggle() // Dark Theme Toggle inside the Account Management section
             }
 
@@ -141,7 +142,7 @@ fun SectionHeader(title: String) {
 }
 
 @Composable
-fun ProfileItem(icon: Int, title: String) {
+fun ProfileItem(icon: Int, title: String, onClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -157,7 +158,7 @@ fun ProfileItem(icon: Int, title: String) {
         Spacer(modifier = Modifier.width(16.dp))
         ClickableText(
             text = AnnotatedString(title),
-            onClick = { /* Navigate to the corresponding screen */ },
+            onClick = { onClick() },
             style = LocalTextStyle.current.copy(fontSize = 16.sp)
         )
     }
