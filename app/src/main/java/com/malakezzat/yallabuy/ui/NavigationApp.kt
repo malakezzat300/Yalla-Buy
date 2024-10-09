@@ -94,7 +94,7 @@ fun NavigationApp(
         }
         ) { paddingValues ->
 
-            NavHost(navController = navController, startDestination = Screen.HomeScreen.route, Modifier.padding(paddingValues)) {
+            NavHost(navController = navController, startDestination = Screen.ShoppingScreen.route, Modifier.padding(paddingValues)) {
                 composable(Screen.SplashScreen.route) {
                     SplashScreen(navController)
                 }

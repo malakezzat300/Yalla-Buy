@@ -1,5 +1,6 @@
 package com.malakezzat.yallabuy.ui.search
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,12 +47,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
+import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.util.CurrencyConverter
 import com.malakezzat.yallabuy.model.Product
+import com.malakezzat.yallabuy.ui.CustomTopBar
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.orders.view.CustomTopBarr
 import com.malakezzat.yallabuy.ui.product_info.AddToFavorites
@@ -70,7 +74,7 @@ fun SearchScreen(viewModel: SearchViewModel,
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
     Scaffold(
-//        topBar = { CustomTopBarr(navController) },
+       topBar = { CustomTopBar(navController,"",Color.White) },
         containerColor = Color.White,
         content = { paddingValues ->
             Column(
@@ -80,22 +84,7 @@ fun SearchScreen(viewModel: SearchViewModel,
                     .padding(18.dp)
                     .background(Color.White)
             ) {
-                Spacer(modifier = Modifier.height(50.dp))
-                // Search bar
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                       ,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.Black
-                        )
-                    }
-                }
+                Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = query,
                     onValueChange = {input->
@@ -103,13 +92,17 @@ fun SearchScreen(viewModel: SearchViewModel,
                         viewModel.onSearchQueryChanged(input,sliderPosition)
                     },
                     placeholder = { Text("Search") },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Icon") },
+                    leadingIcon = { Image(
+                        painter = painterResource(id = R.drawable.search_normal), // logo
+                        contentDescription = "Search Icon",
+                        modifier = Modifier.size(16.dp)
+                    ) },
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(color = Color.White)
                         .padding(10.dp),
-                    colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.MintGreen)
+                    colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.Teal)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

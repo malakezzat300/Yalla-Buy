@@ -109,7 +109,7 @@ fun HomeScreen(
     }
 
     Scaffold(
-        topBar = { CustomTopBar(navController) },
+        topBar = { CustomTopBarHome(navController) },
         containerColor = Color.White,
         //  bottomBar = { BottomNavigationBar(navController) }
     ) {
@@ -241,7 +241,7 @@ fun BrandsList(brands: List<SmartCollection>,navController: NavController) {
 
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun CustomTopBar(navController: NavController) {
+fun CustomTopBarHome(navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

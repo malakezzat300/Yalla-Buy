@@ -45,8 +45,8 @@ import coil.compose.rememberAsyncImagePainter
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.Product
+import com.malakezzat.yallabuy.ui.CustomTopBar
 import com.malakezzat.yallabuy.ui.Screen
-import com.malakezzat.yallabuy.ui.categories.view.CustomTopBarCategory
 import com.malakezzat.yallabuy.ui.home.view.LatestProductsSection
 import com.malakezzat.yallabuy.ui.home.view.TAG
 import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollectionIdViewModel
@@ -70,7 +70,7 @@ fun ProductsByCategoryScreen(
     }
     }
     Scaffold(
-        topBar = { body?.let { CustomTopBarCategory(navController, it) } },
+        topBar = { body?.let { CustomTopBar(navController, it) } },
         containerColor = Color.White
     ) {
 
@@ -120,7 +120,7 @@ fun ProductsByBrandScreen(
         }
     }
     Scaffold(
-        topBar = { body?.let { CustomTopBarCategory(navController, it) } },
+        topBar = { body?.let { CustomTopBar(navController, it) } },
         containerColor = Color.White
     ) {
 

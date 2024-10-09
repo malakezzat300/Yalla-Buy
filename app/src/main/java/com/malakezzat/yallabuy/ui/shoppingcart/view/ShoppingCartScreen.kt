@@ -70,6 +70,8 @@ import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.LineItem
 import com.malakezzat.yallabuy.model.Variant
 import com.malakezzat.yallabuy.ui.Screen
+import com.malakezzat.yallabuy.ui.home.view.CustomTopBarHome
+import com.malakezzat.yallabuy.ui.orders.view.CustomTopBarr
 import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModel
 import com.malakezzat.yallabuy.ui.theme.AppColors
 import kotlinx.coroutines.delay
@@ -149,6 +151,7 @@ fun ShoppingCartScreen(
             if (orderItems.isNotEmpty()) {
                 Scaffold(
                     topBar = { CustomTopBar(bottomSheetState,navController) },
+                    containerColor = Color.White,
                     content = { paddingValues ->
                         Box(
                             modifier = Modifier
@@ -216,15 +219,11 @@ fun CustomTopBar(sheetState: ModalBottomSheetState,navController : NavController
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Spacer(modifier = Modifier.padding(2.dp))
-            IconButton(
-                modifier = Modifier.size(30.dp),
-                onClick = {
-                    navController.navigate(Screen.HomeScreen.route)
-                }
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_back),
-                    contentDescription = "back"
+            IconButton(onClick = { navController.navigate(Screen.HomeScreen.route) }) {
+                Image(
+                    painter = painterResource(id = R.drawable.back_arrow),
+                    contentDescription = "Search Icon",
+                    modifier = Modifier.size(24.dp)
                 )
             }
 
@@ -232,6 +231,7 @@ fun CustomTopBar(sheetState: ModalBottomSheetState,navController : NavController
             Text(
                 text = "My Cart",
                 style = TextStyle(fontSize = 20.sp),
+                color = AppColors.Teal,
                 modifier = Modifier.padding(start = 4.dp)
             )
         }
@@ -250,7 +250,7 @@ fun CustomTopBar(sheetState: ModalBottomSheetState,navController : NavController
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium
                 ),
-                color = AppColors.MintGreen
+                color = AppColors.RoseLight
             )
         }
     }
@@ -277,6 +277,7 @@ fun ShoppingItem(
             .fillMaxHeight(),
         shape = RoundedCornerShape(18.dp),
         elevation = CardDefaults.cardElevation(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
     ) {
         Row(
             modifier = Modifier
@@ -455,7 +456,7 @@ fun ShoppingItem(
     }
 }
 
-
+//order info section
 @Composable
 fun ShoppingView(
     modifier: Modifier,
@@ -535,36 +536,42 @@ fun ShoppingView(
         }
     }
 }
+
+
+
 @Composable
 fun ShoppingEmpty(){
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.empty_cart_image),
-            contentDescription = "Empty Cart",
-            modifier = Modifier.size(280.dp)
-        )
+    Scaffold(
+        containerColor = Color.White,
+        content = { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.empty_cart_image),
+                    contentDescription = "Empty Cart",
+                    modifier = Modifier.size(280.dp)
+                )
 
-        Text(
-            text = "Your cart is empty",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(top = 16.dp),
-            fontWeight = FontWeight.Bold
-        )
+                Text(
+                    text = "Your cart is empty",
+                    color = AppColors.Rose,
+                    style = MaterialTheme.typography.headlineLarge,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
 
-        Text(
-            text = "Looks like you have not added anything in your cart. Go ahead and explore top categories.",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .wrapContentWidth(),
-            textAlign = TextAlign.Center
-        )
+                Text(
+                    text = "Looks like you have not added anything in your cart. Go ahead and explore top categories.",
+                    color = AppColors.GrayDark,
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 24.dp)
+                )
 
 
 //        Button(
@@ -582,7 +589,10 @@ fun ShoppingEmpty(){
 //                fontSize = 16.sp
 //            )
 //        }
-    }
+            }
+        })
+        //  bottomBar = { BottomNavigationBar(navController) }
+
 }
 
 @Composable
