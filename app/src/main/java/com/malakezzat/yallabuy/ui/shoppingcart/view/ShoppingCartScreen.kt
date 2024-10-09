@@ -59,12 +59,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.malakezzat.yallabuy.data.ProductsRepository
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.data.sharedpref.CurrencyPreferences
 import com.malakezzat.yallabuy.data.util.CurrencyConverter
+import com.malakezzat.yallabuy.model.AppliedDiscount
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.LineItem
@@ -132,18 +134,15 @@ fun ShoppingCartScreen(
         itemsCount = orderItems.size
     }
 
-    LaunchedEffect (subtotal,discountSaved) {
-        val percentage = 1 - discountSaved
-        total = round(subtotal * percentage)
-        discountAmount = round(subtotal * ( 1 - percentage))
+    LaunchedEffect (subtotal,draftOrder) {
+        discountAmount = draftOrder.applied_discount?.amount?.toDouble() ?: 0.0
+        total = draftOrder.subtotal_price.toDouble()
     }
 
     ModalBottomSheetLayout(
         sheetState = bottomSheetState,
         sheetContent = {
-            VoucherBottomSheet{ discount ->
-                discountSaved = discount
-            }
+            VoucherBottomSheet(viewModel,draftOrder)
         },
         content = {
             if (orderItems.isNotEmpty()) {
@@ -586,7 +585,7 @@ fun ShoppingEmpty(){
 }
 
 @Composable
-fun VoucherBottomSheet(onApplyDiscount: (discount: Double) -> Unit) {
+fun VoucherBottomSheet(viewModel: ShoppingCartViewModel,draftOrder: DraftOrder) {
     var voucherCode by remember { mutableStateOf("") }
     var discountApplied by remember { mutableStateOf(false) }
     var discountMessage by remember { mutableStateOf("") }
@@ -616,24 +615,27 @@ fun VoucherBottomSheet(onApplyDiscount: (discount: Double) -> Unit) {
 
             Button(
                 onClick = {
-                    if (voucherCode.endsWith("YALLABUY10")) {
-                        val discount = 0.10
-                        onApplyDiscount(discount)
-                        discountMessage = "10% discount applied!"
-                        discountApplied = true
-                    } else if (voucherCode.endsWith("YALLABUY30")) {
-                        val discount = 0.30
-                        onApplyDiscount(discount)
-                        discountMessage = "30% discount applied!"
-                        discountApplied = true
-                    } else if (voucherCode.endsWith("YALLABUY50")) {
-                        val discount = 0.50
-                        onApplyDiscount(discount)
-                        discountMessage = "50% discount applied!"
-                        discountApplied = true
-                    } else {
-                            discountMessage = "Invalid voucher code"
-                            discountApplied = false
+                        var discount = ""
+                        if (voucherCode.endsWith("YALLABUY10")) {
+                            discount = "10"
+                            discountMessage = "10% discount applied!"
+                            discountApplied = true
+                        } else if (voucherCode.endsWith("YALLABUY30")) {
+                            discount = "30"
+                            discountMessage = "30% discount applied!"
+                            discountApplied = true
+                        } else if (voucherCode.endsWith("YALLABUY50")) {
+                            discount = "50"
+                            discountMessage = "50% discount applied!"
+                            discountApplied = true
+                        } else {
+                                discountMessage = "Invalid voucher code"
+                                discountApplied = false
+                        }
+                        if(discountApplied){
+                            val newDraftOrder = draftOrder.apply { this.applied_discount = AppliedDiscount(value = discount) }
+                            draftOrder.id?.let { viewModel.updateDraftOrder(it,DraftOrderRequest(newDraftOrder))
+                                viewModel.getDraftOrders()}
                         }
                     },
                 modifier = Modifier
