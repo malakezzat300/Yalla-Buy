@@ -51,7 +51,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -59,13 +58,11 @@ import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.data.util.CurrencyConverter
-import com.malakezzat.yallabuy.model.Customer
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.LineItem
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.*
-import java.util.Properties
-import kotlin.math.log
+
 
 
 //@Composable
@@ -379,13 +376,13 @@ fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : Str
             Icon(
                 imageVector = Icons.Sharp.Favorite,
                 contentDescription = "Favorite",
-                tint = Color.Black
+                tint = Color.Red
             )
         }else{
             Icon(
                 imageVector = Icons.Default.FavoriteBorder,
                 contentDescription = "Favorite",
-                tint = Color.Black
+                tint = Color.Red
             )
         }
 

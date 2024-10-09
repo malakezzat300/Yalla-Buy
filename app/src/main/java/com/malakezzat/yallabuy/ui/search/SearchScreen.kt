@@ -64,6 +64,7 @@ fun SearchScreen(viewModel: SearchViewModel,
         modifier = Modifier
             .fillMaxWidth()
             .padding(18.dp)
+            .background(Color.White)
     ) {
         Spacer(modifier = Modifier.height(50.dp))
         // Search bar
@@ -86,38 +87,40 @@ fun SearchScreen(viewModel: SearchViewModel,
         Spacer(modifier = Modifier.height(16.dp))
 
         // Price slider
-        val price = sliderPosition.toInt()
-        CurrencyConverter.changeCurrency(price.toDouble())?.let {
-            Text(text = "Max Price: ${it} ",
-                style = MaterialTheme.typography.bodyMedium)
-        }
-        /*Text(text = "Max Price: ${sliderPosition.toInt()} ")*/
-        Slider(
-            value = sliderPosition,
-            onValueChange = { input ->
-                sliderPosition = input
-               // viewModel.onSearchQueryChanged(searchQuery, input)
-                            },
-            valueRange = 0f..200f,
-            modifier = Modifier.fillMaxWidth()
-            , onValueChangeFinished = {
-                viewModel.onSearchQueryChanged(searchQuery, sliderPosition)
-            },
-            colors = SliderDefaults.colors(
-                thumbColor = AppColors.MintGreen,
-                activeTrackColor = AppColors.MintGreen,
-                inactiveTrackColor = Color.Gray
-            )
-        )
 
         Spacer(modifier = Modifier.height(16.dp))
         // Recent Searches List
         if(searchQuery.isEmpty()){
 
         }else{
+            val price = sliderPosition.toInt()
+            CurrencyConverter.changeCurrency(price.toDouble())?.let {
+                Text(text = "Max Price: ${it} ",
+                    style = MaterialTheme.typography.bodyMedium)
+            }
+            /*Text(text = "Max Price: ${sliderPosition.toInt()} ")*/
+            Slider(
+                value = sliderPosition,
+                onValueChange = { input ->
+                    sliderPosition = input
+                    // viewModel.onSearchQueryChanged(searchQuery, input)
+                },
+                valueRange = 0f..200f,
+                modifier = Modifier.fillMaxWidth()
+                , onValueChangeFinished = {
+                    viewModel.onSearchQueryChanged(searchQuery, sliderPosition)
+                },
+                colors = SliderDefaults.colors(
+                    thumbColor = AppColors.MintGreen,
+                    activeTrackColor = AppColors.MintGreen,
+                    inactiveTrackColor = Color.Gray
+                )
+            )
+
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(8.dp)
+                contentPadding = PaddingValues(8.dp),
+                modifier = Modifier.background(Color.White)
             ) {
                 items(filteredProducts) { searchItem ->
                     RecentSearchItem(searchItem,navController)
