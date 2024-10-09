@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -55,6 +57,7 @@ import com.malakezzat.yallabuy.ui.shoppingcart.view.DeleteConfirmationDialog
 fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel/*,address: Address*/) {
     val addresses: List<String> = listOf()
     val context = LocalContext.current
+    var showAddressDialog by remember { mutableStateOf(false) }
     var selectedCurrency by remember { mutableStateOf(CurrencyPreferences.getInstance(context).getTargetCurrency()) }
     val exchangeRate by viewModel.conversionRate.collectAsState()
     val userAddressesState by viewModel.userAddresses.collectAsState()
@@ -101,7 +104,7 @@ fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel/*,a
     }
 
     val onAddNewAddress: () -> Unit = {
-        navController.navigate(Screen.AddressScreen.createRoute(""))
+        showAddressDialog = true
     }
     val onDeleteAddress: (String) -> Unit = {
         //TODO delete address from api
@@ -190,12 +193,46 @@ fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel/*,a
         }
         Spacer(modifier = Modifier.height(8.dp))
 
-        LazyColumn {
+        LazyColumn(
+            modifier = Modifier.fillMaxHeight(0.9f)
+        ) {
             items(userAddresses.size){
                 addressItem(navController,viewModel,userAddresses[it],userId)
             }
         }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = { navController.navigate(Screen.OrdersScreen.route) },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+            shape = RoundedCornerShape(10.dp)
+        ) {
+            Text(
+                text = "Orders history",
+                color = Color.White,
+                fontSize = 16.sp
+            )
+        }
 
+    }
+
+    if (showAddressDialog) {
+        AddressDialog(
+            showDialog = showAddressDialog,
+            onDismiss = {
+                showAddressDialog = false
+                        },
+            onWriteAddress = {
+                navController.navigate(Screen.AddressScreen.createRoute(""))
+                showAddressDialog = false
+            },
+            onGetFromMap = {
+                val latitude = 27.18039285293778
+                val longitude = 31.186714348461493
+                navController.navigate("mapScreen/$latitude/$longitude")
+                showAddressDialog = false
+            }
+        )
 
     }
 }
@@ -305,18 +342,46 @@ fun addressItem(navController: NavController,viewModel: SettingsViewModel,addres
         )
 
     }
-    Spacer(modifier = Modifier.height(360.dp))
-    Button(
-        onClick = { navController.navigate(Screen.OrdersScreen.route) },
-        modifier = Modifier.fillMaxWidth(),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-        shape = RoundedCornerShape(10.dp)
-    ) {
-        Text(
-            text = "Orders history",
-            color = Color.White,
-            fontSize = 16.sp
+
+
+}
+
+@Composable
+fun AddressDialog(
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    onWriteAddress: () -> Unit,
+    onGetFromMap: () -> Unit
+) {
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { onDismiss() },
+            title = {
+                Text(text = "Address From Map")
+            },
+            text = {
+                Text("Do you want to get address from Map?")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onGetFromMap()
+                        onDismiss()
+                    }
+                ) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        onWriteAddress()
+                        onDismiss()
+                    }
+                ) {
+                    Text("No")
+                }
+            }
         )
     }
-
 }
