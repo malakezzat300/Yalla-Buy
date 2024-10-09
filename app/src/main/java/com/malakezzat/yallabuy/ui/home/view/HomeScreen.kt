@@ -189,10 +189,10 @@ fun BrandsList(brands: List<SmartCollection>,navController: NavController) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Brands", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
+            Text("Brands", color = AppColors.Teal, style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
             Text(
                 "SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
-                color = AppColors.MintGreen
+                color = AppColors.RoseLight
             )
         }
         LazyRow(
@@ -261,7 +261,7 @@ fun CustomTopBar(navController: NavController) {
                 style = TextStyle(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
-                ),
+                ), color = AppColors.Teal,
                 modifier = Modifier.padding(start = 4.dp)
             )
         }
@@ -421,7 +421,7 @@ fun CategoriesSection(categories: List<CustomCollection>,navController: NavContr
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Categories", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
+            Text("Categories", color = AppColors.Teal, style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
         }
         LazyRow(
             modifier = Modifier.padding(top = 8.dp),
@@ -486,12 +486,14 @@ fun LatestProductsSection(products: List<Product>, navController: NavController)
         ) {
             Text(
                 "All Products",
-                style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(26.dp)
+                style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                color = AppColors.Teal
+                ,
+                modifier = Modifier.padding(8.dp)
             )
             Text(
                 "SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
-                color = AppColors.MintGreen
+                color = AppColors.RoseLight
             )
         }
 
@@ -627,7 +629,7 @@ fun BottomNavigationBar(navController: NavController) {
         BottomNavigationItem(
             icon = {
                 Image(
-                    painter = painterResource(id = R.drawable.home_2),
+                    painter = painterResource(id = if (currentRoute == Screen.HomeScreen.route) R.drawable.home_color else R.drawable.home_2),
                     contentDescription = "Home",
                     modifier = Modifier.size(24.dp)
                 )
@@ -646,7 +648,7 @@ fun BottomNavigationBar(navController: NavController) {
         BottomNavigationItem(
             icon = {
                 Image(
-                    painter = painterResource(id = R.drawable.category_2),
+                    painter = painterResource(id = if (currentRoute == Screen.CategoriesScreen.route) R.drawable.category_colr else R.drawable.category_2),
                     contentDescription = "Categories",
                     modifier = Modifier.size(24.dp)
                 )
@@ -665,7 +667,7 @@ fun BottomNavigationBar(navController: NavController) {
         BottomNavigationItem(
             icon = {
                 Image(
-                    painter = painterResource(id = R.drawable.shopping_cart),
+                    painter = painterResource(id = if (currentRoute == Screen.ShoppingScreen.route) R.drawable.shopping_cart_color else R.drawable.shopping_cart),
                     contentDescription = "My Cart",
                     modifier = Modifier.size(24.dp)
                 )
@@ -684,7 +686,7 @@ fun BottomNavigationBar(navController: NavController) {
         BottomNavigationItem(
             icon = {
                 Image(
-                    painter = painterResource(id = R.drawable.heart),
+                    painter = painterResource(id = if (currentRoute == Screen.WishlistScreen.route) R.drawable.heart_color else R.drawable.heart),
                     contentDescription = "Wishlist",
                     modifier = Modifier.size(24.dp)
                 )
