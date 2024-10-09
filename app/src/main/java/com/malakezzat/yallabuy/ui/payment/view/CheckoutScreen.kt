@@ -196,7 +196,7 @@ fun CheckoutScreen(viewModel: PaymentViewModel,navController: NavController) {
             onClick = {
                 draftOrder.id?.let {
                     viewModel.finalizeDraftOrder(it)
-                    //navController.navigate(Screen.OrderPlacedScreen.route)
+                    navController.navigate(Screen.OrderPlacedScreen.route)
                 }
             },
             modifier = Modifier

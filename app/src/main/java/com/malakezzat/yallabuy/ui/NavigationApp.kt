@@ -30,6 +30,7 @@ import com.malakezzat.yallabuy.ui.orders.viewmodel.OrdersViewModel
 import com.malakezzat.yallabuy.ui.orders.viewmodel.OrdersViewModelFactory
 import com.malakezzat.yallabuy.ui.payment.view.CheckoutScreen
 import com.malakezzat.yallabuy.ui.payment.view.ItemsScreen
+import com.malakezzat.yallabuy.ui.payment.view.OrderPlacedScreen
 import com.malakezzat.yallabuy.ui.payment.view.PaymentMethodScreen
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModelFactory
@@ -113,6 +114,9 @@ fun NavigationApp(
                 composable(Screen.OrdersScreen.route) {
                     val viewModel: OrdersViewModel = viewModel(factory = ordersViewModelFactory)
                     OrdersScreen(viewModel = viewModel, navController)
+                }
+                composable(Screen.OrderPlacedScreen.route) {
+                    OrderPlacedScreen(navController)
                 }
                 composable(Screen.ProfileScreen.route) {
                     val viewModel: ProfileScreenViewModel = viewModel(factory = profileScreenViewModelFactory)
