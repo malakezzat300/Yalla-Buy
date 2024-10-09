@@ -46,6 +46,7 @@ import com.malakezzat.yallabuy.ui.categories.viewmodel.CategoriesViewModel
 import com.malakezzat.yallabuy.ui.home.view.CategoriesSection
 import com.malakezzat.yallabuy.ui.home.view.CategoryItem
 import com.malakezzat.yallabuy.ui.home.view.ProductCard
+import com.malakezzat.yallabuy.ui.theme.AppColors
 
 val TAG = "CategoriesScreen"
 @Composable
@@ -145,7 +146,7 @@ fun CustomTopBarCategory(navController: NavController, title :String) {
                 style = TextStyle(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
-                ),
+                ), color = AppColors.Teal,
                 modifier = Modifier.padding(start = 4.dp)
             )
         }

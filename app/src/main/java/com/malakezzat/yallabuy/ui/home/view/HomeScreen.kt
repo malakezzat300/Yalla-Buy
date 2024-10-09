@@ -467,6 +467,7 @@ fun CategoryItem(category: CustomCollection,navController: NavController) {
             Text(
                 text = category.title,
                 style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
+                color = AppColors.MintGreen,
                 modifier = Modifier.padding(top = 10.dp, bottom = 10.dp)
             )
         }
@@ -705,7 +706,7 @@ fun BottomNavigationBar(navController: NavController) {
         BottomNavigationItem(
             icon = {
                 Image(
-                    painter = painterResource(id = R.drawable.profile),
+                    painter = painterResource(id = if (currentRoute == Screen.SettingsScreen.route) R.drawable.profile_color else R.drawable.profile),
                     contentDescription = "Profile",
                     modifier = Modifier.size(24.dp)
                 )
