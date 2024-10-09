@@ -13,8 +13,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.navigation.toRoute
-import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.ui.auth.view.LogInScreen
 import com.malakezzat.yallabuy.ui.auth.viewmodel.SignUpViewModel
 import com.malakezzat.yallabuy.ui.auth.viewmodel.SignUpViewModelFactory
@@ -45,7 +43,6 @@ import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollecti
 import com.malakezzat.yallabuy.ui.search.SearchScreen
 import com.malakezzat.yallabuy.ui.search.SearchViewModel
 import com.malakezzat.yallabuy.ui.search.SearchViewModelFactory
-import com.malakezzat.yallabuy.ui.settings.view.AddressInfoScreen
 import com.malakezzat.yallabuy.ui.settings.view.AddressScreen
 import com.malakezzat.yallabuy.ui.settings.view.MapScreen
 import com.malakezzat.yallabuy.ui.settings.view.SettingsScreen
@@ -179,7 +176,7 @@ fun NavigationApp(
                 composable( route = Screen.SettingsScreen.route
                 ) {
                     val viewModel: SettingsViewModel = viewModel(factory = settingsViewModelFactory)
-                    SettingsScreen(navController,viewModel,Address())
+                    SettingsScreen(navController,viewModel)
                 }
                 composable(
                     route = Screen.AddressScreen.route,
@@ -190,16 +187,6 @@ fun NavigationApp(
                     val address = backStackEntry.arguments?.getString("address") ?: " "
                     val viewModel: SettingsViewModel = viewModel(factory = settingsViewModelFactory)
                     AddressScreen(navController,viewModel,address)
-                }
-                composable(
-                    route = Screen.AddressInfoScreen.route,
-                    arguments = listOf(
-                        navArgument("address") { type = NavType.StringType }
-                    )
-                ) { backStackEntry ->
-                    val address = backStackEntry.arguments?.getString("address") ?: " "
-                    val viewModel: SettingsViewModel = viewModel(factory = settingsViewModelFactory)
-                    AddressInfoScreen(navController,viewModel,address)
                 }
                 composable(
                     route = Screen.MapScreen.route,

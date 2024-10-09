@@ -72,7 +72,7 @@ fun SignupScreen(viewModel: SignUpViewModel, navController: NavController) {
     var passwordVisibility by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
-
+    var isSuccess by remember { mutableStateOf(false) }
     // Firebase Auth and Google Sign-In setup
     val context = LocalContext.current
     val auth = FirebaseAuthun()
@@ -80,8 +80,10 @@ fun SignupScreen(viewModel: SignUpViewModel, navController: NavController) {
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        // Handle Google Sign-In result
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        auth.handleSignInResult(task, context, navController)
     }
+
 
     Column(
         modifier = Modifier
@@ -174,7 +176,56 @@ fun SignupScreen(viewModel: SignUpViewModel, navController: NavController) {
 
         // Create Account Button
         Button(
-            onClick = { /* Logic for account creation */ },
+            onClick = {
+//                viewModel.getCustomerById(7716613128374)
+//                when(customerData){
+//                    is ApiState.Error -> {
+//                        Log.i("TAG", "SignupScreen: customer by id failed")
+//                    }
+//                    ApiState.Loading -> {
+//
+//                    }
+//                    is ApiState.Success -> {
+//                        val brands = (customerData as ApiState.Success<CustomerSearchRespnse>).data
+//
+//                        Log.i("TAG", "SignupScreen: ${ brands.customers.get(0).id}")
+//                    }
+//                }
+                isLoading=true
+                if(email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || email.isEmpty()){
+                    Toast.makeText(context,"complete empty fields please",Toast.LENGTH_LONG).show()
+                    isLoading=false
+                    //showDialog=true
+                }else{
+                    if(password == confirmPassword){
+                        isLoading = true
+                        auth.signInWithEmailAndPassword(email,password,fullName, onSuccess = {
+                            showDialog = true
+                            isLoading = false
+                            /*create customer on API*/
+                            val customer = Customerr(
+                                first_name = fullName,
+                                last_name = "",
+                                email = email,
+                                phone = ""
+                            )
+
+                            val customerRequest = CustomerRequest(customer)
+                            viewModel.createCustomer(customerRequest)
+
+
+                        }, onError = {m->
+                            Toast.makeText(context,m,Toast.LENGTH_LONG).show()
+                            isLoading=false
+                        })
+
+                    }else{
+                        isLoading=false
+                        Toast.makeText(context,"password and confirm password are not the same",Toast.LENGTH_LONG).show()
+                        Log.i("TAG", "SignupScreen: password and confirm password are not the same")
+                    }
+                }
+            },
             shape = RoundedCornerShape(30.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Black,
@@ -206,7 +257,7 @@ fun SignupScreen(viewModel: SignUpViewModel, navController: NavController) {
         Spacer(modifier = Modifier.height(10.dp))
 
         // Google Icon
-        TextButton(
+        IconButton(
             onClick = {
                 val signInIntent = googleSignInClient.signInIntent
                 launcher.launch(signInIntent)

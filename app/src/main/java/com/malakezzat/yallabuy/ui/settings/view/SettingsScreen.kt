@@ -52,7 +52,7 @@ import com.malakezzat.yallabuy.ui.settings.viewmodel.SettingsViewModel
 import com.malakezzat.yallabuy.ui.shoppingcart.view.DeleteConfirmationDialog
 
 @Composable
-fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel,address: Address) {
+fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel/*,address: Address*/) {
     val addresses: List<String> = listOf()
     val context = LocalContext.current
     var selectedCurrency by remember { mutableStateOf(CurrencyPreferences.getInstance(context).getTargetCurrency()) }
