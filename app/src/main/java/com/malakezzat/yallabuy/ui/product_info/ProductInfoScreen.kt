@@ -276,13 +276,13 @@ fun ProductInfoScreen(
                         .align(Alignment.TopEnd),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-//                    IconButton(onClick = { navController.popBackStack() }) {
-//                        Icon(
-//                            imageVector = Icons.Default.ArrowBack,
-//                            contentDescription = "Back",
-//                            tint = Color.Black
-//                        )
-//                    }
+                    IconButton(onClick ={} ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "W",
+                            tint = Color.White
+                        )
+                    }
                     AddToFavorites(viewModel, product, FirebaseAuth.getInstance().currentUser?.email.toString(), wishListDraftOrder)
                 }
 
@@ -296,7 +296,9 @@ fun ProductInfoScreen(
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)),
+                                .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
+                                .border(1.dp, shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp), color = AppColors.Teal)
+                            ,
                             shadowElevation = 3.dp,
                             color = Color.White
                         ) {
@@ -310,7 +312,7 @@ fun ProductInfoScreen(
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 20.sp
                                 )
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(10.dp))
                                 // Product Price
                                 val price = product.variants.get(0).price
                                 CurrencyConverter.changeCurrency(price.toDouble())?.let {
@@ -319,7 +321,7 @@ fun ProductInfoScreen(
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                 }
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(10.dp))
 
 
                                 val colors = product.options.get(1).values // Example list of color names
@@ -398,14 +400,15 @@ fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : Str
             Icon(
                 imageVector = Icons.Sharp.Favorite,
                 contentDescription = "Favorite",
-                tint = Color.Red,
-                modifier = Modifier.size(30.dp)
+                tint = AppColors.Teal,
+                modifier = Modifier.size(35.dp)
             )
         }else{
             Icon(
                 imageVector = Icons.Default.FavoriteBorder,
                 contentDescription = "Favorite",
-                tint = Color.Red
+                tint = AppColors.Teal,
+                modifier = Modifier.size(35.dp)
             )
         }
 
@@ -527,6 +530,7 @@ fun SizeCirclesRow(Itemsizes: List<String>) {
     ) {
         items(Itemsizes.size) { index ->
            // Log.i("color", "ColorCirclesRow: ${colorNames[index]}")
+            if(Itemsizes[index] != "size"){
             Box(
                 modifier = Modifier
                     .size(50.dp)  // Set the size for each circle
@@ -535,7 +539,7 @@ fun SizeCirclesRow(Itemsizes: List<String>) {
                     .border(0.5.dp, shape = CircleShape, color = Color.Black)// Make the background a circle
                     .clickable {  }
             ){
-                if(Itemsizes[index] != "size"){
+
                     Text(text = Itemsizes[index], textAlign = TextAlign.Center, fontSize = 14.sp,
                         modifier = Modifier.align(Alignment.Center) )
                 }
