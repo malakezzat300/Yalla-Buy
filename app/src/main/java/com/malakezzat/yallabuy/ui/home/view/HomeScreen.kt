@@ -706,17 +706,17 @@ fun BottomNavigationBar(navController: NavController) {
         BottomNavigationItem(
             icon = {
                 Image(
-                    painter = painterResource(id = if (currentRoute == Screen.SettingsScreen.route) R.drawable.profile_color else R.drawable.profile),
+                    painter = painterResource(id = if (currentRoute == Screen.ProfileScreen.route) R.drawable.profile_color else R.drawable.profile),
                     contentDescription = "Profile",
                     modifier = Modifier.size(24.dp)
                 )
             },
             label = { Text("Profile", style = TextStyle(fontSize = 12.sp)) },
-            selected =  currentRoute == Screen.SettingsScreen.route,
+            selected =  currentRoute == Screen.ProfileScreen.route,
             onClick = {
                 if (currentRoute != Screen.SettingsScreen.route) {
-                    navController.popBackStack(Screen.SettingsScreen.route, inclusive = false)
-                    navController.navigate(Screen.SettingsScreen.route) {
+                    navController.popBackStack(Screen.ProfileScreen.route, inclusive = false)
+                    navController.navigate(Screen.ProfileScreen.route) {
                         launchSingleTop = true
                     }
                 }
