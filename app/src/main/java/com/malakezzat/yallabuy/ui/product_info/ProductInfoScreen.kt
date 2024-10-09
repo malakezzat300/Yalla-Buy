@@ -199,7 +199,7 @@ fun ProductInfoScreen(
     navController: NavController,
     productId: Long
 ) {
-    // Collecting state variables
+
     val productState by viewModel.searchProductsList.collectAsState()
     val draftOrderId by viewModel.draftOrderId.collectAsState()
     val shoppingCartDraftOrderState by viewModel.shoppingCartDraftOrder.collectAsState()
@@ -209,7 +209,8 @@ fun ProductInfoScreen(
     var shoppingCartDraftOrder by remember { mutableStateOf(DraftOrder(0L, "", listOf(), "")) }
     var wishListDraftOrder by remember { mutableStateOf(DraftOrder(0L, "", listOf(), "")) }
 
-    // Handle draft orders and product states
+
+
     when (draftOrderId) {
         is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(draftOrderId as ApiState.Error).message}")
         ApiState.Loading -> {}
@@ -238,7 +239,7 @@ fun ProductInfoScreen(
     Box(modifier = Modifier.fillMaxSize()
          .padding(paddingValues)
     ) {
-        // Loading and Error State Handling
+
         when (productState) {
             is ApiState.Loading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -247,13 +248,14 @@ fun ProductInfoScreen(
             }
             is ApiState.Success -> {
                 val product = (productState as ApiState.Success<Product>).data
+                //images
                 LazyRow(
                     modifier = Modifier.fillMaxWidth()
                     ,
-                    //horizontalArrangement = Arrangement.spacedBy(8.dp) // Space between items
+
                 ) {
                     items(product.images) { product ->
-                       // Box (){
+
                             Image(
                                 painter = rememberAsyncImagePainter(product.src),
                                 contentDescription = null,
@@ -263,12 +265,12 @@ fun ProductInfoScreen(
                                     .height(200.dp)
                                     .align(Alignment.Center)
                             )
-                        //}
+
 
                     }
                 }
 
-                // Heart and Back Arrow Icons
+                // Heart and Back
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -299,7 +301,7 @@ fun ProductInfoScreen(
                                 .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
                                 .border(1.dp, shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp), color = AppColors.Teal)
                             ,
-                            shadowElevation = 3.dp,
+                            shadowElevation = 10.dp,
                             color = Color.White
                         ) {
                             Column(
@@ -318,13 +320,15 @@ fun ProductInfoScreen(
                                 CurrencyConverter.changeCurrency(price.toDouble())?.let {
                                     Text(
                                         text = it,
-                                        style = MaterialTheme.typography.bodyMedium
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = AppColors.Teal
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(10.dp))
 
 
-                                val colors = product.options.get(1).values // Example list of color names
+                                val colors = product.options.get(1).values
                                 ColorCirclesRow(colorNames = colors)
                                 // Product Description
                                 val sizes = product.options.get(0).values
@@ -481,23 +485,38 @@ fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,o
 
 @Composable
 fun ColorCirclesRow(colorNames: List<String>) {
+    var colorSelection by remember { mutableStateOf(0) }
     Text(text = "Available Colors:")
     LazyRow(
         modifier = Modifier
             .padding(16.dp)
-            .height(60.dp) // Adjust the height if needed
+            .height(60.dp)
     ) {
         items(colorNames.size) { index ->
             val color = getColorFromName(colorNames[index])
-            Log.i("color", "ColorCirclesRow: ${colorNames[index]}")
-            Box(
-                modifier = Modifier
-                    .size(40.dp)  // Set the size for each circle
-                    .padding(4.dp)
-                    .background(color = color, shape = CircleShape)
-                    .border(0.5.dp, shape = CircleShape, color = Color.Black)// Make the background a circle
-                    .clickable {  }
-            )
+            if(index == colorSelection){
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(4.dp)
+                        .background(color = color, shape = CircleShape)
+                        .border(0.5.dp, shape = CircleShape, color = Color.Black)
+                        .clickable { colorSelection=index }
+                )
+            }
+            else{
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(4.dp)
+                        .background(color = color, shape = CircleShape)
+                        .border(0.5.dp, shape = CircleShape, color = Color.Gray)
+                        .clickable { colorSelection=index }
+                )
+            }
+
+//            Log.i("color", "ColorCirclesRow: ${colorNames[index]}")
+
         }
     }
 }
@@ -516,33 +535,49 @@ fun getColorFromName(colorName: String): Color {
         "light_brown" -> Color(0xFFD2B48C)
         "burgandy" -> Color(0xFF800020)
         "green" -> Color.Green
-        else -> Color.LightGray // Default color if the name is not recognized
+        else -> Color.LightGray
     }
 }
 
 @Composable
 fun SizeCirclesRow(Itemsizes: List<String>) {
+    var sizeSelection by remember { mutableStateOf(0) }
    Text(text = "Available Sizes:")
     LazyRow(
         modifier = Modifier
             .padding(8.dp)
-            .height(60.dp) // Adjust the height if needed
+            .height(60.dp)
     ) {
         items(Itemsizes.size) { index ->
-           // Log.i("color", "ColorCirclesRow: ${colorNames[index]}")
             if(Itemsizes[index] != "size"){
-            Box(
-                modifier = Modifier
-                    .size(50.dp)  // Set the size for each circle
-                    .padding(4.dp)
-                    .background(color = Color.White, shape = RectangleShape)
-                    .border(0.5.dp, shape = CircleShape, color = Color.Black)// Make the background a circle
-                    .clickable {  }
-            ){
+                if(index == sizeSelection){
+                    Box(
+                        modifier = Modifier
+                            .size(50.dp)
+                            .padding(4.dp)
+                            .background(color = Color.White, shape = RectangleShape)
+                            .border(0.5.dp, shape = CircleShape, color = Color.Black)
+                            .clickable { sizeSelection=index }
+                    ){
 
-                    Text(text = Itemsizes[index], textAlign = TextAlign.Center, fontSize = 14.sp,
-                        modifier = Modifier.align(Alignment.Center) )
+                        Text(text = Itemsizes[index], textAlign = TextAlign.Center, fontSize = 14.sp,
+                            modifier = Modifier.align(Alignment.Center) )
+                    }
+                }else{
+                    Box(
+                        modifier = Modifier
+                            .size(50.dp)
+                            .padding(4.dp)
+                            .background(color = Color.White, shape = RectangleShape)
+                            .border(0.5.dp, shape = CircleShape, color = Color.Gray)
+                            .clickable { sizeSelection=index }
+                    ){
+
+                        Text(text = Itemsizes[index], textAlign = TextAlign.Center, fontSize = 14.sp,
+                            modifier = Modifier.align(Alignment.Center) )
+                    }
                 }
+
             }
         }
     }
