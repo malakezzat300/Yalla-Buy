@@ -97,7 +97,7 @@ fun SearchScreen(viewModel: SearchViewModel,
                         contentDescription = "Search Icon",
                         modifier = Modifier.size(16.dp)
                     ) },
-                    shape = RoundedCornerShape(10.dp),
+                    shape = RoundedCornerShape(20.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(color = Color.White)
