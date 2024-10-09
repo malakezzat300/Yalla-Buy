@@ -231,7 +231,7 @@ fun ProductInfoScreen(
         viewModel.getProductById(productId)
     }
     Scaffold(
-        topBar = { CustomTopBar(navController,"",Color.White) },
+        topBar = { CustomTopBar(navController,"Product Details",AppColors.Teal) },
         containerColor = Color.White,
         content = { paddingValues ->
     // Main UI layout
@@ -273,16 +273,16 @@ fun ProductInfoScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
-                        .align(Alignment.TopStart),
+                        .align(Alignment.TopEnd),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.Black
-                        )
-                    }
+//                    IconButton(onClick = { navController.popBackStack() }) {
+//                        Icon(
+//                            imageVector = Icons.Default.ArrowBack,
+//                            contentDescription = "Back",
+//                            tint = Color.Black
+//                        )
+//                    }
                     AddToFavorites(viewModel, product, FirebaseAuth.getInstance().currentUser?.email.toString(), wishListDraftOrder)
                 }
 
@@ -398,7 +398,8 @@ fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : Str
             Icon(
                 imageVector = Icons.Sharp.Favorite,
                 contentDescription = "Favorite",
-                tint = Color.Red
+                tint = Color.Red,
+                modifier = Modifier.size(30.dp)
             )
         }else{
             Icon(
@@ -521,14 +522,14 @@ fun SizeCirclesRow(Itemsizes: List<String>) {
    Text(text = "Available Sizes:")
     LazyRow(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(8.dp)
             .height(60.dp) // Adjust the height if needed
     ) {
         items(Itemsizes.size) { index ->
            // Log.i("color", "ColorCirclesRow: ${colorNames[index]}")
             Box(
                 modifier = Modifier
-                    .size(60.dp)  // Set the size for each circle
+                    .size(50.dp)  // Set the size for each circle
                     .padding(4.dp)
                     .background(color = Color.White, shape = RectangleShape)
                     .border(0.5.dp, shape = CircleShape, color = Color.Black)// Make the background a circle
