@@ -16,4 +16,8 @@ object CurrencyConverter {
             CurrencyPreferences.getInstance(appContext!!).calculateTargetAmount(amount, it)
         }
     }
+
+    fun getCurrency(): String? {
+        return CurrencyPreferences.getInstance(appContext!!).getTargetCurrency()
+    }
 }

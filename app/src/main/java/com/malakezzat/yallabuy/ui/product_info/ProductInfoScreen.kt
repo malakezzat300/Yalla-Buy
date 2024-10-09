@@ -403,7 +403,7 @@ fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,o
                         product.variants[0].id,
                         1,
                         properties = properties,
-                        product.id ?: 0
+                        product.id ?: 0,
                     )
                 )
                 val draftOrder =
@@ -418,7 +418,7 @@ fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,o
                             product.variants[0].id,
                             1,
                             properties = properties,
-                            product.id ?: 0
+                            product.id ?: 0,
                         )
                     )
                 ) {
@@ -429,7 +429,7 @@ fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,o
                             product.variants[0].id,
                             1,
                             properties = properties,
-                            product.id ?: 0
+                            product.id ?: 0,
                         )
                     )
                     val draftOrder =
