@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
-class OrdersViewModel (private val repository: ProductsRepository): ViewModel() {
+class OrdersViewModel (val repository: ProductsRepository): ViewModel() {
     private val TAG = "OrdersViewModel"
     private val _customerDataByEmail = MutableStateFlow<ApiState<CustomerSearchRespnse>>(ApiState.Loading)
     val customerDataByEmail = _customerDataByEmail.asStateFlow()
@@ -59,7 +59,7 @@ class OrdersViewModel (private val repository: ProductsRepository): ViewModel() 
     fun getAllOrdersForCustomerByID(id :Long){
         viewModelScope.launch {
             //add a temporary permanent email
-            repository.getAllOrdersForCustomerByID(repository.getUserId())
+            repository.getAllOrdersForCustomerByID(7713903837366)
                 .onStart {
                     _customerOrders.value = ApiState.Loading
                 }.catch { e->
@@ -68,7 +68,7 @@ class OrdersViewModel (private val repository: ProductsRepository): ViewModel() 
                     Log.i(TAG, "getAllOrdersForCustomerByID: error ${e.message}")
                 }.collect{customerOrders->
                     _customerOrders.value = ApiState.Success(customerOrders)
-                    //Log.i(TAG, "getAllOrdersForCustomerByID: ${customerOrders.get(0).note}")
+                    Log.i(TAG, "getAllOrdersForCustomerByID: ${customerOrders.get(0).line_items}")
                     Log.i(TAG, "getAllOrdersForCustomerByID: ${repository.getUserId()},,,,,,${repository.getUserEmail()}")
 
                 }

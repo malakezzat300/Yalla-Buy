@@ -31,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 
 import androidx.compose.ui.unit.dp
@@ -39,6 +40,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import com.malakezzat.yallabuy.data.remote.ApiState
+import com.malakezzat.yallabuy.data.util.CurrencyConverter
 import com.malakezzat.yallabuy.model.Customer
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.LineItem
@@ -147,6 +149,9 @@ fun ProductInfoScreen (viewModel: ProductInfoViewModel, navController: NavContro
 
 @Composable
 fun ProductInfoSection(product: Product) {
+    //Currency
+    val context = LocalContext.current
+    CurrencyConverter.initialize(context)
 
     Column {
         // Image Carousel (Placeholder for actual image carousel)
@@ -168,7 +173,11 @@ fun ProductInfoSection(product: Product) {
 //        if (product.sizes.isNotEmpty()) {
 //            Text(text = "Available Sizes: ${product.sizes.joinToString()}")
 //        }
-        Text(text = "Price: ${product.variants.get(0).price} EGP")
+        val price = product.variants.get(0).price
+        CurrencyConverter.changeCurrency(price.toDouble())?.let {
+            Text(text = it,
+                style = MaterialTheme.typography.bodyMedium)
+        }
         Text(text = "Rating:  ⭐")
     }
 }

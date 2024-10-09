@@ -133,6 +133,13 @@ fun CustomTopBarCategory(navController: NavController, title :String) {
                 contentDescription = "Logo",
                 modifier = Modifier.size(30.dp)
             )*/
+            IconButton(onClick = { navController.navigate(Screen.HomeScreen.route) }) {
+                Image(
+                    painter = painterResource(id = R.drawable.back_arrow),
+                    contentDescription = "Search Icon",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
             Text(
                 text = title,
                 style = TextStyle(
@@ -141,15 +148,6 @@ fun CustomTopBarCategory(navController: NavController, title :String) {
                 ),
                 modifier = Modifier.padding(start = 4.dp)
             )
-        }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { navController.navigate(Screen.HomeScreen.route) }) {
-                Image(
-                    painter = painterResource(id = R.drawable.back_arrow),
-                    contentDescription = "Search Icon",
-                    modifier = Modifier.size(24.dp)
-                )
-            }
         }
     }
 }

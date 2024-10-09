@@ -30,6 +30,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -46,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -57,9 +59,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remote.ApiState
+import com.malakezzat.yallabuy.data.util.CurrencyConverter
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.LineItem
@@ -92,10 +96,12 @@ fun WishlistScreen(viewModel: WishlistViewModel, navController: NavController) {
     when(wishlistItems){
         is ApiState.Error ->{
             isLoading = false
+
            // Log.i("shoppingCartTest", "ShoppingCartScreen: draftOrder ${(shoppingCartOrder as ApiState.Error).message}")
         }
         ApiState.Loading -> {
             isLoading = true
+            CircularProgressIndicator()
         }
         is ApiState.Success -> {
             isLoading = false
@@ -116,8 +122,12 @@ fun WishlistScreen(viewModel: WishlistViewModel, navController: NavController) {
             TopAppBar(
                 title = { Text(text = "Wishlist") },
                 navigationIcon = {
-                    IconButton(onClick = {  }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    IconButton(onClick = { navController.navigate(Screen.HomeScreen.route) }) {
+                        Image(
+                            painter = painterResource(id = R.drawable.back_arrow),
+                            contentDescription = "Search Icon",
+                            modifier = Modifier.size(24.dp)
+                        )
                     }
                 },
                 backgroundColor = Color.White,
@@ -134,7 +144,9 @@ fun WishlistScreen(viewModel: WishlistViewModel, navController: NavController) {
             }
         }
     }else{
-        EmptyWishlistScreen(navController)
+        if(!isLoading){
+            EmptyWishlistScreen(navController)
+        }
     }
 
 }
@@ -145,11 +157,14 @@ fun WishlistItem(viewModel: WishlistViewModel,
                  draftOrder: DraftOrder,
                  navController: NavController
                  ) {
+    val context = LocalContext.current
+    CurrencyConverter.initialize(context)
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(120.dp) // Adjust height as needed
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable { navController.navigate("${Screen.ProductInfScreen.route}/${item.variant_id}") },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -185,11 +200,16 @@ fun WishlistItem(viewModel: WishlistViewModel,
                     overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
+                val price = item.price
+                CurrencyConverter.changeCurrency(price.toDouble())?.let {
+                    Text(text = it,
+                        style = MaterialTheme.typography.bodyMedium)
+                }
+                /*Text(
                     text = item.price,
                     color = Color.Black,
                     fontSize = 14.sp
-                )
+                )*/
 
             }
             var showDialog by remember { mutableStateOf(false) }
@@ -213,10 +233,14 @@ fun WishlistItem(viewModel: WishlistViewModel,
                             }
                         } else {
                             draftOrder.id?.let { viewModel.deleteDraftOrder(it) }
+                            navController.popBackStack(Screen.WishlistScreen.route, inclusive = true)
+                             navController.navigate(Screen.WishlistScreen.route)
+
 
                         }
-                        //onItemUpdated()
+
                     }
+
                 )
             }
         }
@@ -262,7 +286,7 @@ fun EmptyWishlistScreen(navController: NavController) {
             onClick = { navController.navigate(Screen.CategoriesScreen.route) },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-            shape = RoundedCornerShape(16.dp)
+            shape = RoundedCornerShape(20.dp)
         ) {
             Text(text = "Explore Categories", color = Color.White)
         }
