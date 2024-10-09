@@ -218,6 +218,7 @@ fun ProductInfoScreen(
         is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(draftOrderId as ApiState.Error).message}")
         ApiState.Loading -> {}
         is ApiState.Success -> draftOrderIdSaved = (draftOrderId as ApiState.Success).data.draft_order.id ?: 0L
+        else -> {}
     }
     when (shoppingCartDraftOrderState) {
         is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(shoppingCartDraftOrderState as ApiState.Error).message}")
