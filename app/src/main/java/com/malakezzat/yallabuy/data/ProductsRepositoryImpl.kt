@@ -100,7 +100,7 @@ class ProductsRepositoryImpl private constructor(
     }
 
     override suspend fun finalizeDraftOrder(draftOrderId: Long): Flow<DraftOrderResponse> {
-        return finalizeDraftOrder(draftOrderId)
+        return productsRemoteDataSource.finalizeDraftOrder(draftOrderId)
     }
 
     override suspend fun getProductById(productId: Long): Flow<ProductResponse> {
