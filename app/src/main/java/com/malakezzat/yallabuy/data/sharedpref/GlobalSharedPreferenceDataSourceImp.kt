@@ -22,3 +22,9 @@ class GlobalSharedPreferenceDataSourceImp(private val sharedPreferences: SharedP
     }
 
 }
+//userId
+//context.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE).getLong("USER_ID",0L)
+
+//email
+//context.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE).getString("USER_EMAIL","empty")?:"empty"
+

@@ -8,7 +8,6 @@ import androidx.activity.enableEdgeToEdge
 import com.example.yallabuyadmin.coupons.model.CouponsRemoteDataSource
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.FirebaseApp
-import com.malakezzat.paymenttest2.PaymentRemoteDataSourceImpl
 import com.malakezzat.yallabuy.data.ProductsRepositoryImpl
 import com.malakezzat.yallabuy.data.remot.ProductService
 import com.malakezzat.yallabuy.data.remote.ProductsRemoteDataSourceImpl
@@ -40,9 +39,6 @@ class MainActivity : ComponentActivity() {
             CouponsRemoteDataSource(RetrofitHelper.getInstance().create(ProductService::class.java))
         )
     }
-    private val paymentRemoteDataSource by lazy {
-        PaymentRemoteDataSourceImpl()
-    }
     private val homeScreenViewModelFactory by lazy {
         HomeScreenViewModelFactory(repo)
     }
@@ -65,7 +61,7 @@ class MainActivity : ComponentActivity() {
         LogInViewModelFactory(repo)
     }
     private val paymentViewModelFactory by lazy {
-        PaymentViewModelFactory(paymentRemoteDataSource)
+        PaymentViewModelFactory(repo)
     }
     private val searchViewModelFactory by lazy {
         SearchViewModelFactory(repo)
