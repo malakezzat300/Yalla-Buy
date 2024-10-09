@@ -28,7 +28,7 @@ import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModelFactory
 import com.malakezzat.yallabuy.ui.orders.view.OrdersScreen
 import com.malakezzat.yallabuy.ui.orders.viewmodel.OrdersViewModel
 import com.malakezzat.yallabuy.ui.orders.viewmodel.OrdersViewModelFactory
-import com.malakezzat.yallabuy.ui.payment.view.CheckoutView
+import com.malakezzat.yallabuy.ui.payment.view.CheckoutScreen
 import com.malakezzat.yallabuy.ui.payment.view.OrderScreen
 import com.malakezzat.yallabuy.ui.payment.view.PaymentMethodScreen
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
@@ -142,14 +142,11 @@ fun NavigationApp(
                     val viewModel: LogInViewModel = viewModel(factory = logInViewModelFactory)
                     LogInScreen(viewModel, navController)
                 }
-
                 composable(
                     route = Screen.CheckoutScreen.route,
-                    arguments = listOf(navArgument("orderId") { type = NavType.StringType })
-                ) { backStackEntry ->
-                    val orderId = backStackEntry.arguments?.getString("orderId") ?: return@composable
+                ) {
                     val viewModel: PaymentViewModel = viewModel(factory = paymentViewModelFactory)
-                    CheckoutView(viewModel, navController, orderId)
+                    CheckoutScreen(viewModel, navController)
                 }
                 composable(
                     route = Screen.PaymentMethodScreen.route

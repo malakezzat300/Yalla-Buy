@@ -94,7 +94,6 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
         ApiState.Loading -> {}
         is ApiState.Success -> {
             userAddresses = (userAddressesState as ApiState.Success).data.addresses
-            //Log.i("paymentTest", "PaymentMethodScreen: $userAddresses")
             getDefaultAddress(userAddresses).let {
                 if (it != null) {
                     defaultAddress = it
@@ -104,21 +103,9 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
                 }
             }
             addressesList = getAddressesList(userAddresses)
-            //Log.i("paymentTest", "PaymentMethodScreen: ${addressesList.toString()}")
         }
     }
 
-//    when(defaultAddressState){
-//        is ApiState.Error -> Log.i("paymentTest", "PaymentMethodScreen: defaultAddressState ${(defaultAddressState as ApiState.Error).message}")
-//        ApiState.Loading -> {}
-//        is ApiState.Success -> {
-//            //defaultAddress = (defaultAddressState as ApiState.Success).data.customer_address
-////            Log.i("paymentTest", "PaymentMethodScreen: $userAddresses")
-////            LaunchedEffect(Unit) {
-////                address = defaultAddress.address1.toString()
-////            }
-//        }
-//    }
     Scaffold(
         topBar = { CustomTopBar(navController) },
         containerColor = Color.White,
@@ -323,7 +310,7 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
                             if (cardHolderName.isNotBlank() && cardNumber.isNotBlank()
                                 && expiration.text.isNotBlank() && cvv.isNotBlank()
                             ) {
-                                //TODO go to payment
+                                navController.navigate(Screen.CheckoutScreen.route)
                             } else {
                                 Toast.makeText(
                                     context,
@@ -332,7 +319,7 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
                                 ).show()
                             }
                         } else {
-                            //TODO go to payment
+                            navController.navigate(Screen.CheckoutScreen.route)
                         }
                     },
                     modifier = Modifier
