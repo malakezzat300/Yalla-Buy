@@ -237,6 +237,7 @@ fun addressItem(navController: NavController,viewModel: SettingsViewModel,addres
 
             Box(
                 modifier = Modifier.fillMaxWidth()
+
             ) {
                 Text(
                     text = "${address.address1}",
@@ -245,6 +246,9 @@ fun addressItem(navController: NavController,viewModel: SettingsViewModel,addres
                 )
 
             }
+//            if(address.default) {
+
+//            }
             Spacer(modifier = Modifier.height(8.dp))
 
             Box(
@@ -252,25 +256,38 @@ fun addressItem(navController: NavController,viewModel: SettingsViewModel,addres
             ) {
 
                 Row(
-                    modifier = Modifier.align(Alignment.CenterEnd)
+                    modifier = Modifier.align(Alignment.CenterEnd),
+                    horizontalArrangement = Arrangement.SpaceBetween
+
                 ) {
-                    IconButton(onClick = {
-                        // Handle Edit click
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit"
+                    Row {
+                        Text(
+                            text = "Actions:",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(end = 8.dp)
+                                .align(Alignment.Bottom)
                         )
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    IconButton(onClick = {
-                        showDialog = true
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete"
-                        )
+                    Row {
+                        IconButton(onClick = {
+                            // Handle Edit click
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Edit"
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        IconButton(onClick = {
+                            showDialog = true
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete"
+                            )
+                        }
                     }
+
                 }
             }
         }

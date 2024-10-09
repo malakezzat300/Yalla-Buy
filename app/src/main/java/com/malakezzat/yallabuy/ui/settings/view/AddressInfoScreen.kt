@@ -81,6 +81,7 @@ fun AddressInfoScreen(navController: NavHostController,viewModel: SettingsViewMo
     var address by remember { mutableStateOf(Address()) }
     val userId by viewModel.userId.collectAsState()
     val deleteAddressState by viewModel.deleteAddressEvent.collectAsState("")
+    val defaultAddressState by viewModel.defaultAddressEvent.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val sharedPreferences = LocalContext.current.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
@@ -93,6 +94,18 @@ fun AddressInfoScreen(navController: NavHostController,viewModel: SettingsViewMo
     LaunchedEffect(userId){
 
         viewModel.userId.value?.let { viewModel.getAddressDetails(it,addressId.toLong()) }
+    }
+
+    LaunchedEffect(defaultAddressState) {
+       when(defaultAddressState){
+           is ApiState.Error -> {}
+           ApiState.Loading -> {}
+           is ApiState.Success -> {
+               address = (defaultAddressState as ApiState.Success).data.customer_address
+               Toast.makeText(context, "The Address has been set default", Toast.LENGTH_SHORT)
+                   .show()
+           }
+       }
     }
 
     LaunchedEffect(Unit) {
@@ -108,12 +121,10 @@ fun AddressInfoScreen(navController: NavHostController,viewModel: SettingsViewMo
     val messageState = viewModel.defaultAddressEvent.collectAsState(initial = "")
 
     LaunchedEffect(Unit) {
-        viewModel.defaultAddressEvent.collect { message ->
-            if(message.contains("422")){
-                Toast.makeText(context, "Cannot Delete The Default Address", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-            }
+        when(addressState){
+            is ApiState.Error -> Log.i("addressTest", "AddressInfoScreen: ${(addressState as ApiState.Error).message}")
+            ApiState.Loading -> {}
+            is ApiState.Success -> address = (addressState as ApiState.Success).data?.customer_address ?: Address()
         }
     }
 
