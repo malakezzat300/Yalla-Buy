@@ -1,108 +1,176 @@
 package com.malakezzat.yallabuy.ui.payment.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.malakezzat.paymenttest2.PaymentRemoteDataSource
-import com.malakezzat.paymenttest2.model.CardPaymentRequest
-import com.malakezzat.paymenttest2.model.OrderRequest
-import com.malakezzat.paymenttest2.model.OrderResponse
-import com.malakezzat.paymenttest2.model.PaymentKeyRequest
-import com.malakezzat.paymenttest2.model.PaymentKeyResponse
-import com.malakezzat.paymenttest2.model.PaymentResponse
-import com.malakezzat.paymenttest2.model.PaymentStatusResponse
-import com.malakezzat.paymenttest2.model.RefundRequest
+import com.google.firebase.auth.FirebaseAuth
+import com.malakezzat.yallabuy.data.ProductsRepository
+import com.malakezzat.yallabuy.data.remote.ApiState
+import com.malakezzat.yallabuy.model.AddressRequest
+import com.malakezzat.yallabuy.model.AddressResponse
+import com.malakezzat.yallabuy.model.CustomerAddress
+import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.DraftOrderResponse
+import com.malakezzat.yallabuy.model.DraftOrdersResponse
+import com.malakezzat.yallabuy.model.VariantResponse
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
-class PaymentViewModel(private val paymentRemoteDataSource: PaymentRemoteDataSource) : ViewModel() {
+class PaymentViewModel(private val repository: ProductsRepository) : ViewModel() {
 
-    private val _authToken = MutableStateFlow<String?>(null)
-    val authToken: StateFlow<String?> get() = _authToken
+    private val TAG = "PaymentViewModel"
 
-    private val _orderResponse = MutableStateFlow<OrderResponse?>(null)
-    val orderResponse: StateFlow<OrderResponse?> get() = _orderResponse
+    private val _draftOrders = MutableStateFlow<ApiState<DraftOrdersResponse>>(ApiState.Loading)
+    val draftOrders : StateFlow<ApiState<DraftOrdersResponse>> get() = _draftOrders
 
-    private val _errorMessage = MutableStateFlow<String?>(null)
-    val errorMessage: StateFlow<String?> get() = _errorMessage
+    private val _singleDraftOrders = MutableStateFlow<ApiState<DraftOrderResponse>>(ApiState.Loading)
+    val singleDraftOrders : StateFlow<ApiState<DraftOrderResponse>> get() = _singleDraftOrders
 
-    private val _paymentKey = MutableStateFlow<String?>(null)
-    val paymentKey: StateFlow<String?> = _paymentKey
+    private val _shoppingCartDraftOrder = MutableStateFlow<ApiState<DraftOrder>>(ApiState.Loading)
+    val shoppingCartDraftOrder = _shoppingCartDraftOrder.asStateFlow()
 
-    private val _paymentStatus = MutableStateFlow<PaymentStatusResponse?>(null)
-    val paymentStatus: StateFlow<PaymentStatusResponse?> = _paymentStatus
+    private val _variantId = MutableStateFlow<ApiState<VariantResponse>>(ApiState.Loading)
+    val variantId = _variantId.asStateFlow()
 
-    private val _payment = MutableStateFlow<PaymentResponse?>(null)
-    val payment: StateFlow<PaymentResponse?> = _payment
+    private val _userAddresses = MutableStateFlow<ApiState<AddressResponse>>(ApiState.Loading)
+    val userAddresses = _userAddresses.asStateFlow()
 
-    fun fetchToken() {
+    private val _addressDetails = MutableStateFlow<ApiState<CustomerAddress?>>(ApiState.Loading)
+    val addressDetails= _addressDetails.asStateFlow()
+
+    private val _customerAddress = MutableStateFlow<ApiState<CustomerAddress?>>(ApiState.Loading)
+    val customerAddress= _customerAddress.asStateFlow()
+
+    private val _deleteAddressEvent = MutableSharedFlow<String>()
+    val deleteAddressEvent: SharedFlow<String> = _deleteAddressEvent.asSharedFlow()
+
+    private val _defaultAddressEvent = MutableStateFlow<ApiState<CustomerAddress>>(ApiState.Loading)
+    val defaultAddressEvent= _defaultAddressEvent.asStateFlow()
+
+
+
+    fun getDraftOrders(){
         viewModelScope.launch {
-            getAuthToken()
-        }
-    }
-
-    fun getAuthToken() {
-        viewModelScope.launch {
-            paymentRemoteDataSource.getAuthToken().collect { token ->
-                if (token != null) {
-                    _authToken.value = token
-                } else {
-                    _errorMessage.value = "Failed to get auth token."
+            repository.getAllDraftOrders().onStart {
+                _draftOrders.value = ApiState.Loading
+            }
+                .catch { e ->
+                    _draftOrders.value = ApiState.Error(e.message ?: "Unknown error")
                 }
-            }
-        }
-    }
-
-    fun createOrder(authToken: String, orderRequest: OrderRequest) {
-        viewModelScope.launch {
-            paymentRemoteDataSource.createOrder(authToken, orderRequest).collect { response ->
-                if (response != null) {
-                    _orderResponse.value = response
-                } else {
-                    _errorMessage.value = "Failed to create order."
+                .collect { draftOrdersResponse ->
+                    val draftOrders = draftOrdersResponse.draft_orders.filter {
+                        it.email == FirebaseAuth.getInstance().currentUser?.email
+                    }
+                    val shoppingCartDraftOrder = draftOrders.filter{
+                        it.note == "shoppingCart"
+                    }
+                    if (shoppingCartDraftOrder.isNotEmpty()) {
+                        _shoppingCartDraftOrder.value = ApiState.Success(draftOrders.filter{
+                            it.note == "shoppingCart"
+                        }[0])
+                    } else {
+                        _shoppingCartDraftOrder.value = ApiState.Error("shoppingCart not found")
+                    }
                 }
+        }
+    }
+
+    fun getDraftOrder(draftOrderId: Long) {
+        viewModelScope.launch {
+            repository.getDraftOrder(draftOrderId)
+                .onStart {
+                    _singleDraftOrders.value = ApiState.Loading
+                }
+                .catch { e ->
+                    _singleDraftOrders.value = ApiState.Error(e.message ?: "Unknown error")
+                }
+                .collect { draftOrderResponse ->
+                    _singleDraftOrders.value = ApiState.Success(draftOrderResponse)
+                }
+        }
+    }
+
+    fun finalizeDraftOrder(draftOrderId: Long) {
+        viewModelScope.launch {
+            repository.finalizeDraftOrder(draftOrderId)
+                .onStart {
+                    _singleDraftOrders.value = ApiState.Loading
+                }
+                .catch { e ->
+                    _singleDraftOrders.value = ApiState.Error(e.message ?: "Failed to finalize draft order")
+                }
+                .collect { response ->
+                    _singleDraftOrders.value = ApiState.Success(response)
+                    getDraftOrders()
+                }
+        }
+    }
+
+
+    fun addNewAddress(customerId: Long,address: AddressRequest) {
+        viewModelScope.launch {
+            try {
+                _customerAddress.emit(ApiState.Loading)
+                repository.addNewAddress(customerId,address)
+                    .collect { newAddress ->
+                        _customerAddress.emit(ApiState.Success(newAddress))
+                    }
+            } catch (e: Exception) {
+                _customerAddress.emit(ApiState.Error(e.message ?: "Unknown Error"))
             }
         }
     }
 
-    fun fetchPaymentKey(paymentKeyRequest: PaymentKeyRequest) {
+    fun getUserAddresses(customerId: Long) {
         viewModelScope.launch {
-            val result = paymentRemoteDataSource.getPaymentKey(paymentKeyRequest)
-            _paymentKey.value = result
-            if(result != null){
-                _paymentKey.value = result
-            } else {
-                _errorMessage.value = "Failed to Fetch Payment Key."
+            try {
+                _userAddresses.emit(ApiState.Loading)
+                repository.getUserAddresses(customerId)
+                    .collect { addresses ->
+                        _userAddresses.emit(ApiState.Success(addresses))
+                    }
+            } catch (e: Exception) {
+                _userAddresses.emit(ApiState.Error(e.message ?: "Unknown Error"))
             }
         }
     }
 
-    fun processPayment(cardPaymentRequest: CardPaymentRequest) {
+
+    fun getAddressDetails(customerId: Long, addressId: Long) {
         viewModelScope.launch {
-            val result = paymentRemoteDataSource.processCardPayment(cardPaymentRequest)
-            if(result != null){
-                _payment.value = result
-            } else {
-                _errorMessage.value = "Failed to Process Payment."
+            try {
+                _addressDetails.emit(ApiState.Loading)
+                repository.getAddressDetails(customerId, addressId)
+                    .collect { addressDetail ->
+                        _addressDetails.emit(ApiState.Success(addressDetail))
+                    }
+            } catch (e: Exception) {
+                _addressDetails.emit(ApiState.Error(e.message ?: "Unknown Error"))
             }
         }
     }
 
-    fun fetchPaymentStatus(paymentId: String) {
+    fun setDefaultAddress(customerId: Long, addressId: Long) {
         viewModelScope.launch {
-            val result = paymentRemoteDataSource.getPaymentStatus(paymentId)
-            if(result != null){
-                _paymentStatus.value = result
-            } else {
-                _errorMessage.value = "Failed to Fetch Payment Status."
+            try {
+                _defaultAddressEvent.emit(ApiState.Loading)
+                repository.setDefaultAddress(customerId, addressId)
+                    .collect { updatedAddress ->
+                        _defaultAddressEvent.emit(ApiState.Success(updatedAddress))
+                        Log.i("paymentTest", "setDefaultAddress: ${updatedAddress.customer_address.default}")
+                    }
+            } catch (e: Exception) {
+                _defaultAddressEvent.emit(ApiState.Error(e.message ?: "Unknown Error"))
             }
         }
     }
 
-    fun refundPayment(refundRequest: RefundRequest) {
-        viewModelScope.launch {
-            paymentRemoteDataSource.refundPayment(refundRequest)
 
-        }
-    }
 }

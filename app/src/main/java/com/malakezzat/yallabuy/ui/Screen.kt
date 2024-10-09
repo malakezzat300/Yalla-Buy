@@ -9,7 +9,6 @@ sealed class Screen(val route: String) {
     data object LogInScreen : Screen("logInScreen")
     data object OrderScreen : Screen("orderScreen")
     data object CheckoutScreen : Screen("checkoutScreen/{orderId}")
-    data object PaymentScreen : Screen("payment_screen/{paymentKey}")
     data object SearchScreen : Screen("searchScreen")
     data object ShoppingScreen : Screen("shoppingScreen")
     data object ProductInfScreen : Screen("productInfo")
@@ -30,4 +29,5 @@ sealed class Screen(val route: String) {
     data object WishlistScreen:Screen("wishlistScreen")
     data object OrdersScreen : Screen("ordersScreen")
     data object ProfileScreen : Screen("profileScreen")
+    data object PaymentMethodScreen : Screen("paymentMethodScreen")
 }

@@ -36,10 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.malakezzat.paymenttest2.PaymentRemoteDataSourceImpl
-import com.malakezzat.paymenttest2.model.BillingData
-import com.malakezzat.paymenttest2.model.FakeData
-import com.malakezzat.paymenttest2.model.PaymentKeyRequest
+
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
 
@@ -84,7 +81,7 @@ fun CheckoutScreen(
     var couponCode by remember { mutableStateOf("") }
     var selectedPaymentMethod by remember { mutableStateOf("") }
 
-    val paymentKey by viewModel.paymentKey.collectAsState()
+//    val paymentKey by viewModel.paymentKey.collectAsState()
 
     Log.i("paymentTest", "CheckoutScreen: orderId $orderId")
 
@@ -177,10 +174,10 @@ fun CheckoutScreen(
                 Text(text = method)
                 if(method == "Credit Card"){
                     Log.i("paymentTest", "Checkout: Credit Card")
-                    val paymentKeyRequest = FakeData.paymentKeyRequest.apply {
-//                        this.order_id = orderId.toString()
-                    }
-                    viewModel.fetchPaymentKey(paymentKeyRequest)
+//                    val paymentKeyRequest = FakeData.paymentKeyRequest.apply {
+////                        this.order_id = orderId.toString()
+//                    }
+//                    viewModel.fetchPaymentKey(paymentKeyRequest)
                 }
             }
         }
@@ -188,12 +185,12 @@ fun CheckoutScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
 
-        Log.i("paymentTest", "Checkout: paymentKey $paymentKey")
+//        Log.i("paymentTest", "Checkout: paymentKey $paymentKey")
         Button(
             onClick = {
                 if(selectedPaymentMethod == "Credit Card"){
 
-                    navController.navigate(Screen.PaymentScreen.route.replace("{paymentKey}", paymentKey ?: "default key"))
+                    //navController.navigate(Screen.PaymentScreen.route.replace("{paymentKey}", paymentKey ?: "default key"))
                 } else {
                     //with cash
                 }

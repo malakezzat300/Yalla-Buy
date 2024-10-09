@@ -30,7 +30,7 @@ import com.malakezzat.yallabuy.ui.orders.viewmodel.OrdersViewModel
 import com.malakezzat.yallabuy.ui.orders.viewmodel.OrdersViewModelFactory
 import com.malakezzat.yallabuy.ui.payment.view.CheckoutView
 import com.malakezzat.yallabuy.ui.payment.view.OrderScreen
-import com.malakezzat.yallabuy.ui.payment.view.PaymentScreen
+import com.malakezzat.yallabuy.ui.payment.view.PaymentMethodScreen
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModelFactory
 import com.malakezzat.yallabuy.ui.product_info.ProductInfoScreen
@@ -98,7 +98,7 @@ fun NavigationApp(
         }
         ) { paddingValues ->
 
-            NavHost(navController = navController, startDestination = Screen.SettingsScreen.route, Modifier.padding(paddingValues)) {
+            NavHost(navController = navController, startDestination = Screen.PaymentMethodScreen.route, Modifier.padding(paddingValues)) {
                 composable(Screen.SplashScreen.route) {
                     SplashScreen(navController)
                 }
@@ -152,16 +152,10 @@ fun NavigationApp(
                     CheckoutView(viewModel, navController, orderId)
                 }
                 composable(
-                    route = Screen.PaymentScreen.route,
-                    arguments = listOf(navArgument("paymentKey") { type = NavType.StringType })
+                    route = Screen.PaymentMethodScreen.route
                 ) { backStackEntry ->
-                    val paymentKey = backStackEntry.arguments?.getString("paymentKey")
-                    PaymentScreen(
-                        onPaymentSuccess = { /* Handle success */ },
-                        viewModel = viewModel(factory = paymentViewModelFactory),
-                        navController = navController,
-                        paymentKey = paymentKey
-                    )
+                    val viewModel : PaymentViewModel = viewModel(factory = paymentViewModelFactory)
+                    PaymentMethodScreen(viewModel,navController)
                 }
                 composable(Screen.SearchScreen.route) {
                     val viewModel: SearchViewModel = viewModel(factory = searchViewModelFactory)

@@ -23,7 +23,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.malakezzat.paymenttest2.model.FakeData
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
 import com.malakezzat.yallabuy.ui.theme.AppColors
@@ -36,13 +35,13 @@ fun OrderScreen(viewModel: PaymentViewModel,
     var email by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
-    val authToken by viewModel.authToken.collectAsState()
-    val orderResponse by viewModel.orderResponse.collectAsState()
-    val errorMessage by viewModel.errorMessage.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.fetchToken()
-    }
+//    val authToken by viewModel.authToken.collectAsState()
+//    val orderResponse by viewModel.orderResponse.collectAsState()
+//    val errorMessage by viewModel.errorMessage.collectAsState()
+//
+//    LaunchedEffect(Unit) {
+//        viewModel.fetchToken()
+//    }
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -58,10 +57,10 @@ fun OrderScreen(viewModel: PaymentViewModel,
             isLoading = true
 
             //make order with data
-            authToken?.let { token ->
-                val order = FakeData.orderRequest.apply { this.auth_token = token  }
-                viewModel.createOrder(token,order)
-            }
+//            authToken?.let { token ->
+//                val order = FakeData.orderRequest.apply { this.auth_token = token  }
+//                viewModel.createOrder(token,order)
+//            }
         }) {
             if (isLoading) {
                 CircularProgressIndicator(color = Color.White)
@@ -70,22 +69,22 @@ fun OrderScreen(viewModel: PaymentViewModel,
             }
         }
 
-        if (errorMessage != null) {
-            Text(errorMessage ?: "", color = Color.Red)
-            isLoading = false
-        }
-
-        if (orderResponse != null) {
-            Text("Order Created: ${orderResponse?.id}", color = AppColors.MintGreen)
-            if(isLoading) {
-                navController.navigate(
-                    Screen.CheckoutScreen.route.replace(
-                        "{orderId}",
-                        orderResponse?.id ?: ""
-                    )
-                )
-            }
-            isLoading = false
-        }
+//        if (errorMessage != null) {
+//            Text(errorMessage ?: "", color = Color.Red)
+//            isLoading = false
+//        }
+//
+//        if (orderResponse != null) {
+//            Text("Order Created: ${orderResponse?.id}", color = AppColors.MintGreen)
+//            if(isLoading) {
+//                navController.navigate(
+//                    Screen.CheckoutScreen.route.replace(
+//                        "{orderId}",
+//                        orderResponse?.id ?: ""
+//                    )
+//                )
+//            }
+//            isLoading = false
+//        }
     }
 }
