@@ -194,25 +194,14 @@ fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel/*,a
         Spacer(modifier = Modifier.height(8.dp))
 
         LazyColumn(
-            modifier = Modifier.fillMaxHeight(0.9f)
+            modifier = Modifier.fillMaxHeight()
         ) {
             items(userAddresses.size){
                 addressItem(navController,viewModel,userAddresses[it],userId)
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = { navController.navigate(Screen.OrdersScreen.route) },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-            shape = RoundedCornerShape(10.dp)
-        ) {
-            Text(
-                text = "Orders history",
-                color = Color.White,
-                fontSize = 16.sp
-            )
-        }
+
+
 
     }
 
