@@ -1,5 +1,7 @@
 package com.malakezzat.yallabuy.ui
 
+import com.malakezzat.yallabuy.model.Address
+
 sealed class Screen(val route: String) {
     data object HomeScreen : Screen("homeScreen")
     data object SplashScreen : Screen("splashScreen")
@@ -14,8 +16,11 @@ sealed class Screen(val route: String) {
     data object SettingsScreen : Screen("settingsScreen")
     data object AddressScreen : Screen("addressScreen/{address}") {
         fun createRoute(address: String) = "addressScreen/$address"
+        fun createRoute(addressId : Long) = "addressScreen/$addressId"
     }
-
+    data object AddressInfoScreen : Screen("addressInfoScreen/{address}") {
+        fun createRoute(address: Long?) = "addressInfoScreen/$address"
+    }
     data object MapScreen : Screen("mapScreen/{latitude}/{longitude}") {
         fun createRoute(latitude: Float, longitude: Float) = "mapScreen/$latitude/$longitude"
     }

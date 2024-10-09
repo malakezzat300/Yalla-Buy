@@ -3,6 +3,7 @@ package com.malakezzat.yallabuy.data.remote
 import com.malakezzat.yallabuy.data.remot.ProductService
 import okhttp3.Credentials
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

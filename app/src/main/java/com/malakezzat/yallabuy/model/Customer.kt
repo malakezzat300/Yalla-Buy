@@ -1,6 +1,8 @@
 package com.malakezzat.yallabuy.model
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+
 
 data class Customerr (
     val first_name: String?,
@@ -30,8 +32,8 @@ data class CustomerDetails(
 
 data class Address (
 
-    var id           : Int?     = null,
-    var customer_id   : Int?     = null,
+    var id           : Long?     = null,
+    var customer_id   : Long?     = null,
     var first_name    : String?  = null,
     var last_name     : String?  = null,
     var company      : String?  = null,
@@ -45,10 +47,23 @@ data class Address (
     var name         : String?  = null,
     var province_code : String?  = null,
     var country_code  : String?  = null,
-    var country_name  : String?  = null,
+    var country_name  : String?  = country,
     var default      : Boolean? = null
 
 )
+
+data class CustomerId (
+    val id: Long
+)
+
+data class AddressResponse(
+    val addresses : List<Address>
+)
+
+data class AddressRequest(
+    val address : Address
+)
+
 data class EmailMarketingConsent (
 
     var state            : String? = null,
@@ -75,7 +90,7 @@ data class Customers (
     @SerializedName("orders_count"                 ) var ordersCount               : Int?                   = null,
     @SerializedName("state"                        ) var state                     : String?                = null,
     @SerializedName("total_spent"                  ) var totalSpent                : String?                = null,
-    @SerializedName("last_order_id"                ) var lastOrderId               : Int?                   = null,
+    @SerializedName("last_order_id"                ) var lastOrderId               : Long?                   = null,
     @SerializedName("note"                         ) var note                      : String?                = null,
     @SerializedName("verified_email"               ) var verifiedEmail             : Boolean?               = null,
     @SerializedName("multipass_identifier"         ) var multipassIdentifier       : String?                = null,
@@ -103,4 +118,10 @@ data class CustomerSearchRespnse(
 
 data class CustomerAddress(
     val customer_address: Address,
+)
+
+data class AddressUpdateRequest(
+    val customer_id: Long,
+    val id: Long,
+    val default: Boolean = true
 )

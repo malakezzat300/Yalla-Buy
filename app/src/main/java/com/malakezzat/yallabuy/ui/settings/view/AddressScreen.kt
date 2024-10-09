@@ -59,26 +59,108 @@ import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.malakezzat.yallabuy.ui.settings.viewmodel.SettingsViewModel
 import com.malakezzat.yallabuy.ui.theme.AppColors
+import java.io.File
+import java.io.IOException
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import com.malakezzat.yallabuy.data.remote.ApiState
+import com.malakezzat.yallabuy.model.Address
+import com.malakezzat.yallabuy.model.AddressRequest
+import com.malakezzat.yallabuy.model.CustomerId
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,address: String? = null){
+    var addressId by remember { mutableStateOf(0L) }
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
-    var addressState by remember { mutableStateOf(address ?: "") }
     var city by remember { mutableStateOf("") }
     var country by remember { mutableStateOf("") }
     var permissionGranted by remember { mutableStateOf(false) }
     var locationEnabled by remember { mutableStateOf(false) }
+    var expandedCity by remember { mutableStateOf(false) }
+    var expandedCountry by remember { mutableStateOf(false) }
+    var cities by remember { mutableStateOf(emptyList<String>()) }
+    val userId by viewModel.userId.collectAsState()
+    val addNewAddressState by viewModel.customerAddress.collectAsState()
+    val addressDetails by viewModel.addressDetails.collectAsState()
+    var addressState by remember { mutableStateOf(address ?: "") }
+    var saveButton by remember { mutableStateOf("Save") }
+
+    val sharedPreferences = LocalContext.current.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
+    LaunchedEffect(Unit) {
+        val isAddressId = address?.let { isAddressId(it) }
+        if(isAddressId == true){
+            addressState = ""
+            viewModel.getAddressDetails(sharedPreferences.getLong("USER_ID", 0L),address.toLong())
+            saveButton = "Update"
+        } else {
+            if (address != null) {
+                addressState = address
+            }
+        }
+    }
+
+    when(addressDetails){
+        is ApiState.Error -> Log.i("addressTest", "Error: ${(addressDetails as ApiState.Error).message}")
+        ApiState.Loading -> {}
+        is ApiState.Success -> {
+            LaunchedEffect(Unit) {
+                addressId = (addressDetails as ApiState.Success).data?.customer_address?.id!!
+                firstName = (addressDetails as ApiState.Success).data?.customer_address?.first_name.toString()
+                lastName = (addressDetails as ApiState.Success).data?.customer_address?.last_name.toString()
+                phoneNumber = (addressDetails as ApiState.Success).data?.customer_address?.phone.toString()
+                addressState= (addressDetails as ApiState.Success).data?.customer_address?.address1.toString()
+                city = (addressDetails as ApiState.Success).data?.customer_address?.city.toString()
+                country = (addressDetails as ApiState.Success).data?.customer_address?.country.toString()
+            }
+        }
+    }
 
     val context = LocalContext.current
+
+    val countries = getCountries(context)
+
+    LaunchedEffect(Unit) {
+        viewModel.getUserId()
+    }
+
+    LaunchedEffect(country) {
+        if (country.isNotEmpty()) {
+            cities = getCitiesFromCountries(context, country)
+        }
+    }
+
+    when(addNewAddressState){
+        is ApiState.Error -> Toast.makeText(context, "Error: ${(addNewAddressState as ApiState.Error).message}", Toast.LENGTH_SHORT).show()
+        ApiState.Loading -> {}
+        is ApiState.Success -> {
+            LaunchedEffect(Unit) {
+                Toast.makeText(context, "Address has been added", Toast.LENGTH_SHORT).show()
+                navController.navigateUp()
+            }
+        }
+    }
 
     val fusedLocationClient = remember {
         LocationServices.getFusedLocationProviderClient(context)
@@ -142,7 +224,14 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
             Text(text = "Phone Number", fontSize = 18.sp)
             OutlinedTextField(
                 value = phoneNumber,
-                onValueChange = { input -> phoneNumber = input },
+                onValueChange = { input ->
+                    val regex = Regex("^0(1[0125])?\\d{0,8}$")
+                    if (regex.matches(input) || input.isEmpty()) {
+                        phoneNumber = input
+                    } else {
+                        Toast.makeText(context, "Enter a vaild number", Toast.LENGTH_SHORT).show()
+                    }
+                },
                 label = { Text(text = "Phone Number") },
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier
@@ -216,42 +305,124 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
+
+
             Text(text = "City", fontSize = 18.sp)
-            OutlinedTextField(
-                value = city,
-                onValueChange = { input -> city = input },
-                label = { Text(text = "City") },
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = Color.White)
-                    .padding(top = 2.dp),
-                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.MintGreen)
-            )
+
+            ExposedDropdownMenuBox(
+                expanded = expandedCity,
+                onExpandedChange = { if (cities.isEmpty()) {
+                    Toast.makeText(context, "Choose a Country First", Toast.LENGTH_SHORT).show()
+                } else {
+                    expandedCity = !expandedCity
+                } }
+            ) {
+                TextField(
+                    value = city,
+                    onValueChange = { /* No change here since it's readOnly */ },
+                    readOnly = true,
+                    label = { Text(text = "City") },
+                    trailingIcon = {
+                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                    },
+                    colors = TextFieldDefaults.textFieldColors(
+                        unfocusedIndicatorColor = Color.Green
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expandedCity,
+                    onDismissRequest = { expandedCity = false }
+                ) {
+                    cities.forEach { cityOption ->
+                        DropdownMenuItem(onClick = {
+                            city = cityOption
+                            expandedCity = false
+                        }) {
+                            Text(text = cityOption)
+                        }
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
+
             Text(text = "Country", fontSize = 18.sp)
-            OutlinedTextField(
-                value = country,
-                onValueChange = { input -> country = input },
-                label = { Text(text = "Country") },
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = Color.White)
-                    .padding(top = 2.dp),
-                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.MintGreen)
-            )
+
+            ExposedDropdownMenuBox(
+                expanded = expandedCountry,
+                onExpandedChange = { expandedCountry = !expandedCountry }
+            ) {
+                TextField(
+                    value = country,
+                    onValueChange = { /* No change here since it's readOnly */ },
+                    readOnly = true,
+                    label = { Text(text = "Country") },
+                    trailingIcon = {
+                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                    },
+                    colors = TextFieldDefaults.textFieldColors(
+                        unfocusedIndicatorColor = Color.Green
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expandedCountry,
+                    onDismissRequest = { expandedCountry = false }
+                ) {
+                    countries.forEach { countryOption ->
+                        DropdownMenuItem(onClick = {
+                            country = countryOption
+                            expandedCountry = false
+                        }) {
+                            Text(text = countryOption)
+                        }
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                onClick = { /* Action for button click */ },
+                onClick = {
+                    if(firstName.isNotBlank() && lastName.isNotBlank() && phoneNumber.isNotBlank()
+                        && addressState.isNotBlank() && city.isNotBlank() && country.isNotBlank()) {
+                        userId?.let {
+                            val address1 = Address(
+                                customer_id = it,
+                                first_name = firstName,
+                                last_name = lastName,
+                                phone = phoneNumber,
+                                address1 = addressState,
+                                city = city,
+                                country = country
+                            )
+                            if (address?.let { isAddressId(it) } == true) {
+                                viewModel.updateUserAddress(it, addressId, AddressRequest(address1))
+                            } else {
+                                viewModel.addNewAddress(it, AddressRequest(address1))
+                            }
+                        }
+
+                    } else {
+                        Toast.makeText(context,"Please fill all fields" ,Toast.LENGTH_SHORT).show()
+                    }
+
+
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Text(
-                    text = "Save",
+                    text = saveButton,
                     color = Color.White,
                     fontSize = 16.sp
                 )
@@ -343,4 +514,48 @@ fun LocationPrompt() {
             }
         )
     }
+}
+
+fun getCitiesFromCountries(context: Context, countryName: String): List<String> {
+    val json: String
+    try {
+        val inputStream = context.assets.open("cities_countries.json")
+        val size = inputStream.available()
+        val buffer = ByteArray(size)
+        inputStream.read(buffer)
+        inputStream.close()
+        json = String(buffer, Charsets.UTF_8)
+    } catch (ex: IOException) {
+        ex.printStackTrace()
+        return emptyList()
+    }
+
+    val type = object : TypeToken<Map<String, List<String>>>() {}.type
+    val countriesWithCities: Map<String, List<String>> = Gson().fromJson(json, type)
+
+    return countriesWithCities[countryName] ?: emptyList()
+}
+
+fun getCountries(context: Context): List<String> {
+    val json: String
+    try {
+        val inputStream = context.assets.open("cities_countries.json")
+        val size = inputStream.available()
+        val buffer = ByteArray(size)
+        inputStream.read(buffer)
+        inputStream.close()
+        json = String(buffer, Charsets.UTF_8)
+    } catch (ex: IOException) {
+        ex.printStackTrace()
+        return emptyList()
+    }
+
+    val type = object : TypeToken<Map<String, List<String>>>() {}.type
+    val countriesWithCities: Map<String, List<String>> = Gson().fromJson(json, type)
+
+    return countriesWithCities.keys.toList()
+}
+
+fun isAddressId(input: String): Boolean {
+    return input.toLongOrNull() != null
 }

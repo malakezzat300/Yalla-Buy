@@ -4,6 +4,8 @@ import android.util.Log
 import com.malakezzat.yallabuy.data.remot.ProductService
 import com.malakezzat.yallabuy.data.remote.RetrofitHelper.apiCurrency
 import com.malakezzat.yallabuy.model.Address
+import com.malakezzat.yallabuy.model.AddressRequest
+import com.malakezzat.yallabuy.model.AddressResponse
 import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.CustomerAddress
@@ -176,14 +178,14 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
         e.printStackTrace()
     }
 
-    override suspend fun addNewAddress(customerId: Long): Flow<CustomerAddress> = flow {
-        val response = productService.addNewAddress(customerId)
+    override suspend fun addNewAddress(customerId: Long,address: AddressRequest): Flow<CustomerAddress> = flow {
+        val response = productService.addNewAddress(customerId,address)
         emit(response)
     }.catch { e ->
         e.printStackTrace()
     }
 
-    override suspend fun getUserAddresses(customerId: Long): Flow<List<Address>> = flow {
+    override suspend fun getUserAddresses(customerId: Long): Flow<AddressResponse> = flow {
         val response = productService.getUserAddresses(customerId)
         emit(response)
     }.catch { e ->
@@ -202,9 +204,10 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
 
     override suspend fun updateUserAddress(
         customerId: Long,
-        addressId: Long
+        addressId: Long,
+        address: AddressRequest
     ): Flow<CustomerAddress> = flow {
-        val response = productService.updateUserAddress(customerId,addressId)
+        val response = productService.updateUserAddress(customerId,addressId,address)
         emit(response)
     }.catch { e ->
         e.printStackTrace()

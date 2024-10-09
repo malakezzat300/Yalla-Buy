@@ -4,6 +4,8 @@ package com.malakezzat.yallabuy.data.remot
 import com.malakezzat.yallabuy.data.remote.coupons.DiscountCodeResponse
 import com.malakezzat.yallabuy.data.remote.coupons.priceRuleResponse
 import com.malakezzat.yallabuy.model.Address
+import com.malakezzat.yallabuy.model.AddressRequest
+import com.malakezzat.yallabuy.model.AddressResponse
 import com.malakezzat.yallabuy.model.Brands
 import com.malakezzat.yallabuy.model.Category
 import com.malakezzat.yallabuy.model.CurrencyResponse
@@ -108,16 +110,18 @@ interface ProductService {
     suspend fun getLatestRates(): CurrencyResponse
 
     @POST("customers/{customer_id}/addresses.json")
-    suspend fun addNewAddress(@Path("customer_id") customerId: Long): CustomerAddress
+    suspend fun addNewAddress(@Path("customer_id") customerId: Long,
+                              @Body address: AddressRequest): CustomerAddress
 
     @GET("customers/{customer_id}/addresses.json")
-    suspend fun getUserAddresses(@Path("customer_id") customerId: Long): List<Address>
+    suspend fun getUserAddresses(@Path("customer_id") customerId: Long): AddressResponse
 
     @GET("customers/{customer_id}/addresses/{address_id}.json")
     suspend fun getAddressDetails(@Path("customer_id") customerId: Long,@Path("address_id") addressId: Long): CustomerAddress
 
     @PUT("customers/{customer_id}/addresses/{address_id}.json")
-    suspend fun updateUserAddress(@Path("customer_id") customerId: Long,@Path("address_id") addressId: Long): CustomerAddress
+    suspend fun updateUserAddress(@Path("customer_id") customerId: Long,@Path("address_id") addressId: Long,
+                                  @Body address: AddressRequest): CustomerAddress
 
     @PUT("customers/{customer_id}/addresses/{address_id}/default.json")
     suspend fun setDefaultAddress(@Path("customer_id") customerId: Long,@Path("address_id") addressId: Long): CustomerAddress

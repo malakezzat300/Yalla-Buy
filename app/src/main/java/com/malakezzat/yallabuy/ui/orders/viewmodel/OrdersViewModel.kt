@@ -28,6 +28,7 @@ class OrdersViewModel (val repository: ProductsRepository): ViewModel() {
         getUserByEmail()
         getAllOrdersForCustomerByID(7713903837366)
     }
+
     fun getUserByEmail(){
         val userEmail = FirebaseAuth.getInstance().currentUser?.email
         if (userEmail != null) {
@@ -48,7 +49,7 @@ class OrdersViewModel (val repository: ProductsRepository): ViewModel() {
                     .collect { customerData ->
                         _customerDataByEmail.value = ApiState.Success(customerData) // Set success state with data
                         Log.i(TAG, "getCustomer: ${customerData.customers.get(0).id}")
-                        customerData.customers.get(0).id?.let { repository.setUserId(it) }
+                        //customerData.customers.get(0).id?.let { repository.setUserId(it) }
                     }
             }
         }
