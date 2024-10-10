@@ -128,7 +128,7 @@ fun HomeScreen(
 
                 is ApiState.Success -> {
                     val brands = (brandsState as ApiState.Success<List<SmartCollection>>).data
-                    BrandsList(brands,navController)
+                    BrandsList(brands, navController)
                 }
 
                 is ApiState.Error -> {
@@ -146,7 +146,7 @@ fun HomeScreen(
                 is ApiState.Success -> {
                     val categories =
                         (categoriesState as ApiState.Success<List<CustomCollection>>).data
-                    CategoriesSection(categories,navController)
+                    CategoriesSection(categories, navController)
                     Log.d(TAG, "$categoriesState")
                 }
 
@@ -182,7 +182,7 @@ fun HomeScreen(
 
 
 @Composable
-fun BrandsList(brands: List<SmartCollection>,navController: NavController) {
+fun BrandsList(brands: List<SmartCollection>, navController: NavController) {
     Column(modifier = Modifier.padding(16.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -208,8 +208,8 @@ fun BrandsList(brands: List<SmartCollection>,navController: NavController) {
                         .clickable {
                             Log.i(TAG, "BrandsList: clicked")
                             navController.navigate("${Screen.ProductsByBrandScreen.route}/${brand.id.toString()}/${brand.title}")
-                        }
-                    ,
+                        },
+                    shape = RoundedCornerShape(50.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
@@ -258,7 +258,7 @@ fun CustomTopBarHome(navController: NavController) {
             )
             Text(
                 text = "YallaBuy",
-                style =  MaterialTheme.typography.titleLarge, color = AppColors.Teal,
+                style = MaterialTheme.typography.titleLarge, color = AppColors.Teal,
                 modifier = Modifier.padding(start = 4.dp)
             )
         }
@@ -318,8 +318,8 @@ fun AdList(viewModel: HomeScreenViewModel) {
         }
         item {
             if (discountCodeIds.isNotEmpty()) {
-                    val randomCoupon = discountCodeIds.random()
-                    CouponsCard(randomCoupon)
+                val randomCoupon = discountCodeIds.random()
+                CouponsCard(randomCoupon)
             }
         }
 //        items(filteredDiscountCodes.size) { index ->
@@ -409,7 +409,7 @@ fun CouponsCard(code: String?) {
 
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun CategoriesSection(categories: List<CustomCollection>,navController: NavController) {
+fun CategoriesSection(categories: List<CustomCollection>, navController: NavController) {
     //categories: List<CustomCollection>
     Log.d(TAG, "3. ${categories}")
     Column(modifier = Modifier.padding(16.dp)) {
@@ -418,14 +418,14 @@ fun CategoriesSection(categories: List<CustomCollection>,navController: NavContr
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Categories", color = AppColors.Teal, style =  MaterialTheme.typography.titleLarge)
+            Text("Categories", color = AppColors.Teal, style = MaterialTheme.typography.titleLarge)
         }
         LazyRow(
             modifier = Modifier.padding(top = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             itemsIndexed(categories) { index, category ->
-                CategoryItem(category,navController)
+                CategoryItem(category, navController)
             }
         }
     }
@@ -434,11 +434,11 @@ fun CategoriesSection(categories: List<CustomCollection>,navController: NavContr
 
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun CategoryItem(category: CustomCollection,navController: NavController) {
+fun CategoryItem(category: CustomCollection, navController: NavController) {
     Log.d(TAG, "4. ${category}")
     Card(
         modifier = Modifier
-            .size(200.dp)
+            .size(120.dp)
             .clickable {
                 navController.navigate("${Screen.ProductsByCategoryScreen.route}/${category.id.toString()}/${category.body_html}")
             },
@@ -463,7 +463,7 @@ fun CategoryItem(category: CustomCollection,navController: NavController) {
             )
             Text(
                 text = category.title,
-                style =  MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyMedium,
                 color = AppColors.Teal,
                 modifier = Modifier.padding(top = 10.dp, bottom = 10.dp)
             )
@@ -485,8 +485,7 @@ fun LatestProductsSection(products: List<Product>, navController: NavController)
             Text(
                 "All Products",
                 style = MaterialTheme.typography.titleLarge,
-                color = AppColors.Teal
-                ,
+                color = AppColors.Teal,
                 modifier = Modifier.padding(8.dp)
             )
             /*Text(
@@ -536,9 +535,10 @@ fun ProductCard(product: Product, navController: NavController) {
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
 
-    ) {
+        ) {
         Column(
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier
+                .padding(8.dp)
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -558,19 +558,26 @@ fun ProductCard(product: Product, navController: NavController) {
                     contentScale = ContentScale.Fit
                 )
             }
-                Text(product.title, style =  MaterialTheme.typography.titleSmall)
-                Text(product.vendor, color = AppColors.MintGreen)
-                val price = product.variants.first().price
-                CurrencyConverter.changeCurrency(price.toDouble())?.let{
-                    Text( text = it,
-                        style = MaterialTheme.typography.bodyMedium)
-                }
+            // Column for product details
+            Column(
+                modifier = Modifier
+                    .padding(start = 10.dp) // Add space between the image and text
+            ) {
+            Text(product.title, style = MaterialTheme.typography.titleSmall)
+            Text(product.vendor, color = AppColors.Teal)
+            val price = product.variants.first().price
+            CurrencyConverter.changeCurrency(price.toDouble())?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            }
 
 
         }
     }
 }
-
 
 
 //@Preview(showBackground = true, showSystemUi = true)
@@ -632,7 +639,7 @@ fun BottomNavigationBar(navController: NavController) {
                     modifier = Modifier.size(24.dp)
                 )
             },
-            label = { Text("Home",fontSize = 10.sp, style =  MaterialTheme.typography.titleSmall) },
+            label = { Text("Home", fontSize = 10.sp, style = MaterialTheme.typography.titleSmall) },
             selected = currentRoute == Screen.HomeScreen.route,
             onClick = {
                 if (currentRoute != Screen.HomeScreen.route) {
@@ -651,7 +658,13 @@ fun BottomNavigationBar(navController: NavController) {
                     modifier = Modifier.size(24.dp)
                 )
             },
-            label = { Text("Categories", fontSize = 10.sp, style =  MaterialTheme.typography.titleSmall) },
+            label = {
+                Text(
+                    "Categories",
+                    fontSize = 10.sp,
+                    style = MaterialTheme.typography.titleSmall
+                )
+            },
             selected = currentRoute == Screen.CategoriesScreen.route,
             onClick = {
                 if (currentRoute != Screen.CategoriesScreen.route) {
@@ -670,7 +683,13 @@ fun BottomNavigationBar(navController: NavController) {
                     modifier = Modifier.size(24.dp)
                 )
             },
-            label = { Text("My Cart",fontSize = 10.sp, style =  MaterialTheme.typography.titleSmall) },
+            label = {
+                Text(
+                    "My Cart",
+                    fontSize = 10.sp,
+                    style = MaterialTheme.typography.titleSmall
+                )
+            },
             selected = currentRoute == Screen.ShoppingScreen.route,
             onClick = {
                 if (currentRoute != Screen.ShoppingScreen.route) {
@@ -689,7 +708,13 @@ fun BottomNavigationBar(navController: NavController) {
                     modifier = Modifier.size(24.dp)
                 )
             },
-            label = { Text("Wishlist",fontSize = 10.sp, style =  MaterialTheme.typography.titleSmall) },
+            label = {
+                Text(
+                    "Wishlist",
+                    fontSize = 10.sp,
+                    style = MaterialTheme.typography.titleSmall
+                )
+            },
             selected = currentRoute == Screen.WishlistScreen.route,
             onClick = {
                 if (currentRoute != Screen.WishlistScreen.route) {
@@ -708,8 +733,14 @@ fun BottomNavigationBar(navController: NavController) {
                     modifier = Modifier.size(24.dp)
                 )
             },
-            label = { Text("Profile", fontSize = 10.sp,style =  MaterialTheme.typography.titleSmall) },
-            selected =  currentRoute == Screen.ProfileScreen.route,
+            label = {
+                Text(
+                    "Profile",
+                    fontSize = 10.sp,
+                    style = MaterialTheme.typography.titleSmall
+                )
+            },
+            selected = currentRoute == Screen.ProfileScreen.route,
             onClick = {
                 if (currentRoute != Screen.SettingsScreen.route) {
                     navController.popBackStack(Screen.ProfileScreen.route, inclusive = false)
