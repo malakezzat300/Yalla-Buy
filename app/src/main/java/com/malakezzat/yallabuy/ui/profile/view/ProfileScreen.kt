@@ -38,19 +38,18 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .background(Color(0xFF00C4B4)) // Your specified color for upper part
-
+                .padding(top = paddingValues.calculateTopPadding())
         ) {
             // User Info Section with the colored background
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color(0xFF00C4B4)) // Your specified color for upper part
-                    .padding(16.dp),
+                    .padding(start = 16.dp, bottom = 4.dp, end = 16.dp)
             ) {
                 if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
-                UserInfoSection(navController = navController, onLogoutClick = { showLoginDialog = true })
+                    UserInfoSection(navController = navController, onLogoutClick = { showLoginDialog = true })
                 }else{
                     UserInfoSection(navController = navController, onLogoutClick = { showLogoutDialog = true })                }
             }
@@ -58,7 +57,6 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
 
             // Personal Information Section
             Surface (modifier = Modifier
-                .fillMaxWidth()
                 .fillMaxHeight()
                 .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
                 .border(
@@ -114,7 +112,7 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
                 }
             }
 
-            Spacer(modifier = Modifier.weight(1f))
+            //Spacer(modifier = Modifier.weight(1f))
         }
     }
     // Log Out Confirmation Dialog

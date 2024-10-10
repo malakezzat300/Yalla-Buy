@@ -58,7 +58,7 @@ fun YallaBuyTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = AppColors.TealLight.toArgb()
+            window.statusBarColor = AppColors.Teal.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
