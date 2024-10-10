@@ -111,6 +111,7 @@ fun HomeScreen(
 
         if(CurrencyPreferences.getInstance(context).getFirstLaunch()){
             viewModel.getRate()
+            CurrencyPreferences.getInstance(context).setFirstLaunch(false)
         }
     }
 
