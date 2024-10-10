@@ -163,7 +163,12 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
         is ApiState.Success -> {
             LaunchedEffect(Unit) {
                 Toast.makeText(context, "Address has been added", Toast.LENGTH_SHORT).show()
-                navController.navigateUp()
+                if(address?.let { isAddressId(it) } == true){
+                    navController.navigateUp()
+                } else {
+                    navController.navigateUp()
+                    navController.navigateUp()
+                }
             }
         }
     }

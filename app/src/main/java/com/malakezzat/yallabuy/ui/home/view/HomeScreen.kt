@@ -99,6 +99,8 @@ fun HomeScreen(
     val productState by viewModel.productList.collectAsStateWithLifecycle()
     val categoriesState by viewModel.categoriesList.collectAsStateWithLifecycle()
     val brandsState by viewModel.brandsList.collectAsStateWithLifecycle()
+    val exchangeRate by viewModel.conversionRate.collectAsState()
+
     //Currency
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
@@ -106,6 +108,19 @@ fun HomeScreen(
         Log.d(TAG, categoriesState.toString())
         viewModel.getAllProducts()
         viewModel.getAllCategories()
+
+        if(CurrencyPreferences.getInstance(context).getFirstLaunch()){
+            viewModel.getRate()
+            CurrencyPreferences.getInstance(context).setFirstLaunch(false)
+        }
+    }
+
+    when(exchangeRate){
+        is ApiState.Error -> Log.i("currencyTest", "SettingsScreen: exchangeRate ${(exchangeRate as ApiState.Error).message}")
+        ApiState.Loading -> {}
+        is ApiState.Success -> {
+            CurrencyPreferences.getInstance(context).saveExchangeRate((exchangeRate as ApiState.Success).data?.conversion_rates)
+        }
     }
 
     Scaffold(

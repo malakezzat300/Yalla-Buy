@@ -50,6 +50,7 @@ import com.malakezzat.yallabuy.ui.profile.viewmodel.ProfileScreenViewModelFactor
 import com.malakezzat.yallabuy.ui.search.SearchScreen
 import com.malakezzat.yallabuy.ui.search.SearchViewModel
 import com.malakezzat.yallabuy.ui.search.SearchViewModelFactory
+import com.malakezzat.yallabuy.ui.settings.view.AddressInfoScreen
 import com.malakezzat.yallabuy.ui.settings.view.AddressScreen
 import com.malakezzat.yallabuy.ui.settings.view.MapScreen
 import com.malakezzat.yallabuy.ui.settings.view.SettingsScreen
@@ -216,6 +217,16 @@ fun NavigationApp(
                     val latitude = backStackEntry.arguments?.getDouble("latitude") ?: 0.0
                     val longitude = backStackEntry.arguments?.getDouble("longitude") ?: 0.0
                     MapScreen(navController,latitude = latitude, longitude = longitude)
+                }
+                composable(
+                    route = Screen.AddressInfoScreen.route,
+                    arguments = listOf(
+                        navArgument("address") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val address = backStackEntry.arguments?.getString("address") ?: " "
+                    val viewModel: SettingsViewModel = viewModel(factory = settingsViewModelFactory)
+                    AddressInfoScreen(navController,viewModel,address)
                 }
                 composable(Screen.WishlistScreen.route) {
                     val viewModel: WishlistViewModel = viewModel(factory = wishlistViewModelFactory)
