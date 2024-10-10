@@ -25,6 +25,7 @@ import com.malakezzat.yallabuy.model.VariantResponse
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -75,7 +76,8 @@ interface ProductService {
     @DELETE("draft_orders/{draft_order_id}.json")
     suspend fun deleteDraftOrder(@Path("draft_order_id") draftOrderId: Long)
 
-    @POST("draft_orders/{draft_order_id}/complete.json")
+    @Headers("Accept: application/json")
+    @PUT("draft_orders/{draft_order_id}/complete.json")
     suspend fun finalizeDraftOrder(@Path("draft_order_id") draftOrderId: Long): DraftOrderResponse
 
     @GET("products/{id}.json")

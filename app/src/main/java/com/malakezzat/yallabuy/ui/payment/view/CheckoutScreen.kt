@@ -53,6 +53,7 @@ import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.data.util.CurrencyConverter
 import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.LineItem
 
 import com.malakezzat.yallabuy.ui.Screen
@@ -196,6 +197,9 @@ fun CheckoutScreen(viewModel: PaymentViewModel,navController: NavController) {
             onClick = {
                 draftOrder.id?.let {
                     viewModel.finalizeDraftOrder(it)
+                    val newDraftOrder = draftOrder
+                    newDraftOrder.note = "Placed Order"
+                    viewModel.updateDraftOrder(it, DraftOrderRequest(newDraftOrder))
                     navController.navigate(Screen.OrderPlacedScreen.route)
                 }
             },
