@@ -213,6 +213,9 @@ fun ProductInfoScreen(
 
     var color by remember { mutableStateOf("") }
     var size by remember { mutableStateOf("") }
+    var index by remember { mutableStateOf(0L) }
+
+    var variant by remember { mutableStateOf(0) }
 
     when (draftOrderId) {
         is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(draftOrderId as ApiState.Error).message}")
@@ -252,6 +255,9 @@ fun ProductInfoScreen(
             }
             is ApiState.Success -> {
                 val product = (productState as ApiState.Success<Product>).data
+                size = product.variants[0].option1
+                color = product.variants[0].option2
+                index = product.variants[0].id
                 //images
                 LazyRow(
                     modifier = Modifier.fillMaxWidth()
@@ -345,6 +351,7 @@ fun ProductInfoScreen(
                                     for(item in product.variants){
                                         if((item.option1 == size)&&(item.option2==color)){
                                             price=item.price
+                                            index = item.id
                                         }
                                     }
                                 })
@@ -354,6 +361,7 @@ fun ProductInfoScreen(
                                     for(item in product.variants){
                                         if((item.option1 == size)&&(item.option2==color)){
                                             price=item.price
+                                            index = item.id
                                         }
                                     }
                                 })
@@ -375,7 +383,8 @@ fun ProductInfoScreen(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    AddToCart(viewModel, product, FirebaseAuth.getInstance().currentUser?.email.toString(), shoppingCartDraftOrder)
+                                    AddToCart(viewModel, product, FirebaseAuth.getInstance().currentUser?.email.toString(), shoppingCartDraftOrder,
+                                        price,size,color,index)
 
                                 }
                             }
@@ -450,18 +459,20 @@ fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : Str
 }
 
 @Composable
-fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,oldDraftOrder : DraftOrder) {
+fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,oldDraftOrder : DraftOrder,price : String,size: String,color: String,id : Long) {
     Row(modifier = Modifier.fillMaxWidth()) {
         OutlinedButton(
              onClick = {
-            val properties = listOf(Property(name = "imageUrl", value = product.image.src))
-            Log.i("propertiesTest", "AddToCart: $properties")
+             val properties = listOf(Property(name = "imageUrl",value = product.image.src),
+                 Property(name = "size",value = size),
+                 Property(name = "color",value = color))
+            Log.i("propertiesTest", "AddToCart: id ${id}")
             if (oldDraftOrder.id == 0L) {
                 val lineItems = listOf(
                     LineItem(
                         product.title,
-                        product.variants[0].price,
-                        product.variants[0].id,
+                        price,
+                        id,
                         1,
                         properties = properties,
                         product.id ?: 0,
@@ -475,8 +486,8 @@ fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,o
                 if (!oldDraftOrder.line_items.contains(
                         LineItem(
                             product.title,
-                            product.variants[0].price,
-                            product.variants[0].id,
+                            price,
+                            id,
                             1,
                             properties = properties,
                             product.id ?: 0,
@@ -486,8 +497,8 @@ fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,o
                     val lineItems = oldDraftOrder.line_items + listOf(
                         LineItem(
                             product.title,
-                            product.variants[0].price,
-                            product.variants[0].id,
+                            price,
+                            id,
                             1,
                             properties = properties,
                             product.id ?: 0,
@@ -536,7 +547,7 @@ fun ColorCirclesRow(colorNames: List<String> ,onColorChange: (String) -> Unit
                         .size(40.dp)
                         .padding(4.dp)
                         .background(color = color, shape = CircleShape)
-                        .border(0.5.dp, shape = CircleShape, color = Color.Black)
+                        .border(2.dp, shape = CircleShape, color = AppColors.MintGreen)
                         .clickable { colorSelection=index
                                     onColorChange(colorNames[colorSelection])
                         }
@@ -594,7 +605,7 @@ fun SizeCirclesRow(Itemsizes: List<String>,onSizeChange: (String) -> Unit) {
                             .size(50.dp)
                             .padding(4.dp)
                             .background(color = Color.White, shape = RectangleShape)
-                            .border(0.5.dp, shape = CircleShape, color = Color.Black)
+                            .border(2.dp, shape = CircleShape, color = AppColors.MintGreen)
                             .clickable { sizeSelection=index
                                 onSizeChange(Itemsizes[sizeSelection])
                             }
