@@ -26,6 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -59,7 +61,8 @@ fun ChangePasswordScreen(navController: NavController){
                         .height(75.dp)
                         .background(color = Color.White)
                         .padding(10.dp),
-                    colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.MintGreen)
+                    colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.MintGreen),
+                    visualTransformation =  PasswordVisualTransformation()
                 )
                 Text("Confirm Password", fontSize = 18.sp, modifier = Modifier.padding(8.dp))
                 OutlinedTextField(
@@ -71,7 +74,8 @@ fun ChangePasswordScreen(navController: NavController){
                         .height(75.dp)
                         .background(color = Color.White)
                         .padding(10.dp),
-                    colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.MintGreen)
+                    colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.MintGreen),
+                    visualTransformation =  PasswordVisualTransformation()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 // Create Account Button
