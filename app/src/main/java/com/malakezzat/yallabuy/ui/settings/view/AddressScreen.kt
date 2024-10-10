@@ -89,6 +89,7 @@ import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.model.AddressRequest
 import com.malakezzat.yallabuy.model.CustomerId
+import com.malakezzat.yallabuy.ui.CustomTopBar
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -111,6 +112,11 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
     var addressState by remember { mutableStateOf(address ?: "") }
     var saveButton by remember { mutableStateOf("Save") }
     var screenTitle by remember { mutableStateOf("New Address") }
+    //search on city and country list
+    var searchQuery by remember { mutableStateOf("") }
+    var countrySearchQuery by remember { mutableStateOf("") }
+    var citySearchQuery by remember { mutableStateOf("") }
+
 
     val sharedPreferences = LocalContext.current.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
     LaunchedEffect(Unit) {
@@ -195,417 +201,466 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
     }
 
 
+    androidx.compose.material3.Scaffold(
+        topBar = { CustomTopBar(navController,"New Address")},
+        containerColor = Color.White,
+        content = { paddingValues ->
 
-
-    LazyColumn(modifier = Modifier.padding(16.dp)) {
-        item{
-            Text(
-                text = "New Address",
-                style = MaterialTheme.typography.headlineMedium,
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = buildAnnotatedString {
-                    append("Phone Number ")
-                    withStyle(style = SpanStyle(color = Color.Red, fontWeight = FontWeight.Bold, fontSize = 24.sp)) {
-                        append("*")
-                    }
-                },
-                fontSize = 18.sp
-            )
-            OutlinedTextField(
-                value = phoneNumber,
-                onValueChange = { input ->
-                    val regex = Regex("^0(1[0125])?\\d{0,8}$")
-                    if (regex.matches(input) || input.isEmpty()) {
-                        phoneNumber = input
-                    } else {
-                        Toast.makeText(context, "Enter a vaild number", Toast.LENGTH_SHORT).show()
-                    }
-                },
-                label = { Text(text = "Phone Number") },
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = Color.White)
-                    .padding(top = 2.dp),
-                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.MintGreen)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+            LazyColumn(modifier = Modifier.padding(16.dp)
+                .padding(paddingValues)
             ) {
-                Text(
-                    text = buildAnnotatedString {
-                        append("Address ")
-                        withStyle(style = SpanStyle(color = Color.Red, fontWeight = FontWeight.Bold, fontSize = 24.sp)) {
-                            append("*")
-                        }
-                    },
-                    fontSize = 18.sp,
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
-//                Text(text = "Address",
-//                    fontSize = 18.sp,
-//                    modifier = Modifier.align(Alignment.CenterVertically)
-//                )
-                Row {
-//                    Button(
-//                        onClick = {
-//
-//                        },
-//                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-//                        shape = RoundedCornerShape(10.dp)
-//                    ) {
-//                        Text(
-//                            text = "Map",
-//                            color = Color.White,
-//                            fontSize = 16.sp
-//                        )
-//                    }
-//                    Spacer(modifier = Modifier.width(8.dp))
-                    Button(
-                        onClick = {
-                            if (ContextCompat.checkSelfPermission(
-                                    context,
-                                    Manifest.permission.ACCESS_FINE_LOCATION
-                                ) == PackageManager.PERMISSION_GRANTED
+                item {
+                    /*Text(
+                        text = "New Address",
+                        style = MaterialTheme.typography.headlineMedium,
+                    )*/
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = buildAnnotatedString {
+                            append("Phone Number ")
+                            withStyle(
+                                style = SpanStyle(
+                                    color = Color.Red,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 24.sp
+                                )
                             ) {
-                                getUserLocation(context,fusedLocationClient) { loc ->
-                                    addressState = loc
-                                }
-                            } else {
-                                    permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                                append("*")
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                        shape = RoundedCornerShape(10.dp)
+                        fontSize = 18.sp
+                    )
+                    OutlinedTextField(
+                        value = phoneNumber,
+                        onValueChange = { input ->
+                            val regex = Regex("^0(1[0125])?\\d{0,8}$")
+                            if (regex.matches(input) || input.isEmpty()) {
+                                phoneNumber = input
+                            } else {
+                                Toast.makeText(context, "Enter a vaild number", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        },
+                        label = { Text(text = "Phone Number") },
+                        shape = RoundedCornerShape(30.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(color = Color.White)
+                            .padding(top = 2.dp),
+                        colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.Teal)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "GPS",
+                            text = buildAnnotatedString {
+                                append("Address ")
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = Color.Red,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 24.sp
+                                    )
+                                ) {
+                                    append("*")
+                                }
+                            },
+                            fontSize = 18.sp,
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                        )
+                        Row {
+
+                            Button(
+                                onClick = {
+                                    if (ContextCompat.checkSelfPermission(
+                                            context,
+                                            Manifest.permission.ACCESS_FINE_LOCATION
+                                        ) == PackageManager.PERMISSION_GRANTED
+                                    ) {
+                                        getUserLocation(context, fusedLocationClient) { loc ->
+                                            addressState = loc
+                                        }
+                                    } else {
+                                        permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
+                                shape = RoundedCornerShape(30.dp)
+                            ) {
+                                Text(
+                                    text = "GPS",
+                                    color = Color.White,
+                                    fontSize = 16.sp
+                                )
+                            }
+                        }
+                    }
+                    OutlinedTextField(
+                        value = addressState,
+                        onValueChange = { input -> addressState = input },
+                        label = { Text(text = "Address") },
+                        shape = RoundedCornerShape(30.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(color = Color.White)
+                            .padding(top = 2.dp),
+                        colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.Teal)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = buildAnnotatedString {
+                            append("Country ")
+                            withStyle(
+                                style = SpanStyle(
+                                    color = Color.Red,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 24.sp
+                                )
+                            ) {
+                                append("*")
+                            }
+                        },
+                        fontSize = 18.sp,
+                    )
+                    ExposedDropdownMenuBox(
+                        expanded = expandedCountry,
+                        onExpandedChange = { expandedCountry = !expandedCountry }
+                    ) {
+                        TextField(
+                            value = country,
+                            onValueChange = { /* No change here since it's readOnly */ },
+                            readOnly = true,
+                            label = { Text(text = "Country") },
+                            trailingIcon = {
+                                Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                            },
+                            colors = TextFieldDefaults.textFieldColors(
+                                unfocusedIndicatorColor = Color.Green
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor()
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = expandedCountry,
+                            onDismissRequest = { expandedCountry = false }
+                        ) {
+                            TextField(
+                                value = searchQuery,
+                                onValueChange = { searchQuery = it },
+                                label = { Text("Search Country") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            countries.filter { it.contains(searchQuery, ignoreCase = true) }.forEach { countryOption ->
+                                DropdownMenuItem(onClick = {
+                                    country = countryOption
+                                    expandedCountry = false
+                                    searchQuery = ""
+                                }) {
+                                    Text(text = countryOption)
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = buildAnnotatedString {
+                            append("City ")
+                            withStyle(
+                                style = SpanStyle(
+                                    color = Color.Red,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 24.sp
+                                )
+                            ) {
+                                append("*")
+                            }
+                        },
+                        fontSize = 18.sp,
+                    )
+                    ExposedDropdownMenuBox(
+                        expanded = expandedCity,
+                        onExpandedChange = {
+                            if (cities.isEmpty()) {
+                                Toast.makeText(context, "Choose a Country First", Toast.LENGTH_SHORT).show()
+                            } else {
+                                expandedCity = !expandedCity
+                            }
+                        }
+                    ) {
+                        TextField(
+                            value = city,
+                            onValueChange = { /* No change here since it's readOnly */ },
+                            readOnly = true,
+                            label = { Text(text = "City") },
+                            trailingIcon = {
+                                Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                            },
+                            colors = TextFieldDefaults.textFieldColors(
+                                unfocusedIndicatorColor = Color.Green
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor()
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = expandedCity,
+                            onDismissRequest = { expandedCity = false }
+                        ) {
+
+                            TextField(
+                                value = searchQuery,
+                                onValueChange = { searchQuery = it },
+                                label = { Text("Search City") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            cities.filter { it.contains(searchQuery, ignoreCase = true) }.forEach { cityOption ->
+                                DropdownMenuItem(onClick = {
+                                    city = cityOption
+                                    expandedCity = false
+                                    searchQuery = ""
+                                }) {
+                                    Text(text = cityOption)
+                                }
+                            }
+                        }
+                    }
+
+
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = "First Name", fontSize = 18.sp)
+                    OutlinedTextField(
+                        value = firstName,
+                        onValueChange = { input ->
+                            if (input.all { it.isLetter() }) {
+                                firstName = input
+                            }
+                        },
+                        label = { Text(text = "First Name") },
+                        shape = RoundedCornerShape(30.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(color = Color.White)
+                            .padding(top = 2.dp),
+                        colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.Teal)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = "Last Name", fontSize = 18.sp)
+                    OutlinedTextField(
+                        value = lastName,
+                        onValueChange = { input ->
+                            if (input.all { it.isLetter() }) {
+                                lastName = input
+                            }
+                        },
+                        label = { Text(text = "Last Name") },
+                        shape = RoundedCornerShape(30.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(color = Color.White)
+                            .padding(top = 2.dp),
+                        colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.Teal)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        onClick = {
+                            if (phoneNumber.isNotBlank()
+                                && addressState.isNotBlank() && city.isNotBlank() && country.isNotBlank()
+                            ) {
+                                userId?.let {
+                                    val address1 = Address(
+                                        customer_id = it,
+                                        first_name = firstName,
+                                        last_name = lastName,
+                                        phone = phoneNumber,
+                                        address1 = addressState,
+                                        city = city,
+                                        country = country
+                                    )
+                                    if (address?.let { isAddressId(it) } == true) {
+                                        viewModel.updateUserAddress(
+                                            it,
+                                            addressId,
+                                            AddressRequest(address1)
+                                        )
+                                    } else {
+                                        viewModel.addNewAddress(it, AddressRequest(address1))
+                                    }
+                                }
+
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "Please fill all fields",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
+                        shape = RoundedCornerShape(30.dp)
+                    ) {
+                        Text(
+                            text = saveButton,
                             color = Color.White,
                             fontSize = 16.sp
                         )
                     }
                 }
             }
-            OutlinedTextField(
-                value = addressState,
-                onValueChange = {input -> addressState = input },
-                label = { Text(text = "Address") },
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = Color.White)
-                    .padding(top = 2.dp),
-                colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.MintGreen)
-            )
+        })
 
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = buildAnnotatedString {
-                    append("Country ")
-                    withStyle(style = SpanStyle(color = Color.Red, fontWeight = FontWeight.Bold, fontSize = 24.sp)) {
-                        append("*")
+
+            if (!locationEnabled && permissionGranted) {
+                LocationPrompt()
+            }
+        }
+
+        fun getUserLocation(
+            context: Context,
+            fusedLocationClient: FusedLocationProviderClient,
+            onLocationReceived: (String) -> Unit
+        ) {
+            if (ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return
+            }
+
+            fusedLocationClient.getCurrentLocation(
+                LocationRequest.PRIORITY_HIGH_ACCURACY,
+                object : CancellationToken() {
+                    override fun onCanceledRequested(p0: OnTokenCanceledListener) =
+                        CancellationTokenSource().token
+
+                    override fun isCancellationRequested() = false
+                }).addOnSuccessListener { location: Location? ->
+                if (location == null)
+                    onLocationReceived("Cannot get location.")
+                else {
+                    val geocoder = Geocoder(context, Locale.getDefault())
+                    val addresses =
+                        geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                    val address = addresses?.get(0)?.getAddressLine(0) ?: "Address not available"
+
+                    onLocationReceived(address)
+                }
+
+            }
+
+        }
+
+        fun isLocationEnabled(context: Context): Boolean {
+            val locationManager =
+                context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        }
+
+        @Composable
+        fun EnableLocationDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+            AlertDialog(
+                onDismissRequest = onDismiss,
+                title = { Text(text = "Enable Location") },
+                text = { Text("Please enable location services to use this feature.") },
+                confirmButton = {
+                    Button(onClick = {
+                        onConfirm()
+                        onDismiss()
+                    }) {
+                        Text("Settings")
                     }
                 },
-                fontSize = 18.sp,
-            )
-            ExposedDropdownMenuBox(
-                expanded = expandedCountry,
-                onExpandedChange = { expandedCountry = !expandedCountry }
-            ) {
-                TextField(
-                    value = country,
-                    onValueChange = { /* No change here since it's readOnly */ },
-                    readOnly = true,
-                    label = { Text(text = "Country") },
-                    trailingIcon = {
-                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-                    },
-                    colors = TextFieldDefaults.textFieldColors(
-                        unfocusedIndicatorColor = Color.Green
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor()
-                )
-
-                ExposedDropdownMenu(
-                    expanded = expandedCountry,
-                    onDismissRequest = { expandedCountry = false }
-                ) {
-                    countries.forEach { countryOption ->
-                        DropdownMenuItem(onClick = {
-                            country = countryOption
-                            expandedCountry = false
-                        }) {
-                            Text(text = countryOption)
-                        }
+                dismissButton = {
+                    Button(onClick = onDismiss) {
+                        Text("Cancel")
                     }
                 }
+            )
+        }
+
+        @Composable
+        fun LocationPrompt() {
+            val context = LocalContext.current
+            var showDialog by remember { mutableStateOf(false) }
+
+            if (!isLocationEnabled(context)) {
+                showDialog = true
             }
 
-
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = buildAnnotatedString {
-                    append("City ")
-                    withStyle(style = SpanStyle(color = Color.Red, fontWeight = FontWeight.Bold, fontSize = 24.sp)) {
-                        append("*")
-                    }
-                },
-                fontSize = 18.sp,
-            )
-            ExposedDropdownMenuBox(
-                expanded = expandedCity,
-                onExpandedChange = { if (cities.isEmpty()) {
-                    Toast.makeText(context, "Choose a Country First", Toast.LENGTH_SHORT).show()
-                } else {
-                    expandedCity = !expandedCity
-                } }
-            ) {
-                TextField(
-                    value = city,
-                    onValueChange = { /* No change here since it's readOnly */ },
-                    readOnly = true,
-                    label = { Text(text = "City") },
-                    trailingIcon = {
-                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+            if (showDialog) {
+                EnableLocationDialog(
+                    onConfirm = {
+                        context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
                     },
-                    colors = TextFieldDefaults.textFieldColors(
-                        unfocusedIndicatorColor = Color.Green
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor()
-                )
-
-                ExposedDropdownMenu(
-                    expanded = expandedCity,
-                    onDismissRequest = { expandedCity = false }
-                ) {
-                    cities.forEach { cityOption ->
-                        DropdownMenuItem(onClick = {
-                            city = cityOption
-                            expandedCity = false
-                        }) {
-                            Text(text = cityOption)
-                        }
+                    onDismiss = {
+                        showDialog = false
                     }
-                }
-            }
-
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "First Name", fontSize = 18.sp)
-            OutlinedTextField(
-                value = firstName,
-                onValueChange = { input ->
-                    if (input.all { it.isLetter()  }) {
-                        firstName = input
-                    }
-                },
-                label = { Text(text = "First Name") },
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = Color.White)
-                    .padding(top = 2.dp),
-                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.MintGreen)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Last Name", fontSize = 18.sp)
-            OutlinedTextField(
-                value = lastName,
-                onValueChange = { input ->
-                    if (input.all { it.isLetter() }) {
-                        lastName = input
-                    }
-                },
-                label = { Text(text = "Last Name") },
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = Color.White)
-                    .padding(top = 2.dp),
-                colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.MintGreen)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                onClick = {
-                    if(phoneNumber.isNotBlank()
-                        && addressState.isNotBlank() && city.isNotBlank() && country.isNotBlank()) {
-                        userId?.let {
-                            val address1 = Address(
-                                customer_id = it,
-                                first_name = firstName,
-                                last_name = lastName,
-                                phone = phoneNumber,
-                                address1 = addressState,
-                                city = city,
-                                country = country
-                            )
-                            if (address?.let { isAddressId(it) } == true) {
-                                viewModel.updateUserAddress(it, addressId, AddressRequest(address1))
-                            } else {
-                                viewModel.addNewAddress(it, AddressRequest(address1))
-                            }
-                        }
-
-                    } else {
-                        Toast.makeText(context,"Please fill all fields" ,Toast.LENGTH_SHORT).show()
-                    }
-
-
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Text(
-                    text = saveButton,
-                    color = Color.White,
-                    fontSize = 16.sp
                 )
             }
         }
-    }
-    if (!locationEnabled && permissionGranted) {
-        LocationPrompt()
-    }
-}
 
-fun getUserLocation(context: Context, fusedLocationClient: FusedLocationProviderClient,  onLocationReceived: (String) -> Unit) {
-    if (ActivityCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ) != PackageManager.PERMISSION_GRANTED
-    ) {
-        return
-    }
-
-        fusedLocationClient.getCurrentLocation(
-            LocationRequest.PRIORITY_HIGH_ACCURACY,
-            object : CancellationToken() {
-                override fun onCanceledRequested(p0: OnTokenCanceledListener) =
-                    CancellationTokenSource().token
-
-                override fun isCancellationRequested() = false
-            }).addOnSuccessListener { location: Location? ->
-            if (location == null)
-                onLocationReceived("Cannot get location.")
-            else {
-                val geocoder = Geocoder(context, Locale.getDefault())
-                val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
-                val address = addresses?.get(0)?.getAddressLine(0) ?: "Address not available"
-
-                onLocationReceived(address)
+        fun getCitiesFromCountries(context: Context, countryName: String): List<String> {
+            val json: String
+            try {
+                val inputStream = context.assets.open("cities_countries.json")
+                val size = inputStream.available()
+                val buffer = ByteArray(size)
+                inputStream.read(buffer)
+                inputStream.close()
+                json = String(buffer, Charsets.UTF_8)
+            } catch (ex: IOException) {
+                ex.printStackTrace()
+                return emptyList()
             }
 
+            val type = object : TypeToken<Map<String, List<String>>>() {}.type
+            val countriesWithCities: Map<String, List<String>> = Gson().fromJson(json, type)
+
+            return countriesWithCities[countryName] ?: emptyList()
         }
 
-}
-
-fun isLocationEnabled(context: Context): Boolean {
-    val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-    return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-}
-
-@Composable
-fun EnableLocationDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(text = "Enable Location") },
-        text = { Text("Please enable location services to use this feature.") },
-        confirmButton = {
-            Button(onClick = {
-                onConfirm()
-                onDismiss()
-            }) {
-                Text("Settings")
+        fun getCountries(context: Context): List<String> {
+            val json: String
+            try {
+                val inputStream = context.assets.open("cities_countries.json")
+                val size = inputStream.available()
+                val buffer = ByteArray(size)
+                inputStream.read(buffer)
+                inputStream.close()
+                json = String(buffer, Charsets.UTF_8)
+            } catch (ex: IOException) {
+                ex.printStackTrace()
+                return emptyList()
             }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss) {
-                Text("Cancel")
-            }
+
+            val type = object : TypeToken<Map<String, List<String>>>() {}.type
+            val countriesWithCities: Map<String, List<String>> = Gson().fromJson(json, type)
+
+            return countriesWithCities.keys.toList()
         }
-    )
-}
 
-@Composable
-fun LocationPrompt() {
-    val context = LocalContext.current
-    var showDialog by remember { mutableStateOf(false) }
-
-    if (!isLocationEnabled(context)) {
-        showDialog = true
-    }
-
-    if (showDialog) {
-        EnableLocationDialog(
-            onConfirm = {
-                context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-            },
-            onDismiss = {
-                showDialog = false
-            }
-        )
-    }
-}
-
-fun getCitiesFromCountries(context: Context, countryName: String): List<String> {
-    val json: String
-    try {
-        val inputStream = context.assets.open("cities_countries.json")
-        val size = inputStream.available()
-        val buffer = ByteArray(size)
-        inputStream.read(buffer)
-        inputStream.close()
-        json = String(buffer, Charsets.UTF_8)
-    } catch (ex: IOException) {
-        ex.printStackTrace()
-        return emptyList()
-    }
-
-    val type = object : TypeToken<Map<String, List<String>>>() {}.type
-    val countriesWithCities: Map<String, List<String>> = Gson().fromJson(json, type)
-
-    return countriesWithCities[countryName] ?: emptyList()
-}
-
-fun getCountries(context: Context): List<String> {
-    val json: String
-    try {
-        val inputStream = context.assets.open("cities_countries.json")
-        val size = inputStream.available()
-        val buffer = ByteArray(size)
-        inputStream.read(buffer)
-        inputStream.close()
-        json = String(buffer, Charsets.UTF_8)
-    } catch (ex: IOException) {
-        ex.printStackTrace()
-        return emptyList()
-    }
-
-    val type = object : TypeToken<Map<String, List<String>>>() {}.type
-    val countriesWithCities: Map<String, List<String>> = Gson().fromJson(json, type)
-
-    return countriesWithCities.keys.toList()
-}
-
-fun isAddressId(input: String): Boolean {
-    return input.toLongOrNull() != null
-}
+        fun isAddressId(input: String): Boolean {
+            return input.toLongOrNull() != null
+        }
