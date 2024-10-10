@@ -102,7 +102,7 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
 
                     // Account Management Section
                     SectionWithPadding(title = "Account Management") {
-                        ProfileItem(icon = R.drawable.ic_change_password, title = "Change Password",{})
+                        ProfileItem(icon = R.drawable.ic_change_password, title = "Change Password",{navController.navigate(Screen.ChangePassScreen.route)})
                         //DarkThemeToggle() // Dark Theme Toggle inside the Account Management section
                     }
 
@@ -177,13 +177,13 @@ fun UserInfoSection(navController: NavController, onLogoutClick: () -> Unit) {
             modifier = Modifier.weight(1f) // Takes remaining space
         ) {
             Text(
-                text = "Ahmed Raza", // User name from viewModel
+                text = FirebaseAuth.getInstance().currentUser?.displayName.toString(), // User name from viewModel
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
             Text(
-                text = "ahmedraza@gmail.com", // User email from viewModel
+                text = FirebaseAuth.getInstance().currentUser?.email.toString(), // User email from viewModel
                 fontSize = 16.sp,
                 color = Color.White
             )

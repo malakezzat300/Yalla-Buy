@@ -41,6 +41,7 @@ import com.malakezzat.yallabuy.ui.productbycategory.view.ProductsByBrandScreen
 import com.malakezzat.yallabuy.ui.productbycategory.view.ProductsByCategoryScreen
 import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollectionIdViewModel
 import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollectionIdViewModelFactory
+import com.malakezzat.yallabuy.ui.profile.view.ChangePasswordScreen
 import com.malakezzat.yallabuy.ui.profile.view.FAQScreen
 import com.malakezzat.yallabuy.ui.profile.view.PrivacyPolicyScreen
 import com.malakezzat.yallabuy.ui.profile.view.ProfileScreen
@@ -231,6 +232,9 @@ fun NavigationApp(
                 composable(Screen.WishlistScreen.route) {
                     val viewModel: WishlistViewModel = viewModel(factory = wishlistViewModelFactory)
                     WishlistScreen(viewModel, navController)
+                }
+                composable(Screen.ChangePassScreen.route) {
+                    ChangePasswordScreen(navController)
                 }
             }
         }
