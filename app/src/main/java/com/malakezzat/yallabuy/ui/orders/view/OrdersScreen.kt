@@ -137,7 +137,7 @@ fun OrdersScreen(
             if (orders.isNullOrEmpty()) {
                 NoOrdersScreen(navController)
             } else {
-                CompletedOrdersScreen(orders)
+                CompletedOrdersScreen(orders,navController)
             }
         }
 
@@ -200,8 +200,9 @@ fun NoOrdersScreen(navController: NavController) {
 }
 
 @Composable
-fun CompletedOrdersScreen(orders: List<Order>) {
+fun CompletedOrdersScreen(orders: List<Order>,navController: NavController) {
     Scaffold(
+        topBar = { CustomTopBarr(navController) },
         containerColor = Color.White,
         content = { paddingValues ->
             Column(
@@ -210,12 +211,6 @@ fun CompletedOrdersScreen(orders: List<Order>) {
                     .padding(paddingValues)
                     .padding(16.dp)
             ) {
-                Text(
-                    text = "Completed Orders",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = AppColors.Teal,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
 
                 LazyColumn {
                     itemsIndexed(orders) {_,order ->
@@ -234,23 +229,107 @@ fun OrderItem(order: Order) {
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         elevation = CardDefaults.cardElevation(4.dp),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(text = "Order ID: ${order.id}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Order Total: ${order.total_price} EGP", style = MaterialTheme.typography.bodyMedium)
-            Spacer(modifier = Modifier.height(8.dp))
-
+           // Text(text = "Order ID: ${order.id}", style = MaterialTheme.typography.bodyMedium)
             order.line_items.forEach { item ->
-                Text(text = "Item: ${item.title} - ${item.variant_title}", style = MaterialTheme.typography.bodySmall)
-                Text(text = "Quantity: ${item.quantity}", style = MaterialTheme.typography.bodySmall)
-                Text(text = "Price: ${item.price} EGP", style = MaterialTheme.typography.bodySmall)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = item.title,
+                        fontSize = 22.sp,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AppColors.Teal
+                    )
+                    /*Text(
+                        text = item.title,
+                        fontSize = 15.sp,
+                        style = MaterialTheme.typography.bodySmall
+                    )*/
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Item variant: ",
+                        fontSize = 18.sp,
+                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                        color = AppColors.GrayDark
+                    )
+                    Text(
+                        text = "${item.variant_title}",
+                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                        color = AppColors.GrayLight
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Quantity: ",
+                        fontSize = 18.sp,
+                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                        color = AppColors.GrayDark
+                    )
+                    Text(
+                        text = "${item.quantity}",
+                        fontSize = 18.sp,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AppColors.GrayLight
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Price: ",
+                        fontSize = 18.sp,
+                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                        color = AppColors.GrayDark
+                    )
+                    Text(
+                        text = "${item.price} EGP",
+                        fontSize = 18.sp,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AppColors.GrayLight
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(8.dp))
             }
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Order Total: ",
+                    fontSize = 18.sp,
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                )
+                Text(
+                    text = "${order.total_price} EGP",
+                    fontSize = 18.sp,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AppColors.Teal
+                )
+            }
+
         }
     }
 }
