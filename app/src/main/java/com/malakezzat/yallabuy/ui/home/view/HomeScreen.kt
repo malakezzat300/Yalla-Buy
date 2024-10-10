@@ -99,8 +99,6 @@ fun HomeScreen(
     val productState by viewModel.productList.collectAsStateWithLifecycle()
     val categoriesState by viewModel.categoriesList.collectAsStateWithLifecycle()
     val brandsState by viewModel.brandsList.collectAsStateWithLifecycle()
-    val exchangeRate by viewModel.conversionRate.collectAsState()
-
     //Currency
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
@@ -108,19 +106,6 @@ fun HomeScreen(
         Log.d(TAG, categoriesState.toString())
         viewModel.getAllProducts()
         viewModel.getAllCategories()
-
-        if(CurrencyPreferences.getInstance(context).getFirstLaunch()){
-            viewModel.getRate()
-            CurrencyPreferences.getInstance(context).setFirstLaunch(false)
-        }
-    }
-
-    when(exchangeRate){
-        is ApiState.Error -> Log.i("currencyTest", "SettingsScreen: exchangeRate ${(exchangeRate as ApiState.Error).message}")
-        ApiState.Loading -> {}
-        is ApiState.Success -> {
-            CurrencyPreferences.getInstance(context).saveExchangeRate((exchangeRate as ApiState.Success).data?.conversion_rates)
-        }
     }
 
     Scaffold(
@@ -138,7 +123,7 @@ fun HomeScreen(
 
             when (brandsState) {
                 is ApiState.Loading -> {
-                    CircularProgressIndicator(color = AppColors.Teal, modifier = Modifier.align(Alignment.CenterHorizontally))
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
 
                 is ApiState.Success -> {
@@ -155,7 +140,7 @@ fun HomeScreen(
             }
             when (categoriesState) {
                 is ApiState.Loading -> {
-                    CircularProgressIndicator(color = AppColors.Teal,modifier = Modifier.align(Alignment.CenterHorizontally))
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
 
                 is ApiState.Success -> {
@@ -174,7 +159,7 @@ fun HomeScreen(
             }
             when (productState) {
                 is ApiState.Loading -> {
-                    CircularProgressIndicator(color = AppColors.Teal,modifier = Modifier.align(Alignment.CenterHorizontally))
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
 
                 is ApiState.Success -> {
@@ -204,9 +189,9 @@ fun BrandsList(brands: List<SmartCollection>,navController: NavController) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Brands", color = AppColors.Teal, style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
+            Text("Brands", color = AppColors.Teal, style = MaterialTheme.typography.titleLarge)
             Text(
-                "SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
+                "SEE ALL", style =  MaterialTheme.typography.titleSmall,
                 color = AppColors.RoseLight
             )
         }
@@ -273,10 +258,7 @@ fun CustomTopBarHome(navController: NavController) {
             )
             Text(
                 text = "YallaBuy",
-                style = TextStyle(
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                ), color = AppColors.Teal,
+                style =  MaterialTheme.typography.titleLarge, color = AppColors.Teal,
                 modifier = Modifier.padding(start = 4.dp)
             )
         }
@@ -436,7 +418,7 @@ fun CategoriesSection(categories: List<CustomCollection>,navController: NavContr
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Categories", color = AppColors.Teal, style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
+            Text("Categories", color = AppColors.Teal, style =  MaterialTheme.typography.titleLarge)
         }
         LazyRow(
             modifier = Modifier.padding(top = 8.dp),
@@ -481,7 +463,7 @@ fun CategoryItem(category: CustomCollection,navController: NavController) {
             )
             Text(
                 text = category.title,
-                style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
+                style =  MaterialTheme.typography.titleSmall,
                 color = AppColors.MintGreen,
                 modifier = Modifier.padding(top = 10.dp, bottom = 10.dp)
             )
@@ -502,13 +484,13 @@ fun LatestProductsSection(products: List<Product>, navController: NavController)
         ) {
             Text(
                 "All Products",
-                style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.titleLarge,
                 color = AppColors.Teal
                 ,
                 modifier = Modifier.padding(8.dp)
             )
             Text(
-                "SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
+                "SEE ALL", style =  MaterialTheme.typography.titleSmall,
                 color = AppColors.RoseLight
             )
         }
@@ -576,7 +558,7 @@ fun ProductCard(product: Product, navController: NavController) {
                     contentScale = ContentScale.Fit
                 )
             }
-                Text(product.title, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
+                Text(product.title, style =  MaterialTheme.typography.titleSmall)
                 Text(product.vendor, color = AppColors.MintGreen)
                 val price = product.variants.first().price
                 CurrencyConverter.changeCurrency(price.toDouble())?.let{
@@ -650,7 +632,7 @@ fun BottomNavigationBar(navController: NavController) {
                     modifier = Modifier.size(24.dp)
                 )
             },
-            label = { Text("Home", style = TextStyle(fontSize = 12.sp)) },
+            label = { Text("Home", style =  MaterialTheme.typography.titleSmall) },
             selected = currentRoute == Screen.HomeScreen.route,
             onClick = {
                 if (currentRoute != Screen.HomeScreen.route) {
@@ -669,7 +651,7 @@ fun BottomNavigationBar(navController: NavController) {
                     modifier = Modifier.size(24.dp)
                 )
             },
-            label = { Text("Categories", style = TextStyle(fontSize = 11.5.sp)) },
+            label = { Text("Categories", style =  MaterialTheme.typography.titleSmall) },
             selected = currentRoute == Screen.CategoriesScreen.route,
             onClick = {
                 if (currentRoute != Screen.CategoriesScreen.route) {
@@ -688,7 +670,7 @@ fun BottomNavigationBar(navController: NavController) {
                     modifier = Modifier.size(24.dp)
                 )
             },
-            label = { Text("My Cart", style = TextStyle(fontSize = 12.sp)) },
+            label = { Text("My Cart", style =  MaterialTheme.typography.titleSmall) },
             selected = currentRoute == Screen.ShoppingScreen.route,
             onClick = {
                 if (currentRoute != Screen.ShoppingScreen.route) {
@@ -707,7 +689,7 @@ fun BottomNavigationBar(navController: NavController) {
                     modifier = Modifier.size(24.dp)
                 )
             },
-            label = { Text("Wishlist", style = TextStyle(fontSize = 12.sp)) },
+            label = { Text("Wishlist", style =  MaterialTheme.typography.titleSmall) },
             selected = currentRoute == Screen.WishlistScreen.route,
             onClick = {
                 if (currentRoute != Screen.WishlistScreen.route) {
@@ -726,7 +708,7 @@ fun BottomNavigationBar(navController: NavController) {
                     modifier = Modifier.size(24.dp)
                 )
             },
-            label = { Text("Profile", style = TextStyle(fontSize = 12.sp)) },
+            label = { Text("Profile", style =  MaterialTheme.typography.titleSmall) },
             selected =  currentRoute == Screen.ProfileScreen.route,
             onClick = {
                 if (currentRoute != Screen.SettingsScreen.route) {
