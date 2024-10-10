@@ -101,9 +101,11 @@ fun ShoppingCartScreen(
     var variantSet by remember { mutableStateOf(mutableSetOf<Variant>() ) }
     var itemsCount by remember { mutableIntStateOf(0) }
 
+
     when(variantState){
         is ApiState.Error -> Log.i("shoppingCartTest", "ShoppingCartScreen: draftOrder ${(variantState as ApiState.Error).message}")
-        ApiState.Loading -> {}
+        ApiState.Loading -> {
+        }
         is ApiState.Success -> {
             variant = (variantState as ApiState.Success).data.variant
             variantSet.add(variant)
@@ -117,6 +119,7 @@ fun ShoppingCartScreen(
         }
         ApiState.Loading -> {
             isLoading = true
+
         }
         is ApiState.Success -> {
             isLoading = false
@@ -133,7 +136,9 @@ fun ShoppingCartScreen(
     }
 
     LaunchedEffect(orderItems){
-        itemsCount = orderItems.size
+        itemsCount = 0
+        orderItems.forEach {
+        }
     }
 
     LaunchedEffect (subtotal,draftOrder) {
@@ -147,6 +152,8 @@ fun ShoppingCartScreen(
             VoucherBottomSheet(viewModel,draftOrder)
         },
         content = {
+
+
             if (orderItems.isNotEmpty()) {
                 Scaffold(
                     topBar = { CustomTopBar(bottomSheetState,navController) },
@@ -158,9 +165,7 @@ fun ShoppingCartScreen(
                                 .padding(paddingValues)
 
                         ) {
-                            if(isLoading) {
-                                CircularProgressIndicator(modifier = Modifier.align(alignment = Alignment.Center))
-                            }
+
                             LazyColumn(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -168,14 +173,19 @@ fun ShoppingCartScreen(
                                     .padding(bottom = 230.dp)
                             ) {
 
+
                                 if(orderItems.isNotEmpty()){
                                     items(orderItems.size) { index ->
+                                        itemsCount = 0
+                                        orderItems.forEach { itemsCount += it.quantity }
                                         val orderItem = orderItems[index]
                                         ShoppingItem(viewModel,orderItem,draftOrder,variantSet,subtotal,{
                                             subtotal = calculateSubtotal(orderItems)
                                             total = subtotal
+
                                         },
-                                        navController)
+                                        navController,
+                                            itemsCount)
 
                                     }
                                 }
@@ -264,12 +274,16 @@ fun ShoppingItem(
     variantSet: Set<Variant>,
     subtotal : Double,
     onItemUpdated: () -> Unit,
-    navController: NavController
+    navController: NavController,
+    itemsCount: Int
 ) {
+    var isMinusEnabled by remember { mutableStateOf(true) }
+    var isPlusEnabled by remember { mutableStateOf(true) }
     val coroutineScope = rememberCoroutineScope()
     var showDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
+
 
     Card(
         modifier = Modifier
@@ -323,17 +337,17 @@ fun ShoppingItem(
                         )
                     }
                     Text(
-                        text = "size: ${item.properties[1].value}",
+                        text = "size: ${item.properties[1].value} \\ color: ${item.properties[2].value}",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
                     )
-                    Text(
-                        text = "color: ${item.properties[2].value}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
-                    )
-                }
 
+                }
+                if (item.quantity == 1) {
+                    isMinusEnabled = false
+                } else {
+                    isMinusEnabled = true
+                }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -344,10 +358,6 @@ fun ShoppingItem(
                         onClick = {
                             val newQuantity = (item.quantity - 1).coerceAtLeast(1)
                             item.quantity = newQuantity
-                            if (item.quantity == 1) {
-                                Toast.makeText(context, "Min Limit reached", Toast.LENGTH_SHORT).show()
-                            }
-
                             val updatedDraftItems = draftOrder.line_items.map { currentItem ->
                                 if (currentItem == item) {
                                     currentItem.copy(quantity = newQuantity)
@@ -365,7 +375,8 @@ fun ShoppingItem(
                                 }
                             }
                             onItemUpdated()
-                        }
+                        },
+                        enabled = isMinusEnabled
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_minus),
@@ -382,19 +393,20 @@ fun ShoppingItem(
                     // Plus Button
                     IconButton(
                         onClick = {
-                            if (subtotal <= 1000) {
-                                val newQuantity = (item.quantity + 1).coerceAtMost(
-                                    checkMaxQuantity(
-                                        item.variant_id,
-                                        variantSet
-                                    )
-                                )
-                                item.quantity = newQuantity
-                                if (item.quantity == checkMaxQuantity(item.variant_id, variantSet)) {
-                                    Toast.makeText(context, "Max Limit reached", Toast.LENGTH_SHORT)
+                            if (subtotal >= 10000 ) {
+                                Toast.makeText(context, "Maximum payment reached", Toast.LENGTH_SHORT)
+                                    .show()
+                            } else if(itemsCount >= 10) {
+                                Toast.makeText(context, "Maximum items count reached", Toast.LENGTH_SHORT)
+                                    .show()
+                            } else {
+                                val newQuantity = (item.quantity + 1).coerceAtMost(variantSet.find { it.id == item.variant_id }?.inventory_quantity?.toInt() ?: 1)
+                                if(item.quantity == newQuantity){
+                                    Toast.makeText(context, "Out of Stock", Toast.LENGTH_SHORT)
                                         .show()
                                 }
-
+                                item.quantity = newQuantity
+//                                val max = variantSet.find { it.id == item.variant_id }?.inventory_quantity
                                 val updatedDraftItems = draftOrder.line_items.map { currentItem ->
                                     if (currentItem == item) {
                                         currentItem.copy(quantity = newQuantity)
@@ -412,11 +424,8 @@ fun ShoppingItem(
                                     }
                                 }
                                 onItemUpdated()
-                            } else {
-                                Toast.makeText(context, "Maximum payment reached", Toast.LENGTH_SHORT)
-                                    .show()
                             }
-                        }
+                        },
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_add),
@@ -739,6 +748,7 @@ fun DeleteConfirmationDialog(
 
 fun checkMaxQuantity(variantId : Long,variantSet : Set<Variant>) : Int{
     for(item in variantSet){
+        Log.i("quantityTest", "ShoppingItem: quantity ${item.inventory_quantity}")
         if(item.id == variantId){
             if(item.inventory_quantity < 2){
                 return 1
