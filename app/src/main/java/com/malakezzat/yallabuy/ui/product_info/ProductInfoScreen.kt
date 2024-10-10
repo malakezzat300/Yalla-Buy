@@ -2,14 +2,17 @@ package com.malakezzat.yallabuy.ui.product_info
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,11 +30,14 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.sharp.Favorite
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 
@@ -48,9 +54,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -62,7 +71,8 @@ import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.LineItem
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.*
-
+import com.malakezzat.yallabuy.ui.CustomTopBar
+import com.malakezzat.yallabuy.ui.theme.AppColors
 
 
 //@Composable
@@ -191,7 +201,7 @@ fun ProductInfoScreen(
     navController: NavController,
     productId: Long
 ) {
-    // Collecting state variables
+
     val productState by viewModel.searchProductsList.collectAsState()
     val draftOrderId by viewModel.draftOrderId.collectAsState()
     val shoppingCartDraftOrderState by viewModel.shoppingCartDraftOrder.collectAsState()
@@ -201,11 +211,14 @@ fun ProductInfoScreen(
     var shoppingCartDraftOrder by remember { mutableStateOf(DraftOrder(0L, "", listOf(), "")) }
     var wishListDraftOrder by remember { mutableStateOf(DraftOrder(0L, "", listOf(), "")) }
 
-    // Handle draft orders and product states
+    var color by remember { mutableStateOf("") }
+    var size by remember { mutableStateOf("") }
+
     when (draftOrderId) {
         is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(draftOrderId as ApiState.Error).message}")
         ApiState.Loading -> {}
         is ApiState.Success -> draftOrderIdSaved = (draftOrderId as ApiState.Success).data.draft_order.id ?: 0L
+        else -> {}
     }
     when (shoppingCartDraftOrderState) {
         is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(shoppingCartDraftOrderState as ApiState.Error).message}")
@@ -222,10 +235,15 @@ fun ProductInfoScreen(
     LaunchedEffect(key1 = productId) {
         viewModel.getProductById(productId)
     }
-
+    Scaffold(
+        topBar = { CustomTopBar(navController,"Product Details",AppColors.Teal) },
+        containerColor = Color.White,
+        content = { paddingValues ->
     // Main UI layout
-    Box(modifier = Modifier.fillMaxSize()) {
-        // Loading and Error State Handling
+    Box(modifier = Modifier.fillMaxSize()
+         .padding(paddingValues)
+    ) {
+
         when (productState) {
             is ApiState.Loading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -234,35 +252,41 @@ fun ProductInfoScreen(
             }
             is ApiState.Success -> {
                 val product = (productState as ApiState.Success<Product>).data
+                //images
                 LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp) // Space between items
+                    modifier = Modifier.fillMaxWidth()
+                    ,
+
                 ) {
                     items(product.images) { product ->
-                        Image(
-                            painter = rememberAsyncImagePainter(product.src),
-                            contentDescription = null,
-                            contentScale = ContentScale.FillHeight,
-                            modifier = Modifier
-                                .width(350.dp)
-                                .height(200.dp)
-                        )
+
+                            Image(
+                                painter = rememberAsyncImagePainter(product.src),
+                                contentDescription = null,
+                                contentScale = ContentScale.FillHeight,
+                                modifier = Modifier
+                                    .width(400.dp)
+                                    .height(200.dp)
+                                    .align(Alignment.Center)
+                            )
+
+
                     }
                 }
 
-                // Heart and Back Arrow Icons
+                // Heart and Back
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
-                        .align(Alignment.TopStart),
+                        .align(Alignment.TopEnd),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick ={} ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.Black
+                            contentDescription = "W",
+                            tint = Color.White
                         )
                     }
                     AddToFavorites(viewModel, product, FirebaseAuth.getInstance().currentUser?.email.toString(), wishListDraftOrder)
@@ -272,13 +296,18 @@ fun ProductInfoScreen(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
+                        .height(1500.dp)
                         .padding(top = 200.dp)
                 ) {
                     item {
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)),
+                                .height(1000.dp)
+                                .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
+                                .border(1.dp, shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp), color = AppColors.Teal)
+                            ,
+                            shadowElevation = 10.dp,
                             color = Color.White
                         ) {
                             Column(
@@ -291,26 +320,49 @@ fun ProductInfoScreen(
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 20.sp
                                 )
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(10.dp))
                                 // Product Price
-                                val price = product.variants.get(0).price
+                                var price = product.variants.get(0).price
+                                for(item in product.variants){
+                                    if((item.option1 == size)&&(item.option2==color)){
+                                        price=item.price
+                                    }
+                                }
+
                                 CurrencyConverter.changeCurrency(price.toDouble())?.let {
                                     Text(
                                         text = it,
-                                        style = MaterialTheme.typography.bodyMedium
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = AppColors.Teal
                                     )
                                 }
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(10.dp))
 
 
-                                val colors = product.options.get(1).values // Example list of color names
-                                ColorCirclesRow(colorNames = colors)
+                                val colors = product.options.get(1).values
+                                ColorCirclesRow(colorNames = colors, onColorChange = {c ->  color = c
+                                    for(item in product.variants){
+                                        if((item.option1 == size)&&(item.option2==color)){
+                                            price=item.price
+                                        }
+                                    }
+                                })
                                 // Product Description
+                                val sizes = product.options.get(0).values
+                                SizeCirclesRow(sizes, onSizeChange = {s -> size = s
+                                    for(item in product.variants){
+                                        if((item.option1 == size)&&(item.option2==color)){
+                                            price=item.price
+                                        }
+                                    }
+                                })
                                 Text(
                                     text = "Description",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 18.sp
                                 )
+                                Spacer(Modifier.height(8.dp))
                                 Text(
                                     text = product.body_html,
                                     style = MaterialTheme.typography.bodyMedium,
@@ -339,12 +391,18 @@ fun ProductInfoScreen(
             }
         }
     }
+        })
 }
 
 
 @Composable
 fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : String,oldDraftOrder : DraftOrder){
     var clicked by remember { mutableStateOf(false) }
+    for(item in oldDraftOrder.line_items){
+        if(product.id == item.product_id){
+            clicked=true
+        }
+    }
     IconButton(onClick = {
         clicked=true
         val properties = listOf(Property(name = "imageUrl",value = product.image.src))
@@ -376,13 +434,15 @@ fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : Str
             Icon(
                 imageVector = Icons.Sharp.Favorite,
                 contentDescription = "Favorite",
-                tint = Color.Red
+                tint = AppColors.Teal,
+                modifier = Modifier.size(35.dp)
             )
         }else{
             Icon(
                 imageVector = Icons.Default.FavoriteBorder,
                 contentDescription = "Favorite",
-                tint = Color.Red
+                tint = AppColors.Teal,
+                modifier = Modifier.size(35.dp)
             )
         }
 
@@ -392,7 +452,8 @@ fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : Str
 @Composable
 fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,oldDraftOrder : DraftOrder) {
     Row(modifier = Modifier.fillMaxWidth()) {
-        OutlinedButton(onClick = {
+        OutlinedButton(
+             onClick = {
             val properties = listOf(Property(name = "imageUrl", value = product.image.src))
             Log.i("propertiesTest", "AddToCart: $properties")
             if (oldDraftOrder.id == 0L) {
@@ -435,36 +496,65 @@ fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,o
                     val draftOrder =
                         DraftOrder(note = "shoppingCart", line_items = lineItems, email = email)
                     val draftOrderRequest = DraftOrderRequest(draftOrder)
-                    oldDraftOrder.id?.let { viewModel.updateDraftOrder(it, draftOrderRequest)
+                    oldDraftOrder.id?.let {
+
+                        viewModel.updateDraftOrder(it, draftOrderRequest)
+
                     }
 
                 }
             }
-        }, modifier = Modifier.weight(1f)) {
-            Icon(Icons.Default.ShoppingCart, contentDescription = null)
+        }, modifier = Modifier.weight(1f),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.Teal),
+            border = BorderStroke(1.dp, AppColors.Teal)
+
+        ) {
+
+            Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = AppColors.Teal)
             Spacer(modifier = Modifier.width(4.dp))
-            Text(text = "Add To Cart")
+            Text(text = "Add To Cart", color = AppColors.Teal)
+
         }
     }
 }
 
 @Composable
-fun ColorCirclesRow(colorNames: List<String>) {
+fun ColorCirclesRow(colorNames: List<String> ,onColorChange: (String) -> Unit
+) {
+    var colorSelection by remember { mutableStateOf(0) }
+    Text(text = "Available Colors:")
     LazyRow(
         modifier = Modifier
             .padding(16.dp)
-            .height(60.dp) // Adjust the height if needed
+            .height(60.dp)
     ) {
         items(colorNames.size) { index ->
             val color = getColorFromName(colorNames[index])
-            Log.i("color", "ColorCirclesRow: ${colorNames[index]}")
-            Box(
-                modifier = Modifier
-                    .size(40.dp)  // Set the size for each circle
-                    .padding(4.dp)
-                    .background(color = color, shape = CircleShape)
-                    .border(2.dp, shape = CircleShape, color = Color.Black)// Make the background a circle
-            )
+            if(index == colorSelection){
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(4.dp)
+                        .background(color = color, shape = CircleShape)
+                        .border(0.5.dp, shape = CircleShape, color = Color.Black)
+                        .clickable { colorSelection=index
+                                    onColorChange(colorNames[colorSelection])
+                        }
+                )
+            }
+            else{
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(4.dp)
+                        .background(color = color, shape = CircleShape)
+                        .border(0.5.dp, shape = CircleShape, color = Color.Gray)
+                        .clickable { colorSelection=index
+                            onColorChange(colorNames[colorSelection])
+                        }
+                )
+            }
+
         }
     }
 }
@@ -483,10 +573,57 @@ fun getColorFromName(colorName: String): Color {
         "light_brown" -> Color(0xFFD2B48C)
         "burgandy" -> Color(0xFF800020)
         "green" -> Color.Green
-        else -> Color.LightGray // Default color if the name is not recognized
+        else -> Color.LightGray
     }
 }
 
+@Composable
+fun SizeCirclesRow(Itemsizes: List<String>,onSizeChange: (String) -> Unit) {
+    var sizeSelection by remember { mutableStateOf(0) }
+   Text(text = "Available Sizes:")
+    LazyRow(
+        modifier = Modifier
+            .padding(8.dp)
+            .height(60.dp)
+    ) {
+        items(Itemsizes.size) { index ->
+            if(Itemsizes[index] != "size"){
+                if(index == sizeSelection){
+                    Box(
+                        modifier = Modifier
+                            .size(50.dp)
+                            .padding(4.dp)
+                            .background(color = Color.White, shape = RectangleShape)
+                            .border(0.5.dp, shape = CircleShape, color = Color.Black)
+                            .clickable { sizeSelection=index
+                                onSizeChange(Itemsizes[sizeSelection])
+                            }
+                    ){
+
+                        Text(text = Itemsizes[index], textAlign = TextAlign.Center, fontSize = 14.sp,
+                            modifier = Modifier.align(Alignment.Center) )
+                    }
+                }else{
+                    Box(
+                        modifier = Modifier
+                            .size(50.dp)
+                            .padding(4.dp)
+                            .background(color = Color.White, shape = RectangleShape)
+                            .border(0.5.dp, shape = CircleShape, color = Color.Gray)
+                            .clickable { sizeSelection=index
+                                        onSizeChange(Itemsizes[sizeSelection])
+                            }
+                    ){
+
+                        Text(text = Itemsizes[index], textAlign = TextAlign.Center, fontSize = 14.sp,
+                            modifier = Modifier.align(Alignment.Center) )
+                    }
+                }
+
+            }
+        }
+    }
+}
 @Composable
 fun ProductInfoSection(product: Product) {
     //Currency
@@ -525,8 +662,4 @@ fun ProductInfoSection(product: Product) {
         }
     }
 
-}
-@Composable
-fun ProductInfoScreenPreview(){
-    // ProductInfoScreen(Product(0,"","","","","", em,),NavController(LocalContext.current))
 }
