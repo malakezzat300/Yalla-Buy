@@ -321,6 +321,16 @@ fun ShoppingItem(
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     }
+                    Text(
+                        text = "size: ${item.properties[1].value}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
+                    )
+                    Text(
+                        text = "color: ${item.properties[2].value}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
+                    )
                 }
 
                 Row(
