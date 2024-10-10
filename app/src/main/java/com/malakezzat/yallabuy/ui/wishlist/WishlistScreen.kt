@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -123,7 +124,10 @@ fun WishlistScreen(viewModel: WishlistViewModel, navController: NavController) {
                 .padding(16.dp)
         ) {
             TopAppBar(
-                title = { Text(text = "Wishlist") },
+                title = { Text(text = "Wishlist", fontSize = 20.sp,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = AppColors.Teal,
+                    modifier = Modifier.padding(start = 4.dp)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigate(Screen.HomeScreen.route) }) {
                         Image(
@@ -139,9 +143,14 @@ fun WishlistScreen(viewModel: WishlistViewModel, navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            LazyColumn {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(0.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
                 items(orderItems) { product ->
                     WishlistItem(viewModel,product,draftOrder,navController)
+                    Spacer(modifier = Modifier.height(10.dp))
                   //  orderItems = orderItems.filter { it != product }
                 }
             }
@@ -165,18 +174,14 @@ fun WishlistItem(viewModel: WishlistViewModel,
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp) // Adjust height as needed
-            .padding(8.dp)
             .clickable { navController.navigate("${Screen.ProductInfScreen.route}/${item.product_id}") },
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(30.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, Color(0xFFE0E0E0))
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
+                .padding(10.dp),
             verticalAlignment = Alignment.CenterVertically // Align items vertically
         ) {
             // Product image
@@ -184,9 +189,9 @@ fun WishlistItem(viewModel: WishlistViewModel,
                 painter = rememberAsyncImagePainter(item.properties[0].value),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(80.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.LightGray)
+                    .size(120.dp)
+                    .clip(RoundedCornerShape(30.dp)),
+                contentScale = ContentScale.Crop
             )
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -218,7 +223,11 @@ fun WishlistItem(viewModel: WishlistViewModel,
             var showDialog by remember { mutableStateOf(false) }
             // Delete button
             IconButton(onClick = { showDialog = true }) {
-                Icon(Icons.Outlined.Delete, contentDescription = "Delete item", tint = Color.Red)
+                Icon(
+                    painter = painterResource(R.drawable.ic_delete),
+                    contentDescription = "Delete",
+                    tint = Color.Red
+                )
             }
 
             if (showDialog) {
