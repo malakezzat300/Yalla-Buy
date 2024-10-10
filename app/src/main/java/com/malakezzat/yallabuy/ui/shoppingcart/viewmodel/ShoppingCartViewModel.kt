@@ -6,16 +6,16 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.malakezzat.yallabuy.data.ProductsRepository
 import com.malakezzat.yallabuy.data.remote.ApiState
-import com.malakezzat.yallabuy.model.CurrencyResponse
-import com.malakezzat.yallabuy.model.CustomCollection
+import com.malakezzat.yallabuy.model.DiscountCodeResponse
+import com.malakezzat.yallabuy.model.DiscountCodesResponse
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
-import com.malakezzat.yallabuy.model.Product
-import com.malakezzat.yallabuy.model.Variant
+import com.malakezzat.yallabuy.model.PriceRule
+import com.malakezzat.yallabuy.model.PriceRuleResponse
+import com.malakezzat.yallabuy.model.PriceRulesResponse
 import com.malakezzat.yallabuy.model.VariantResponse
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,8 +39,21 @@ class ShoppingCartViewModel(private val repository: ProductsRepository) : ViewMo
     private val _variantId = MutableStateFlow<ApiState<VariantResponse>>(ApiState.Loading)
     val variantId = _variantId.asStateFlow()
 
+    private val _priceRules = MutableStateFlow<ApiState<PriceRulesResponse>>(ApiState.Loading)
+    val priceRules = _priceRules.asStateFlow()
+
+    private val _priceRule = MutableStateFlow<ApiState<PriceRuleResponse>>(ApiState.Loading)
+    val priceRule = _priceRule.asStateFlow()
+
+    private val _discountCodes = MutableStateFlow<ApiState<DiscountCodesResponse>>(ApiState.Loading)
+    val discountCodes = _discountCodes.asStateFlow()
+
+    private val _discountCode = MutableStateFlow<ApiState<DiscountCodeResponse>>(ApiState.Loading)
+    val discountCode = _discountCode.asStateFlow()
+
     init {
         getDraftOrders()
+        getPriceRules()
     }
 
     fun getDraftOrders(){
@@ -138,6 +151,62 @@ class ShoppingCartViewModel(private val repository: ProductsRepository) : ViewMo
                 }
                 .collect { customerResponse ->
                     _variantId.value = ApiState.Success(customerResponse)
+                }
+        }
+    }
+
+    fun getPriceRules(){
+        viewModelScope.launch {
+            repository.getPriceRules().onStart {
+                _priceRules.value = ApiState.Loading
+            }
+                .catch { e ->
+                    _priceRules.value = ApiState.Error(e.message ?: "Unknown error")
+                }
+                .collect { data ->
+                    _priceRules.value = ApiState.Success(data)
+                }
+        }
+    }
+
+    fun getPriceRule(priceRuleId : Long){
+        viewModelScope.launch {
+            repository.getSinglePriceRule(priceRuleId).onStart {
+                _priceRule.value = ApiState.Loading
+            }
+                .catch { e ->
+                    _priceRule.value = ApiState.Error(e.message ?: "Unknown error")
+                }
+                .collect { data ->
+                    _priceRule.value = ApiState.Success(data)
+                }
+        }
+    }
+
+    fun getDiscountCodes(priceRuleId : Long){
+        viewModelScope.launch {
+            repository.getDiscountCodes(priceRuleId).onStart {
+                _discountCodes.value = ApiState.Loading
+            }
+                .catch { e ->
+                    _discountCodes.value = ApiState.Error(e.message ?: "Unknown error")
+                }
+                .collect { data ->
+                    _discountCodes.value = ApiState.Success(data)
+                }
+        }
+    }
+
+    fun getDiscountCode(priceRuleId : Long,discountCodeId : Long){
+        viewModelScope.launch {
+            repository.getSingleDiscountCodes(priceRuleId,discountCodeId).onStart {
+                _discountCode.value = ApiState.Loading
+            }
+                .catch { e ->
+                    _discountCode.value = ApiState.Error(e.message ?: "Unknown error")
+                }
+                .collect { data ->
+                    _discountCode.value = ApiState.Success(data)
                 }
         }
     }

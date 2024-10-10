@@ -55,7 +55,8 @@ class PaymentViewModel(private val repository: ProductsRepository) : ViewModel()
     private val _defaultAddressEvent = MutableStateFlow<ApiState<CustomerAddress>>(ApiState.Loading)
     val defaultAddressEvent= _defaultAddressEvent.asStateFlow()
 
-
+    private val _finalizeDraftOrder = MutableStateFlow<ApiState<DraftOrderResponse>>(ApiState.Loading)
+    val finalizeDraftOrder : StateFlow<ApiState<DraftOrderResponse>> get() = _finalizeDraftOrder
 
     fun getDraftOrders(){
         viewModelScope.launch {
@@ -102,13 +103,13 @@ class PaymentViewModel(private val repository: ProductsRepository) : ViewModel()
         viewModelScope.launch {
             repository.finalizeDraftOrder(draftOrderId)
                 .onStart {
-                    _singleDraftOrders.value = ApiState.Loading
+                    _finalizeDraftOrder.value = ApiState.Loading
                 }
                 .catch { e ->
-                    _singleDraftOrders.value = ApiState.Error(e.message ?: "Failed to finalize draft order")
+                    _finalizeDraftOrder.value = ApiState.Error(e.message ?: "Failed to finalize draft order")
                 }
                 .collect { response ->
-                    _singleDraftOrders.value = ApiState.Success(response)
+                    _finalizeDraftOrder.value = ApiState.Success(response)
                     getDraftOrders()
                 }
         }

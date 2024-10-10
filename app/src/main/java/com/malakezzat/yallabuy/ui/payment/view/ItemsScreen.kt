@@ -108,7 +108,7 @@ fun ItemsScreen(viewModel: PaymentViewModel, navController: NavController) {
             TopAppBar(
                 title = { Text(text = "Items") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigate(Screen.CheckoutScreen.route) }) {
+                    IconButton(onClick = { navController.navigateUp() }) {
                         Image(
                             painter = painterResource(id = R.drawable.back_arrow),
                             contentDescription = "Search Icon",

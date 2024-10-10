@@ -67,9 +67,13 @@ import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.data.sharedpref.CurrencyPreferences
 import com.malakezzat.yallabuy.data.util.CurrencyConverter
 import com.malakezzat.yallabuy.model.AppliedDiscount
+import com.malakezzat.yallabuy.model.DiscountCode
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.LineItem
+import com.malakezzat.yallabuy.model.PriceRule
+import com.malakezzat.yallabuy.model.PriceRuleResponse
+import com.malakezzat.yallabuy.model.PriceRulesResponse
 import com.malakezzat.yallabuy.model.Variant
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.home.view.CustomTopBarHome
@@ -92,30 +96,39 @@ fun ShoppingCartScreen(
     val shoppingCartOrder by viewModel.shoppingCartDraftOrder.collectAsState()
     val visibleItems = remember { mutableStateListOf<LineItem>(*draftOrder.line_items.toTypedArray()) }
     var subtotal by remember { mutableDoubleStateOf(0.0) }
-    var discountAmount by remember { mutableDoubleStateOf(0.0) }
     var discountSaved by remember { mutableDoubleStateOf(0.0) }
     var total by remember { mutableDoubleStateOf(0.0) }
     val variantState by viewModel.variantId.collectAsState()
     var variant by remember { mutableStateOf(Variant()) }
+    var discountAmount by remember { mutableDoubleStateOf(total - subtotal) }
     var variantSet by remember { mutableStateOf(mutableSetOf<Variant>() ) }
     var itemsCount by remember { mutableIntStateOf(0) }
+    var emptyScreen by remember { mutableStateOf( true ) }
+
+    LaunchedEffect(Unit) {
+        viewModel.getDraftOrders()
+    }
 
     when(variantState){
         is ApiState.Error -> Log.i("shoppingCartTest", "ShoppingCartScreen: draftOrder ${(variantState as ApiState.Error).message}")
-        ApiState.Loading -> {}
+        ApiState.Loading -> {
+        }
         is ApiState.Success -> {
             variant = (variantState as ApiState.Success).data.variant
             variantSet.add(variant)
+            emptyScreen = true
         }
     }
 
     when(shoppingCartOrder){
         is ApiState.Error ->{
             isLoading = false
+            emptyScreen = false
             Log.i("shoppingCartTest", "ShoppingCartScreen: draftOrder ${(shoppingCartOrder as ApiState.Error).message}")
         }
         ApiState.Loading -> {
             isLoading = true
+
         }
         is ApiState.Success -> {
             isLoading = false
@@ -127,12 +140,12 @@ fun ShoppingCartScreen(
                 }
             }
             subtotal = calculateSubtotal(orderItems)
-
+            emptyScreen = true
         }
     }
 
-    LaunchedEffect(orderItems){
-        itemsCount = orderItems.size
+    LaunchedEffect(total,subtotal){
+        discountAmount = total - subtotal
     }
 
     LaunchedEffect (subtotal,draftOrder) {
@@ -146,7 +159,9 @@ fun ShoppingCartScreen(
             VoucherBottomSheet(viewModel,draftOrder)
         },
         content = {
-            if (orderItems.isNotEmpty()) {
+
+
+            if (orderItems.isNotEmpty() && emptyScreen) {
                 Scaffold(
                     topBar = { CustomTopBar(bottomSheetState,navController) },
                     containerColor = Color.White,
@@ -157,9 +172,7 @@ fun ShoppingCartScreen(
                                 .padding(paddingValues)
 
                         ) {
-                            if(isLoading) {
-                                CircularProgressIndicator(modifier = Modifier.align(alignment = Alignment.Center))
-                            }
+
                             LazyColumn(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -167,14 +180,19 @@ fun ShoppingCartScreen(
                                     .padding(bottom = 230.dp)
                             ) {
 
+
                                 if(orderItems.isNotEmpty()){
                                     items(orderItems.size) { index ->
+                                        itemsCount = 0
+                                        orderItems.forEach { itemsCount += it.quantity }
                                         val orderItem = orderItems[index]
                                         ShoppingItem(viewModel,orderItem,draftOrder,variantSet,subtotal,{
                                             subtotal = calculateSubtotal(orderItems)
                                             total = subtotal
+
                                         },
-                                        navController)
+                                        navController,
+                                            itemsCount)
 
                                     }
                                 }
@@ -263,12 +281,16 @@ fun ShoppingItem(
     variantSet: Set<Variant>,
     subtotal : Double,
     onItemUpdated: () -> Unit,
-    navController: NavController
+    navController: NavController,
+    itemsCount: Int
 ) {
+    var isMinusEnabled by remember { mutableStateOf(true) }
+    var isPlusEnabled by remember { mutableStateOf(true) }
     val coroutineScope = rememberCoroutineScope()
     var showDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
+
 
     Card(
         modifier = Modifier
@@ -322,17 +344,17 @@ fun ShoppingItem(
                         )
                     }
                     Text(
-                        text = "size: ${item.properties[1].value}",
+                        text = "size: ${item.properties[1].value} \\ color: ${item.properties[2].value}",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
                     )
-                    Text(
-                        text = "color: ${item.properties[2].value}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
-                    )
-                }
 
+                }
+                if (item.quantity == 1) {
+                    isMinusEnabled = false
+                } else {
+                    isMinusEnabled = true
+                }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -343,10 +365,6 @@ fun ShoppingItem(
                         onClick = {
                             val newQuantity = (item.quantity - 1).coerceAtLeast(1)
                             item.quantity = newQuantity
-                            if (item.quantity == 1) {
-                                Toast.makeText(context, "Min Limit reached", Toast.LENGTH_SHORT).show()
-                            }
-
                             val updatedDraftItems = draftOrder.line_items.map { currentItem ->
                                 if (currentItem == item) {
                                     currentItem.copy(quantity = newQuantity)
@@ -364,7 +382,8 @@ fun ShoppingItem(
                                 }
                             }
                             onItemUpdated()
-                        }
+                        },
+                        enabled = isMinusEnabled
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_minus),
@@ -381,19 +400,20 @@ fun ShoppingItem(
                     // Plus Button
                     IconButton(
                         onClick = {
-                            if (subtotal <= 1000) {
-                                val newQuantity = (item.quantity + 1).coerceAtMost(
-                                    checkMaxQuantity(
-                                        item.variant_id,
-                                        variantSet
-                                    )
-                                )
-                                item.quantity = newQuantity
-                                if (item.quantity == checkMaxQuantity(item.variant_id, variantSet)) {
-                                    Toast.makeText(context, "Max Limit reached", Toast.LENGTH_SHORT)
+                            if (subtotal >= 10000 ) {
+                                Toast.makeText(context, "Maximum payment reached", Toast.LENGTH_SHORT)
+                                    .show()
+                            } else if(itemsCount >= 10) {
+                                Toast.makeText(context, "Maximum items count reached", Toast.LENGTH_SHORT)
+                                    .show()
+                            } else {
+                                val newQuantity = (item.quantity + 1).coerceAtMost(variantSet.find { it.id == item.variant_id }?.inventory_quantity?.toInt() ?: 1)
+                                if(item.quantity == newQuantity){
+                                    Toast.makeText(context, "Out of Stock", Toast.LENGTH_SHORT)
                                         .show()
                                 }
-
+                                item.quantity = newQuantity
+//                                val max = variantSet.find { it.id == item.variant_id }?.inventory_quantity
                                 val updatedDraftItems = draftOrder.line_items.map { currentItem ->
                                     if (currentItem == item) {
                                         currentItem.copy(quantity = newQuantity)
@@ -411,11 +431,8 @@ fun ShoppingItem(
                                     }
                                 }
                                 onItemUpdated()
-                            } else {
-                                Toast.makeText(context, "Maximum payment reached", Toast.LENGTH_SHORT)
-                                    .show()
                             }
-                        }
+                        },
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_add),
@@ -610,6 +627,52 @@ fun VoucherBottomSheet(viewModel: ShoppingCartViewModel,draftOrder: DraftOrder) 
     var voucherCode by remember { mutableStateOf("") }
     var discountApplied by remember { mutableStateOf(false) }
     var discountMessage by remember { mutableStateOf("") }
+    val priceRulesState by viewModel.priceRules.collectAsState()
+    val discountCodesState by viewModel.discountCodes.collectAsState()
+    var priceRules by remember { mutableStateOf(listOf<PriceRule>()) }
+    val discountCodes by remember { mutableStateOf(mutableSetOf<DiscountCode>()) }
+    var discountCode by remember { mutableStateOf(DiscountCode()) }
+    val priceRuleState by viewModel.priceRule.collectAsState()
+    var priceRule by remember { mutableStateOf(PriceRule()) }
+
+    when(priceRulesState){
+        is ApiState.Error -> Log.i("shoppingCartTest", "ShoppingCartScreen: draftOrder ${(priceRulesState as ApiState.Error).message}")
+        ApiState.Loading -> {}
+        is ApiState.Success -> {
+            priceRules = (priceRulesState as ApiState.Success).data.price_rules
+            LaunchedEffect(Unit) {
+                priceRules.forEach {
+                    it.id?.let { it1 -> viewModel.getDiscountCodes(it1) }
+                }
+            }
+        }
+    }
+
+    when(discountCodesState){
+        is ApiState.Error -> Log.i("shoppingCartTest", "ShoppingCartScreen: draftOrder ${(discountCodesState as ApiState.Error).message}")
+        ApiState.Loading -> {}
+        is ApiState.Success -> {
+            val tempDiscountList = (discountCodesState as ApiState.Success).data.discount_codes
+            tempDiscountList.forEach {
+                discountCodes.add(it)
+            }
+        }
+    }
+
+    when(priceRuleState){
+        is ApiState.Error -> Log.i("shoppingCartTest", "ShoppingCartScreen: draftOrder ${(priceRuleState as ApiState.Error).message}")
+        ApiState.Loading -> {}
+        is ApiState.Success -> {
+            priceRule = (priceRuleState as ApiState.Success).data.price_rule
+            val newDraftOrder = draftOrder.apply { this.applied_discount = AppliedDiscount(value = (priceRule.value * -1).toString()) }
+            LaunchedEffect(Unit) {
+                draftOrder.id?.let { viewModel.updateDraftOrder(it,DraftOrderRequest(newDraftOrder))
+                    viewModel.getDraftOrders()}
+            }
+            discountMessage = "${(priceRule.value * -1)}% discount applied!"
+            discountApplied = true
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -636,28 +699,16 @@ fun VoucherBottomSheet(viewModel: ShoppingCartViewModel,draftOrder: DraftOrder) 
 
             Button(
                 onClick = {
-                        var discount = ""
-                        if (voucherCode.endsWith("YALLABUY10")) {
-                            discount = "10"
-                            discountMessage = "10% discount applied!"
-                            discountApplied = true
-                        } else if (voucherCode.endsWith("YALLABUY30")) {
-                            discount = "30"
-                            discountMessage = "30% discount applied!"
-                            discountApplied = true
-                        } else if (voucherCode.endsWith("YALLABUY50")) {
-                            discount = "50"
-                            discountMessage = "50% discount applied!"
-                            discountApplied = true
+
+                        if (discountCodes.any { it.code == voucherCode }) {
+                            discountCode = discountCodes.find { it.code == voucherCode }!!
+                            viewModel.getPriceRule(discountCode.price_rule_id)
+
                         } else {
                                 discountMessage = "Invalid voucher code"
                                 discountApplied = false
                         }
-                        if(discountApplied){
-                            val newDraftOrder = draftOrder.apply { this.applied_discount = AppliedDiscount(value = discount) }
-                            draftOrder.id?.let { viewModel.updateDraftOrder(it,DraftOrderRequest(newDraftOrder))
-                                viewModel.getDraftOrders()}
-                        }
+
                     },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -738,6 +789,7 @@ fun DeleteConfirmationDialog(
 
 fun checkMaxQuantity(variantId : Long,variantSet : Set<Variant>) : Int{
     for(item in variantSet){
+        Log.i("quantityTest", "ShoppingItem: quantity ${item.inventory_quantity}")
         if(item.id == variantId){
             if(item.inventory_quantity < 2){
                 return 1
