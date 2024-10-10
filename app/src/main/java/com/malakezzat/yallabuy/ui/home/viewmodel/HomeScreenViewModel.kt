@@ -44,6 +44,9 @@ private val _brandsList = MutableStateFlow<ApiState<List<SmartCollection>>>(ApiS
     private val _customerDataByEmail = MutableStateFlow<ApiState<CustomerSearchRespnse>>(ApiState.Loading)
     val customerDataByEmail = _customerDataByEmail.asStateFlow()
 
+    private val _conversionRate = MutableStateFlow<ApiState<CurrencyResponse?>>(ApiState.Loading)
+    val conversionRate = _conversionRate.asStateFlow()
+
     init {
         getAllProducts()
         getAllCategories()
@@ -144,6 +147,21 @@ private val _brandsList = MutableStateFlow<ApiState<List<SmartCollection>>>(ApiS
                         Log.i(TAG, "getCustomer:  ${repository.getUserId()}")
                     }
             }
+        }
+    }
+
+    fun getRate(){
+        Log.i("currencyTest", "getRate: getting rate")
+        viewModelScope.launch {
+            repository.getConversionRate().onStart {
+                _conversionRate.value = ApiState.Loading
+            }
+                .catch { e ->
+                    _conversionRate.value = ApiState.Error(e.message ?: "Unknown error")
+                }
+                .collect { response ->
+                    _conversionRate.value = ApiState.Success(response)
+                }
         }
     }
 

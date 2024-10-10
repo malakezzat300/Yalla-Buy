@@ -15,6 +15,7 @@ class CurrencyPreferences private constructor(context: Context) {
         private const val KEY_AED = "AED"
         private const val KEY_SAR = "SAR"
         private const val KEY_CURRENCY = "Current"
+        private const val FIRST_LAUNCH = "first"
 
 
         @Volatile
@@ -76,6 +77,17 @@ class CurrencyPreferences private constructor(context: Context) {
                 val targetAmount = baseAmount * rate
                 String.format("%.2f %s", targetAmount, targetCurrency)
             }
+        }
+    }
+
+    fun getFirstLaunch() : Boolean {
+        return preferences.getBoolean(FIRST_LAUNCH,true)
+    }
+
+    fun setFirstLaunch(firstLaunch : Boolean){
+        preferences.edit().apply {
+            putBoolean(FIRST_LAUNCH, firstLaunch)
+            apply()
         }
     }
 }
