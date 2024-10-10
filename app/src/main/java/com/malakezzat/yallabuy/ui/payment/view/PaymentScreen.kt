@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -110,6 +111,10 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
         topBar = { CustomTopBar(navController) },
         containerColor = Color.White,
         content = { paddingValues ->
+            var addressLabel = "address"
+            if(addressesList.isEmpty()){
+                addressLabel = "Make a new Address \uD83D\uDC49"
+            }
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -118,52 +123,70 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(24.dp))
-
-                ExposedDropdownMenuBox(
-                    expanded = isDropdownExpanded,
-                    onExpandedChange = { isDropdownExpanded = !isDropdownExpanded }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    OutlinedTextField(
-                        value = address,
-                        onValueChange = {
-                            address = it
-
-                        },
-                        label = { Text("Address") },
-                        trailingIcon = { Icon(Icons.Default.ArrowDropDown, null) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor(),
-                        shape = RoundedCornerShape(10.dp),
-                        readOnly = true,
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            disabledTextColor = LocalContentColor.current.copy(LocalContentAlpha.current),
-                            disabledLabelColor = LocalContentColor.current.copy(LocalContentAlpha.current)
-                        )
-                    )
-
-                    ExposedDropdownMenu(
+                    ExposedDropdownMenuBox(
                         expanded = isDropdownExpanded,
-                        onDismissRequest = { isDropdownExpanded = false }
+                        onExpandedChange = { isDropdownExpanded = !isDropdownExpanded },
+                        modifier = Modifier.weight(1f)
                     ) {
-                        addressesList.forEach { addressOption ->
-                            DropdownMenuItem(
-                                text = { Text(text = addressOption) },
-                                onClick = {
-                                    address = addressOption
-                                    userAddresses.find {
-                                        it.address1 == addressOption
-                                    }?.id?.let { viewModel.setDefaultAddress(userId, it) }
-                                    isDropdownExpanded = false
-                                }
+                        OutlinedTextField(
+                            value = address,
+                            onValueChange = { address = it },
+                            label = { Text(addressLabel) },
+                            trailingIcon = { Icon(Icons.Default.ArrowDropDown, null) },
+                            modifier = Modifier.menuAnchor(),
+                            shape = RoundedCornerShape(10.dp),
+                            readOnly = true,
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                disabledTextColor = LocalContentColor.current.copy(LocalContentAlpha.current),
+                                disabledLabelColor = LocalContentColor.current.copy(LocalContentAlpha.current)
                             )
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = isDropdownExpanded,
+                            onDismissRequest = { isDropdownExpanded = false }
+                        ) {
+                            addressesList.forEach { addressOption ->
+                                DropdownMenuItem(
+                                    text = { Text(text = addressOption) },
+                                    onClick = {
+                                        address = addressOption
+                                        userAddresses.find {
+                                            it.address1 == addressOption
+                                        }?.id?.let { viewModel.setDefaultAddress(userId, it) }
+                                        isDropdownExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+                    if(address.isBlank()) {
+                        Button(
+                            onClick = {
+                                navController.navigate(Screen.AddressScreen.createRoute(""))
+                            },
+                            modifier = Modifier
+                                .width(80.dp)
+                                .height(64.dp)
+                                .padding(top = 8.dp),
+                            shape = RoundedCornerShape(10.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
+                        ) {
+                            Text("New")
                         }
                     }
                 }
 
+
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(text = "Payment Method", style = MaterialTheme.typography.bodyMedium)
+                Text(text = "Payment Method \uD83D\uDCB2", style = MaterialTheme.typography.bodyMedium)
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -174,13 +197,13 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
                         selected = selectedPaymentMethod == "Cash on Delivery",
                         onClick = { selectedPaymentMethod = "Cash on Delivery" },
                     )
-                    Text(text = "Cash on Delivery")
+                    Text(text = "Cash on Delivery \uD83D\uDCB5")
 
                     RadioButton(
                         selected = selectedPaymentMethod == "Credit Card",
                         onClick = { selectedPaymentMethod = "Credit Card" }
                     )
-                    Text(text = "Credit Card")
+                    Text(text = "Credit Card \uD83D\uDCB3")
                 }
                 if (selectedPaymentMethod == "Credit Card") {
                     Spacer(modifier = Modifier.height(16.dp))
@@ -306,6 +329,7 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
 
                 Button(
                     onClick = {
+                        if (address.isNotBlank()){
                         if (selectedPaymentMethod == "Credit Card") {
                             if (cardHolderName.isNotBlank() && cardNumber.isNotBlank()
                                 && expiration.text.isNotBlank() && cvv.isNotBlank()
@@ -319,13 +343,20 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
                                 ).show()
                             }
                         } else {
-                            navController.navigate(Screen.CheckoutScreen.route)
+                                navController.navigate(Screen.CheckoutScreen.route)
+                        } } else {
+                            Toast.makeText(
+                                context,
+                                "You Should Have at least one Address",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
                 ) {
                     Text("Checkout")
                 }
