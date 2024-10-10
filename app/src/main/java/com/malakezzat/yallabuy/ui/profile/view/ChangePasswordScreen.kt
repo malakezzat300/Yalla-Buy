@@ -11,12 +11,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Snackbar
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,10 +33,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.malakezzat.yallabuy.ui.CustomTopBar
 import com.malakezzat.yallabuy.ui.Screen
+import com.malakezzat.yallabuy.ui.customAlert
 import com.malakezzat.yallabuy.ui.theme.AppColors
 
 
@@ -42,13 +47,16 @@ fun ChangePasswordScreen(navController: NavController){
     var pass by remember { mutableStateOf("") }
     var ConfirmPass by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
+    var isChanged by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     androidx.compose.material3.Scaffold(
         topBar = { CustomTopBar(navController, "Change Password", AppColors.Teal) },
         containerColor = Color.White,
         content = { paddingValues ->
-            Column (modifier = Modifier.padding(paddingValues)
-                .padding(top= 20.dp)
+            Column (modifier = Modifier
+                .padding(paddingValues)
+                .padding(top = 20.dp)
             ){
 
                 Text("New Password", fontSize = 18.sp, modifier = Modifier.padding(8.dp))
@@ -84,32 +92,39 @@ fun ChangePasswordScreen(navController: NavController){
                         isLoading = true
                         //  viewModel.signInWithEmailAndPassword(email,password,fullName)
                         if(pass.isEmpty() || ConfirmPass.isEmpty()){
-                            isLoading = false
-                           // Toast.makeText(LocalContext.current,"complete empty fields please", Toast.LENGTH_LONG)
-                        }else{
-                            isLoading=true
-                            val user = FirebaseAuth.getInstance().currentUser
-                            if (user != null) {
-                                // New password entered by the user
+                            Log.i("TAG", "ChangePasswordScreen: empty")
+                            Toast.makeText(context,"complete empty fields please", Toast.LENGTH_LONG).show()
 
-                                user.updatePassword(pass)
-                                    .addOnCompleteListener { task ->
-                                        if (task.isSuccessful) {
-                                            Log.d("PasswordChange", "Password updated successfully.")
-                                            isLoading=false
-                                            //Toast.makeText(LocalContext.current, "Password changed successfully.", Toast.LENGTH_SHORT).show()
-                                        } else {
-                                            Log.e("PasswordChange", "Error: ${task.exception?.message}")
-                                           // Toast.makeText(this, "Failed to change password.", Toast.LENGTH_SHORT).show()
+                            isLoading = false
+                        }else{
+                            if(pass == ConfirmPass){
+                                isLoading=true
+                                val user = FirebaseAuth.getInstance().currentUser
+                                if (user != null) {
+                                    user.updatePassword(pass)
+                                        .addOnCompleteListener { task ->
+                                            if (task.isSuccessful) {
+                                                Log.d("PasswordChange", "Password updated successfully.")
+                                                isLoading=false
+                                                isChanged=true
+                                                //Toast.makeText(LocalContext.current, "Password changed successfully.", Toast.LENGTH_SHORT).show()
+                                            } else {
+                                                Log.e("PasswordChange", "Error: ${task.exception?.message}")
+                                                // Toast.makeText(this, "Failed to change password.", Toast.LENGTH_SHORT).show()
+                                            }
                                         }
-                                    }
+                                }
+                            }else{
+                                isLoading=false
+                                Toast.makeText(context,"password and confirm password are not the same", Toast.LENGTH_LONG).show()
                             }
+
                         }
 
                     },
                     shape = RoundedCornerShape(30.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Black,
+                        containerColor = AppColors.Teal,
                         contentColor = Color.White,
                         disabledContainerColor = Color.Gray
                     ),
@@ -126,7 +141,32 @@ fun ChangePasswordScreen(navController: NavController){
                     }
 
                 }
+                if(isChanged){
+                    CustomDialog(navController)
+                }
+
             }
 
         })
         }
+
+@Composable
+fun CustomDialog(navController: NavController) {
+    var showDialog by remember { mutableStateOf(true) }
+    AlertDialog(
+        containerColor = Color.White,
+        onDismissRequest = {  showDialog = false },
+        title = { Text("Change Password") },
+        text = { Text("Your password has been changed successfully") },
+        confirmButton = {
+            TextButton(onClick = {
+                showDialog = false
+                navController.navigate(Screen.HomeScreen.route)
+            }) {
+                Text("Ok", color = Color.Red)
+            }
+        },
+
+
+    )
+}

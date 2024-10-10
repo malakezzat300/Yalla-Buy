@@ -176,7 +176,7 @@ fun LogInScreen(viewModel: LogInViewModel,
             },
             shape = RoundedCornerShape(30.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Black,        // Default background color
+                containerColor = AppColors.Teal,        // Default background color
                 contentColor = Color.White,         // Text color
                 disabledContainerColor = Color.Gray // Background color when disabled
             ),

@@ -228,7 +228,7 @@ fun SignupScreen(viewModel: SignUpViewModel, navController: NavController) {
             },
             shape = RoundedCornerShape(30.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Black,
+                containerColor = AppColors.Teal,
                 contentColor = Color.White
             ),
             modifier = Modifier
