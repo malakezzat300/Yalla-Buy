@@ -108,7 +108,7 @@ fun LogInScreen(viewModel: LogInViewModel,
                 .height(75.dp)
                 .background(color = Color.White)
                 .padding(10.dp),
-            visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+            visualTransformation =  PasswordVisualTransformation(),
             trailingIcon = {
                 val image = if (passwordVisibility) {
                     //  Icons.Filled.Visibility
@@ -176,7 +176,7 @@ fun LogInScreen(viewModel: LogInViewModel,
             },
             shape = RoundedCornerShape(30.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Black,        // Default background color
+                containerColor = AppColors.Teal,        // Default background color
                 contentColor = Color.White,         // Text color
                 disabledContainerColor = Color.Gray // Background color when disabled
             ),

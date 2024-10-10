@@ -48,9 +48,7 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
                     .background(Color(0xFF00C4B4)) // Your specified color for upper part
                     .padding(16.dp),
             ) {
-                UserInfoSection(
-                    navController = navController,
-                    onLogoutClick = { showLogoutDialog = true } // Show dialog on click
+                UserInfoSection(navController = navController, onLogoutClick = { showLogoutDialog = true } // Show dialog on click
                 )
             }
 
@@ -102,7 +100,7 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
 
                     // Account Management Section
                     SectionWithPadding(title = "Account Management") {
-                        ProfileItem(icon = R.drawable.ic_change_password, title = "Change Password",{})
+                        ProfileItem(icon = R.drawable.ic_change_password, title = "Change Password",{navController.navigate(Screen.ChangePassScreen.route)})
                         //DarkThemeToggle() // Dark Theme Toggle inside the Account Management section
                     }
 
@@ -163,7 +161,7 @@ fun UserInfoSection(navController: NavController, onLogoutClick: () -> Unit) {
     ) {
         // Profile Picture
         Image(
-            painter = painterResource(id = R.drawable.ic_user_placeholder),
+            painter = painterResource(id = R.drawable.person),
             contentDescription = "User Profile Picture",
             modifier = Modifier
                 .size(64.dp)
@@ -176,29 +174,39 @@ fun UserInfoSection(navController: NavController, onLogoutClick: () -> Unit) {
         Column(
             modifier = Modifier.weight(1f) // Takes remaining space
         ) {
-            Text(
-                text = "Ahmed Raza", // User name from viewModel
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-            Text(
-                text = "ahmedraza@gmail.com", // User email from viewModel
-                fontSize = 16.sp,
-                color = Color.White
-            )
+            if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
+                Text(
+                    text = "Hello", // User name from viewModel
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }else {
+                Text(
+                    text = FirebaseAuth.getInstance().currentUser?.displayName.toString(), // User name from viewModel
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Text(
+                    text = FirebaseAuth.getInstance().currentUser?.email.toString(), // User email from viewModel
+                    fontSize = 16.sp,
+                    color = Color.White
+                )
+            }
+        }
+        if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
+
+        }else{
+            IconButton(onClick = onLogoutClick ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_logout),
+                    contentDescription = "Log Out",
+                    tint = Color.White,
+                    modifier = Modifier.size(40.dp)
+                ) }
         }
 
-        IconButton(
-            onClick = onLogoutClick // Show the dialog instead of logging out immediately
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_logout),
-                contentDescription = "Log Out",
-                tint = Color.White,
-                modifier = Modifier.size(40.dp)
-            )
-        }
     }
 }
 @Composable
