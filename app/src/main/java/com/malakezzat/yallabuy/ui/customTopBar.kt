@@ -23,7 +23,8 @@ import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.ui.theme.AppColors
 
 @Composable
-fun CustomTopBar(navController: NavController, title :String,backgroundColor: Color = AppColors.Teal) {
+fun CustomTopBar(navController: NavController, title :String,backgroundColor: Color = AppColors.Teal,
+                 onClick: () -> Unit = { navController.navigate(Screen.HomeScreen.route) }) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -38,7 +39,7 @@ fun CustomTopBar(navController: NavController, title :String,backgroundColor: Co
                 contentDescription = "Logo",
                 modifier = Modifier.size(30.dp)
             )*/
-            IconButton(onClick = { navController.navigate(Screen.HomeScreen.route) }) {
+            IconButton(onClick = onClick) {
                 Image(
                     painter = painterResource(id = R.drawable.back_arrow),
                     contentDescription = "Search Icon",

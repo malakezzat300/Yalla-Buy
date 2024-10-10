@@ -163,7 +163,7 @@ fun UserInfoSection(navController: NavController, onLogoutClick: () -> Unit) {
     ) {
         // Profile Picture
         Image(
-            painter = painterResource(id = R.drawable.ic_user_placeholder),
+            painter = painterResource(id = R.drawable.person),
             contentDescription = "User Profile Picture",
             modifier = Modifier
                 .size(64.dp)
