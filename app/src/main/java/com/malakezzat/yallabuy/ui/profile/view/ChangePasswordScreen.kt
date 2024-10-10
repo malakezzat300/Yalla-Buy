@@ -51,7 +51,7 @@ fun ChangePasswordScreen(navController: NavController){
     val context = LocalContext.current
 
     androidx.compose.material3.Scaffold(
-        topBar = { CustomTopBar(navController, "Change Password", AppColors.Teal) },
+        topBar = { CustomTopBar(navController, "Change Password", AppColors.Teal, onClick = {navController.navigateUp()}) },
         containerColor = Color.White,
         content = { paddingValues ->
             Column (modifier = Modifier
