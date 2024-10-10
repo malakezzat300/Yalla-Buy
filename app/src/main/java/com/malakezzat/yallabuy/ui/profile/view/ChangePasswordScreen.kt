@@ -45,9 +45,11 @@ fun ChangePasswordScreen(navController: NavController){
         topBar = { CustomTopBar(navController, "Change Password", AppColors.Teal) },
         containerColor = Color.White,
         content = { paddingValues ->
-            Column (modifier = Modifier.padding(paddingValues)){
+            Column (modifier = Modifier.padding(paddingValues)
+                .padding(top= 20.dp)
+            ){
 
-                Text("New Password")
+                Text("New Password", fontSize = 18.sp, modifier = Modifier.padding(8.dp))
                 OutlinedTextField(
                     value = pass,
                     onValueChange = {input -> pass = input },
@@ -59,7 +61,7 @@ fun ChangePasswordScreen(navController: NavController){
                         .padding(10.dp),
                     colors =  OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.MintGreen)
                 )
-                Text("Confirm New Password")
+                Text("Confirm Password", fontSize = 18.sp, modifier = Modifier.padding(8.dp))
                 OutlinedTextField(
                     value = ConfirmPass,
                     onValueChange = {input -> ConfirmPass = input },
@@ -82,7 +84,22 @@ fun ChangePasswordScreen(navController: NavController){
                            // Toast.makeText(LocalContext.current,"complete empty fields please", Toast.LENGTH_LONG)
                         }else{
                             isLoading=true
+                            val user = FirebaseAuth.getInstance().currentUser
+                            if (user != null) {
+                                // New password entered by the user
 
+                                user.updatePassword(pass)
+                                    .addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+                                            Log.d("PasswordChange", "Password updated successfully.")
+                                            isLoading=false
+                                            //Toast.makeText(LocalContext.current, "Password changed successfully.", Toast.LENGTH_SHORT).show()
+                                        } else {
+                                            Log.e("PasswordChange", "Error: ${task.exception?.message}")
+                                           // Toast.makeText(this, "Failed to change password.", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                            }
                         }
 
                     },
@@ -101,7 +118,7 @@ fun ChangePasswordScreen(navController: NavController){
                     if (isLoading) {
                         CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
                     } else {
-                        Text(text = "Login", fontSize = 20.sp)
+                        Text(text = "Change Password", fontSize = 20.sp)
                     }
 
                 }
