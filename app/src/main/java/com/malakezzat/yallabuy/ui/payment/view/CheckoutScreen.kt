@@ -71,6 +71,7 @@ fun CheckoutScreen(viewModel: PaymentViewModel,navController: NavController) {
     var orderItems by remember { mutableStateOf( emptyList<LineItem>() ) }
     var itemsCount by remember { mutableIntStateOf(0) }
     var draftOrder by remember { mutableStateOf( DraftOrder() ) }
+    val draftOrderState by viewModel.singleDraftOrders.collectAsState()
 
     val context = LocalContext.current
     CurrencyConverter.initialize(context)

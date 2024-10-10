@@ -100,7 +100,11 @@ fun ShoppingCartScreen(
     var variant by remember { mutableStateOf(Variant()) }
     var variantSet by remember { mutableStateOf(mutableSetOf<Variant>() ) }
     var itemsCount by remember { mutableIntStateOf(0) }
+    var emptyScreen by remember { mutableStateOf( true ) }
 
+    LaunchedEffect(Unit) {
+        viewModel.getDraftOrders()
+    }
 
     when(variantState){
         is ApiState.Error -> Log.i("shoppingCartTest", "ShoppingCartScreen: draftOrder ${(variantState as ApiState.Error).message}")
@@ -109,12 +113,14 @@ fun ShoppingCartScreen(
         is ApiState.Success -> {
             variant = (variantState as ApiState.Success).data.variant
             variantSet.add(variant)
+            emptyScreen = true
         }
     }
 
     when(shoppingCartOrder){
         is ApiState.Error ->{
             isLoading = false
+            emptyScreen = false
             Log.i("shoppingCartTest", "ShoppingCartScreen: draftOrder ${(shoppingCartOrder as ApiState.Error).message}")
         }
         ApiState.Loading -> {
@@ -131,7 +137,7 @@ fun ShoppingCartScreen(
                 }
             }
             subtotal = calculateSubtotal(orderItems)
-
+            emptyScreen = true
         }
     }
 
@@ -154,7 +160,7 @@ fun ShoppingCartScreen(
         content = {
 
 
-            if (orderItems.isNotEmpty()) {
+            if (orderItems.isNotEmpty() && emptyScreen) {
                 Scaffold(
                     topBar = { CustomTopBar(bottomSheetState,navController) },
                     containerColor = Color.White,
