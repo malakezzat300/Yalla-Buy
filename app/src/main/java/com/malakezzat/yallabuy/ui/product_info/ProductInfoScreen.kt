@@ -493,13 +493,7 @@ fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : Str
                         Text("Login", color = AppColors.Teal)
                     }
                 },
-                dismissButton = {
-                    TextButton(
-                        onClick = { showDialog = false } // Close dialog without action
-                    ) {
-                        Text("Cancel", color = Color(0xFF00C4B4))
-                    }
-                }
+
             )
         }
     }
