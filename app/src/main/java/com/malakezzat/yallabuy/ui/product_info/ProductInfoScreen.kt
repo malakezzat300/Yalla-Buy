@@ -1,5 +1,6 @@
 package com.malakezzat.yallabuy.ui.product_info
 
+import android.app.Dialog
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.sharp.Favorite
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -40,6 +42,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -72,7 +75,10 @@ import com.malakezzat.yallabuy.model.LineItem
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.*
 import com.malakezzat.yallabuy.ui.CustomTopBar
+import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.theme.AppColors
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 
 
 //@Composable
@@ -295,7 +301,7 @@ fun ProductInfoScreen(
                             tint = Color.White
                         )
                     }
-                    AddToFavorites(viewModel, product, FirebaseAuth.getInstance().currentUser?.email.toString(), wishListDraftOrder)
+                    AddToFavorites(viewModel, product, FirebaseAuth.getInstance().currentUser?.email.toString(), wishListDraftOrder,navController)
                 }
 
                 // Product Details
@@ -384,7 +390,7 @@ fun ProductInfoScreen(
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     AddToCart(viewModel, product, FirebaseAuth.getInstance().currentUser?.email.toString(), shoppingCartDraftOrder,
-                                        price,size,color,index)
+                                        price,size,color,index,navController)
 
                                 }
                             }
@@ -405,8 +411,19 @@ fun ProductInfoScreen(
 
 
 @Composable
-fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : String,oldDraftOrder : DraftOrder){
+fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : String,oldDraftOrder : DraftOrder,navController: NavController){
+    var geustClicked by remember { mutableStateOf(false) }
     var clicked by remember { mutableStateOf(false) }
+    if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
+        IconButton(onClick = {geustClicked=true}) {
+            Icon(
+                imageVector = Icons.Default.FavoriteBorder,
+                contentDescription = "Favorite",
+                tint = AppColors.Teal,
+                modifier = Modifier.size(35.dp)
+            )
+        }
+    }else{
     for(item in oldDraftOrder.line_items){
         if(product.id == item.product_id){
             clicked=true
@@ -439,14 +456,14 @@ fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : Str
             }
         }
     }) {
-        if(clicked){
+        if (clicked) {
             Icon(
                 imageVector = Icons.Sharp.Favorite,
                 contentDescription = "Favorite",
                 tint = AppColors.Teal,
                 modifier = Modifier.size(35.dp)
             )
-        }else{
+        } else {
             Icon(
                 imageVector = Icons.Default.FavoriteBorder,
                 contentDescription = "Favorite",
@@ -456,11 +473,82 @@ fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : Str
         }
 
     }
+        if(geustClicked){
+            var showDialog by remember { mutableStateOf(false) }
+            AlertDialog(
+                onDismissRequest = { showDialog = false }, // Close dialog on dismiss
+                title = { Text(text = "Guest") },
+                text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals, and to save your favorite products") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            navController.navigate(Screen.LogInScreen.route) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    inclusive = true // Remove all previous screens from the back stack
+                                }
+                            }
+                            showDialog = false // Close the dialog after confirming
+                        }
+                    ) {
+                        Text("Login", color = AppColors.Teal)
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { showDialog = false } // Close dialog without action
+                    ) {
+                        Text("Cancel", color = Color(0xFF00C4B4))
+                    }
+                }
+            )
+        }
+    }
+    if(geustClicked){
+        var showDialog by remember { mutableStateOf(false) }
+        AlertDialog(
+            onDismissRequest = { showDialog = false }, // Close dialog on dismiss
+            title = { Text(text = "Guest") },
+            text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals, and to save your favorite products") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        navController.navigate(Screen.LogInScreen.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true // Remove all previous screens from the back stack
+                            }
+                        }
+                        showDialog = false // Close the dialog after confirming
+                    }
+                ) {
+                    Text("Login", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDialog = false } // Close dialog without action
+                ) {
+                    Text("Cancel", color = Color(0xFF00C4B4))
+                }
+            }
+        )
+    }
 }
 
 @Composable
-fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,oldDraftOrder : DraftOrder,price : String,size: String,color: String,id : Long) {
+fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,oldDraftOrder : DraftOrder,price : String,size: String,color: String,id : Long,navController: NavController) {
+   var geustClicked by remember { mutableStateOf(false) }
     Row(modifier = Modifier.fillMaxWidth()) {
+        if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
+            OutlinedButton(
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.Teal),
+                border = BorderStroke(1.dp, AppColors.Teal),
+                onClick = { geustClicked=true },
+                modifier = Modifier.weight(1f)) {
+                Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = AppColors.Teal)
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(text = "Add To Cart", color = AppColors.Teal)
+            }
+        }else{
         OutlinedButton(
              onClick = {
              val properties = listOf(Property(name = "imageUrl",value = product.image.src),
@@ -526,6 +614,25 @@ fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,o
             Text(text = "Add To Cart", color = AppColors.Teal)
 
         }
+   }
+    }
+    if(geustClicked){
+        var showDialog by remember { mutableStateOf(true) }
+    AlertDialog(
+        containerColor = Color.White,
+        onDismissRequest = { showDialog = false},
+        title = { Text("Guest") },
+        text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals, and to save your favorite products") },
+        confirmButton = {
+            TextButton(onClick = {
+                showDialog = false
+                navController.navigate(Screen.LogInScreen.route)
+            }) {
+                Text("Login", color = AppColors.Teal)
+            }
+        },
+
+        )
     }
 }
 
@@ -635,42 +742,23 @@ fun SizeCirclesRow(Itemsizes: List<String>,onSizeChange: (String) -> Unit) {
         }
     }
 }
-@Composable
-fun ProductInfoSection(product: Product) {
-    //Currency
-    val context = LocalContext.current
-    CurrencyConverter.initialize(context)
-    LazyColumn {
-        item{
-            Column {
-                // Image Carousel (Placeholder for actual image carousel)
-                LazyRow {
-                    items(product.images) { imageUrl ->
-                        Image(
-                            painter = rememberAsyncImagePainter(imageUrl.src),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(300.dp)
-                                .padding(4.dp)
-                        )
-                    }
-                }
 
-                Text(text = product.title, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-//        if (product.sizes.isNotEmpty()) {
-//            Text(text = "Available Sizes: ${product.sizes.joinToString()}")
-//        }
-                val price = product.variants.get(0).price
-                CurrencyConverter.changeCurrency(price.toDouble())?.let {
-                    Text(text = it,
-                        style = MaterialTheme.typography.bodyMedium)
-                }
-                Text(text = "Rating:  ⭐")
-                Text(text = "Description", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                //ScrollableColumn {
-                Text(text = product.body_html)
+@Composable
+fun GeustDialog(navController: NavController) {
+    AlertDialog(
+        containerColor = Color.White,
+        onDismissRequest = { },
+        title = { Text("Guest") },
+        text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals, and to save your favorite products") },
+        confirmButton = {
+            TextButton(onClick = {
+                navController.navigate(Screen.LogInScreen.route)
+            }) {
+                Text("Login", color = AppColors.Teal)
             }
-        }
-    }
+        },
+
+    )
 
 }
+
