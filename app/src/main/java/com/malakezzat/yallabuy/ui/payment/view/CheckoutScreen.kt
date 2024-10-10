@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -60,6 +61,7 @@ import com.malakezzat.yallabuy.model.LineItem
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
 import com.malakezzat.yallabuy.ui.shoppingcart.view.calculateSubtotal
+import com.malakezzat.yallabuy.ui.theme.AppColors
 
 @Composable
 fun CheckoutScreen(viewModel: PaymentViewModel,navController: NavController) {
@@ -220,7 +222,8 @@ fun CheckoutScreen(viewModel: PaymentViewModel,navController: NavController) {
                 .fillMaxWidth()
                 .height(48.dp),
 
-            shape = RoundedCornerShape(10.dp)
+            shape = RoundedCornerShape(30.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
         ) {
             Text("Place Order")
         }

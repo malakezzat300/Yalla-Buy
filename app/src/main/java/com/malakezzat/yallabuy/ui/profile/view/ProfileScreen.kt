@@ -32,6 +32,7 @@ import com.malakezzat.yallabuy.ui.theme.AppColors
 @Composable
 fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavController) {
     var showLogoutDialog by remember { mutableStateOf(false) }
+    var showLoginDialog by remember { mutableStateOf(false) }
 
     Scaffold { paddingValues ->
         Column(
@@ -48,8 +49,10 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
                     .background(Color(0xFF00C4B4)) // Your specified color for upper part
                     .padding(16.dp),
             ) {
-                UserInfoSection(navController = navController, onLogoutClick = { showLogoutDialog = true } // Show dialog on click
-                )
+                if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
+                UserInfoSection(navController = navController, onLogoutClick = { showLoginDialog = true })
+                }else{
+                    UserInfoSection(navController = navController, onLogoutClick = { showLogoutDialog = true })                }
             }
 
 
@@ -58,7 +61,11 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
                 .fillMaxWidth()
                 .fillMaxHeight()
                 .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
-                .border(1.dp, shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp), color = AppColors.White))
+                .border(
+                    1.dp,
+                    shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
+                    color = AppColors.White
+                ))
             {
                 Column(modifier = Modifier.padding(start = 8.dp, top = 20.dp)) {
                     SectionWithPadding(title = "Personal Information") {
@@ -140,6 +147,10 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
             }
         )
     }
+
+    if (showLoginDialog) {
+       navController.navigate(Screen.LogInScreen.route)
+    }
 }
 @Composable
 fun SectionWithPadding(title: String, content: @Composable ColumnScope.() -> Unit) {
@@ -174,7 +185,7 @@ fun UserInfoSection(navController: NavController, onLogoutClick: () -> Unit) {
         Column(
             modifier = Modifier.weight(1f) // Takes remaining space
         ) {
-            if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
+            if(FirebaseAuth.getInstance().currentUser?.isAnonymous == true){
                 Text(
                     text = "Hello", // User name from viewModel
                     fontSize = 20.sp,
@@ -195,8 +206,15 @@ fun UserInfoSection(navController: NavController, onLogoutClick: () -> Unit) {
                 )
             }
         }
-        if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
 
+        if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
+            IconButton(onClick = { navController.navigate(Screen.LogInScreen.route) } ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.login),
+                    contentDescription = "Log Out",
+                    tint = Color.White,
+                    modifier = Modifier.size(40.dp)
+                ) }
         }else{
             IconButton(onClick = onLogoutClick ) {
                 Icon(

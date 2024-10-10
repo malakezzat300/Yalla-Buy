@@ -33,6 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,6 +42,7 @@ import androidx.navigation.NavController
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.Order
+import com.malakezzat.yallabuy.ui.CustomTopBar
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.orders.viewmodel.OrdersViewModel
 import com.malakezzat.yallabuy.ui.theme.AppColors
@@ -150,7 +152,7 @@ fun OrdersScreen(
 @Composable
 fun NoOrdersScreen(navController: NavController) {
     Scaffold(
-        topBar = { CustomTopBarr(navController) },
+        topBar = { CustomTopBar(navController,"Your Orders",AppColors.Teal,{navController.navigateUp()}) },
         containerColor = Color.White,
         content = { paddingValues ->
             Column(
@@ -202,7 +204,7 @@ fun NoOrdersScreen(navController: NavController) {
 @Composable
 fun CompletedOrdersScreen(orders: List<Order>,navController: NavController) {
     Scaffold(
-        topBar = { CustomTopBarr(navController) },
+        topBar = { CustomTopBar(navController,"Your Orders",AppColors.Teal,{navController.navigateUp()}) },
         containerColor = Color.White,
         content = { paddingValues ->
             Column(
@@ -238,15 +240,18 @@ fun OrderItem(order: Order) {
                 .padding(16.dp)
         ) {
            // Text(text = "Order ID: ${order.id}", style = MaterialTheme.typography.bodyMedium)
-            order.line_items.forEach { item ->
+            var count = 1
+            order.line_items.forEach {item ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = item.title,
+                        text = "${count++}-${item.title }",
                         fontSize = 22.sp,
                         style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.Teal
+                        color = AppColors.Teal,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1
                     )
                     /*Text(
                         text = item.title,
@@ -267,8 +272,8 @@ fun OrderItem(order: Order) {
                     )
                     Text(
                         text = "${item.variant_title}",
-                        fontSize = 12.sp,
-                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                        fontSize = 18.sp,
+                        style = MaterialTheme.typography.bodySmall,
                         color = AppColors.GrayLight
                     )
                 }
@@ -398,6 +403,7 @@ fun OrderHistoryScreen() {
     )
 }
 
+/*
 @Composable
 fun CustomTopBarr(navController: NavController) {
     Row(
@@ -409,11 +415,13 @@ fun CustomTopBarr(navController: NavController) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            /*Image(
+            */
+/*Image(
                 painter = painterResource(id = R.drawable.logo), // logo
                 contentDescription = "Logo",
                 modifier = Modifier.size(30.dp)
-            )*/
+            )*//*
+
 
             IconButton(onClick = { navController.navigate(Screen.HomeScreen.route) }) {
                 Image(
@@ -433,4 +441,4 @@ fun CustomTopBarr(navController: NavController) {
             )
         }
     }
-}
+}*/

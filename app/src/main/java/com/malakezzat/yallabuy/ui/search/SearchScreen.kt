@@ -57,7 +57,6 @@ import com.malakezzat.yallabuy.data.util.CurrencyConverter
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.ui.CustomTopBar
 import com.malakezzat.yallabuy.ui.Screen
-import com.malakezzat.yallabuy.ui.orders.view.CustomTopBarr
 import com.malakezzat.yallabuy.ui.product_info.AddToFavorites
 import com.malakezzat.yallabuy.ui.theme.AppColors
 
@@ -187,6 +186,10 @@ fun RecentSearchItem(product: Product,navController: NavController) {
 
         // Product name and price
         Text(text = product?.title?:"title", style = MaterialTheme.typography.bodyMedium)
-        Text(text = product?.variants?.get(0)?.price?:"200", style = MaterialTheme.typography.bodyMedium)
+        val price2=product?.variants?.get(0)?.price?:"200"
+        CurrencyConverter.changeCurrency(price2.toDouble())?.let {
+            Text(text = it, style = MaterialTheme.typography.bodyMedium)
+        }
+
     }
 }

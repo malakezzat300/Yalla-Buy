@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -60,7 +61,6 @@ import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.ui.Screen
-import com.malakezzat.yallabuy.ui.orders.view.CustomTopBarr
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
 import com.malakezzat.yallabuy.ui.theme.AppColors
 import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
@@ -325,7 +325,9 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(30.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
+
                 ) {
                     Text("Checkout")
                 }

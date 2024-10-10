@@ -547,7 +547,7 @@ fun ColorCirclesRow(colorNames: List<String> ,onColorChange: (String) -> Unit
                         .size(40.dp)
                         .padding(4.dp)
                         .background(color = color, shape = CircleShape)
-                        .border(2.dp, shape = CircleShape, color = AppColors.MintGreen)
+                        .border(0.8.dp, shape = CircleShape, color = Color.Black)
                         .clickable { colorSelection=index
                                     onColorChange(colorNames[colorSelection])
                         }
@@ -605,7 +605,7 @@ fun SizeCirclesRow(Itemsizes: List<String>,onSizeChange: (String) -> Unit) {
                             .size(50.dp)
                             .padding(4.dp)
                             .background(color = Color.White, shape = RectangleShape)
-                            .border(2.dp, shape = CircleShape, color = AppColors.MintGreen)
+                            .border(0.5.dp, shape = CircleShape, color = AppColors.Teal)
                             .clickable { sizeSelection=index
                                 onSizeChange(Itemsizes[sizeSelection])
                             }
@@ -620,7 +620,7 @@ fun SizeCirclesRow(Itemsizes: List<String>,onSizeChange: (String) -> Unit) {
                             .size(50.dp)
                             .padding(4.dp)
                             .background(color = Color.White, shape = RectangleShape)
-                            .border(0.5.dp, shape = CircleShape, color = Color.Gray)
+                            .border(0.8.dp, shape = CircleShape, color = Color.Gray)
                             .clickable { sizeSelection=index
                                         onSizeChange(Itemsizes[sizeSelection])
                             }

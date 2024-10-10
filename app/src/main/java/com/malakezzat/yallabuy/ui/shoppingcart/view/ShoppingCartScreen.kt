@@ -77,7 +77,6 @@ import com.malakezzat.yallabuy.model.PriceRulesResponse
 import com.malakezzat.yallabuy.model.Variant
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.home.view.CustomTopBarHome
-import com.malakezzat.yallabuy.ui.orders.view.CustomTopBarr
 import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModel
 import com.malakezzat.yallabuy.ui.theme.AppColors
 import kotlinx.coroutines.delay
@@ -552,7 +551,7 @@ fun ShoppingView(
                     .padding(top = 16.dp)
                     .height(56.dp)
                     .align(Alignment.CenterHorizontally),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Text(
