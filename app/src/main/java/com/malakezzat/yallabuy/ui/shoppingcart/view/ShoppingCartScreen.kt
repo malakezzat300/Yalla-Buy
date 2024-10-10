@@ -67,9 +67,13 @@ import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.data.sharedpref.CurrencyPreferences
 import com.malakezzat.yallabuy.data.util.CurrencyConverter
 import com.malakezzat.yallabuy.model.AppliedDiscount
+import com.malakezzat.yallabuy.model.DiscountCode
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.LineItem
+import com.malakezzat.yallabuy.model.PriceRule
+import com.malakezzat.yallabuy.model.PriceRuleResponse
+import com.malakezzat.yallabuy.model.PriceRulesResponse
 import com.malakezzat.yallabuy.model.Variant
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.home.view.CustomTopBarHome
@@ -93,11 +97,11 @@ fun ShoppingCartScreen(
     val shoppingCartOrder by viewModel.shoppingCartDraftOrder.collectAsState()
     val visibleItems = remember { mutableStateListOf<LineItem>(*draftOrder.line_items.toTypedArray()) }
     var subtotal by remember { mutableDoubleStateOf(0.0) }
-    var discountAmount by remember { mutableDoubleStateOf(0.0) }
     var discountSaved by remember { mutableDoubleStateOf(0.0) }
     var total by remember { mutableDoubleStateOf(0.0) }
     val variantState by viewModel.variantId.collectAsState()
     var variant by remember { mutableStateOf(Variant()) }
+    var discountAmount by remember { mutableDoubleStateOf(total - subtotal) }
     var variantSet by remember { mutableStateOf(mutableSetOf<Variant>() ) }
     var itemsCount by remember { mutableIntStateOf(0) }
     var emptyScreen by remember { mutableStateOf( true ) }
@@ -141,10 +145,8 @@ fun ShoppingCartScreen(
         }
     }
 
-    LaunchedEffect(orderItems){
-        itemsCount = 0
-        orderItems.forEach {
-        }
+    LaunchedEffect(total,subtotal){
+        discountAmount = total - subtotal
     }
 
     LaunchedEffect (subtotal,draftOrder) {
@@ -626,6 +628,52 @@ fun VoucherBottomSheet(viewModel: ShoppingCartViewModel,draftOrder: DraftOrder) 
     var voucherCode by remember { mutableStateOf("") }
     var discountApplied by remember { mutableStateOf(false) }
     var discountMessage by remember { mutableStateOf("") }
+    val priceRulesState by viewModel.priceRules.collectAsState()
+    val discountCodesState by viewModel.discountCodes.collectAsState()
+    var priceRules by remember { mutableStateOf(listOf<PriceRule>()) }
+    val discountCodes by remember { mutableStateOf(mutableSetOf<DiscountCode>()) }
+    var discountCode by remember { mutableStateOf(DiscountCode()) }
+    val priceRuleState by viewModel.priceRule.collectAsState()
+    var priceRule by remember { mutableStateOf(PriceRule()) }
+
+    when(priceRulesState){
+        is ApiState.Error -> Log.i("shoppingCartTest", "ShoppingCartScreen: draftOrder ${(priceRulesState as ApiState.Error).message}")
+        ApiState.Loading -> {}
+        is ApiState.Success -> {
+            priceRules = (priceRulesState as ApiState.Success).data.price_rules
+            LaunchedEffect(Unit) {
+                priceRules.forEach {
+                    it.id?.let { it1 -> viewModel.getDiscountCodes(it1) }
+                }
+            }
+        }
+    }
+
+    when(discountCodesState){
+        is ApiState.Error -> Log.i("shoppingCartTest", "ShoppingCartScreen: draftOrder ${(discountCodesState as ApiState.Error).message}")
+        ApiState.Loading -> {}
+        is ApiState.Success -> {
+            val tempDiscountList = (discountCodesState as ApiState.Success).data.discount_codes
+            tempDiscountList.forEach {
+                discountCodes.add(it)
+            }
+        }
+    }
+
+    when(priceRuleState){
+        is ApiState.Error -> Log.i("shoppingCartTest", "ShoppingCartScreen: draftOrder ${(priceRuleState as ApiState.Error).message}")
+        ApiState.Loading -> {}
+        is ApiState.Success -> {
+            priceRule = (priceRuleState as ApiState.Success).data.price_rule
+            val newDraftOrder = draftOrder.apply { this.applied_discount = AppliedDiscount(value = (priceRule.value * -1).toString()) }
+            LaunchedEffect(Unit) {
+                draftOrder.id?.let { viewModel.updateDraftOrder(it,DraftOrderRequest(newDraftOrder))
+                    viewModel.getDraftOrders()}
+            }
+            discountMessage = "${(priceRule.value * -1)}% discount applied!"
+            discountApplied = true
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -652,28 +700,16 @@ fun VoucherBottomSheet(viewModel: ShoppingCartViewModel,draftOrder: DraftOrder) 
 
             Button(
                 onClick = {
-                        var discount = ""
-                        if (voucherCode.endsWith("YALLABUY10")) {
-                            discount = "10"
-                            discountMessage = "10% discount applied!"
-                            discountApplied = true
-                        } else if (voucherCode.endsWith("YALLABUY30")) {
-                            discount = "30"
-                            discountMessage = "30% discount applied!"
-                            discountApplied = true
-                        } else if (voucherCode.endsWith("YALLABUY50")) {
-                            discount = "50"
-                            discountMessage = "50% discount applied!"
-                            discountApplied = true
+
+                        if (discountCodes.any { it.code == voucherCode }) {
+                            discountCode = discountCodes.find { it.code == voucherCode }!!
+                            viewModel.getPriceRule(discountCode.price_rule_id)
+
                         } else {
                                 discountMessage = "Invalid voucher code"
                                 discountApplied = false
                         }
-                        if(discountApplied){
-                            val newDraftOrder = draftOrder.apply { this.applied_discount = AppliedDiscount(value = discount) }
-                            draftOrder.id?.let { viewModel.updateDraftOrder(it,DraftOrderRequest(newDraftOrder))
-                                viewModel.getDraftOrders()}
-                        }
+
                     },
                 modifier = Modifier
                     .fillMaxWidth()

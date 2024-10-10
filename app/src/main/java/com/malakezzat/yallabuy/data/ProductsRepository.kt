@@ -1,8 +1,5 @@
 package com.malakezzat.yallabuy.data
 
-import com.malakezzat.yallabuy.data.remote.coupons.DiscountCode
-import com.malakezzat.yallabuy.data.remote.coupons.PriceRule
-import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.model.AddressRequest
 import com.malakezzat.yallabuy.model.AddressResponse
 import com.malakezzat.yallabuy.model.CurrencyResponse
@@ -11,14 +8,16 @@ import com.malakezzat.yallabuy.model.CustomerAddress
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
 import com.malakezzat.yallabuy.model.CustomerSearchRespnse
-import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.DiscountCodesResponse
 import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Order
-import com.malakezzat.yallabuy.model.Orders
+import com.malakezzat.yallabuy.model.PriceRuleResponse
+import com.malakezzat.yallabuy.model.PriceRulesResponse
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.ProductResponse
+import com.malakezzat.yallabuy.model.DiscountCodeResponse
 import com.malakezzat.yallabuy.model.SmartCollection
 import com.malakezzat.yallabuy.model.VariantResponse
 import kotlinx.coroutines.flow.Flow
@@ -29,8 +28,6 @@ interface ProductsRepository {
     suspend fun getCategories(): Flow<List<CustomCollection>>
     suspend fun getBrands(): Flow<List<SmartCollection>>
     suspend fun getAllOrdersForCustomerByID(id: Long): Flow<List<Order>>
-    fun getPriceRules(): Flow<List<PriceRule>>
-    fun getDiscountCodes(priceRuleId: Long): Flow<List<DiscountCode>>
     suspend fun getAllDraftOrders(): Flow<DraftOrdersResponse>
     suspend fun getDraftOrder(draftOrderId: Long): Flow<DraftOrderResponse>
     suspend fun createDraftOrder(draftOrder: DraftOrderRequest): Flow<DraftOrderResponse>
@@ -62,4 +59,8 @@ interface ProductsRepository {
     fun getUserEmail():String
     fun setUserEmail(string:String)
 
+    suspend fun getPriceRules(): Flow<PriceRulesResponse>
+    suspend fun getSinglePriceRule(priceRuleId: Long): Flow<PriceRuleResponse>
+    suspend fun getDiscountCodes(priceRuleId: Long): Flow<DiscountCodesResponse>
+    suspend fun getSingleDiscountCodes(priceRuleId: Long,discountCodeId: Long): Flow<DiscountCodeResponse>
 }
