@@ -39,6 +39,7 @@ import androidx.compose.material.Chip
 import androidx.compose.material.ChipDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Snackbar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
@@ -76,6 +77,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import com.google.firebase.auth.FirebaseAuth
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.data.sharedpref.CurrencyPreferences
@@ -673,12 +675,17 @@ fun BottomNavigationBar(navController: NavController) {
             label = { Text("My Cart", style =  MaterialTheme.typography.titleSmall) },
             selected = currentRoute == Screen.ShoppingScreen.route,
             onClick = {
-                if (currentRoute != Screen.ShoppingScreen.route) {
-                    navController.popBackStack(Screen.ShoppingScreen.route, inclusive = false)
-                    navController.navigate(Screen.ShoppingScreen.route) {
-                        launchSingleTop = true
+                if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
+
+                }else{
+                    if (currentRoute != Screen.ShoppingScreen.route) {
+                        navController.popBackStack(Screen.ShoppingScreen.route, inclusive = false)
+                        navController.navigate(Screen.ShoppingScreen.route) {
+                            launchSingleTop = true
+                        }
                     }
                 }
+
             }
         )
         BottomNavigationItem(
@@ -692,10 +699,14 @@ fun BottomNavigationBar(navController: NavController) {
             label = { Text("Wishlist", style =  MaterialTheme.typography.titleSmall) },
             selected = currentRoute == Screen.WishlistScreen.route,
             onClick = {
-                if (currentRoute != Screen.WishlistScreen.route) {
-                    navController.popBackStack(Screen.WishlistScreen.route, inclusive = false)
-                    navController.navigate(Screen.WishlistScreen.route) {
-                        launchSingleTop = true
+                if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
+
+                }else {
+                    if (currentRoute != Screen.WishlistScreen.route) {
+                        navController.popBackStack(Screen.WishlistScreen.route, inclusive = false)
+                        navController.navigate(Screen.WishlistScreen.route) {
+                            launchSingleTop = true
+                        }
                     }
                 }
             }
@@ -720,4 +731,5 @@ fun BottomNavigationBar(navController: NavController) {
             }
         )
     }
+
 }
