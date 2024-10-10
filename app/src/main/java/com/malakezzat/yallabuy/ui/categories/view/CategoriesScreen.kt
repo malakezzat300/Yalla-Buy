@@ -31,6 +31,7 @@ import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.ui.CustomTopBar
 import com.malakezzat.yallabuy.ui.categories.viewmodel.CategoriesViewModel
 import com.malakezzat.yallabuy.ui.home.view.CategoryItem
+import com.malakezzat.yallabuy.ui.theme.AppColors
 
 val TAG = "CategoriesScreen"
 @Composable
@@ -55,7 +56,7 @@ fun CategoriesScreen(
         ) {
             when (categoriesState) {
                 is ApiState.Loading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    CircularProgressIndicator(color = AppColors.Teal,modifier = Modifier.align(Alignment.CenterHorizontally))
                 }
 
                 is ApiState.Success -> {

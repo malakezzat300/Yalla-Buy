@@ -102,7 +102,7 @@ fun WishlistScreen(viewModel: WishlistViewModel, navController: NavController) {
         }
         ApiState.Loading -> {
             isLoading = true
-            CircularProgressIndicator()
+            CircularProgressIndicator(color = AppColors.Teal)
         }
         is ApiState.Success -> {
             isLoading = false

@@ -6,8 +6,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,12 +31,15 @@ import com.malakezzat.yallabuy.ui.theme.AppColors
 
 @Composable
 fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavController) {
-    Scaffold{ paddingValues ->
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
+    Scaffold { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF00C4B4)) // Your specified color for upper part
                 .padding(paddingValues)
+                .background(Color(0xFF00C4B4)) // Your specified color for upper part
+
         ) {
             // User Info Section with the colored background
             Box(
@@ -41,10 +48,12 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
                     .background(Color(0xFF00C4B4)) // Your specified color for upper part
                     .padding(16.dp),
             ) {
-                UserInfoSection(navController)
+                UserInfoSection(
+                    navController = navController,
+                    onLogoutClick = { showLogoutDialog = true } // Show dialog on click
+                )
             }
 
-                //Spacer(modifier = Modifier.height(16.dp))
 
             // Personal Information Section
             Surface (modifier = Modifier
@@ -61,7 +70,11 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
                             )
                         }
                         //ProfileItem(icon = R.drawable.ic_payment_method, title = "Payment Method")
-                        ProfileItem(icon = R.drawable.ic_order_history, title = "Order History",{})
+                        ProfileItem(icon = R.drawable.ic_order_history, title = "Order History") {
+                            navController.navigate(
+                                Screen.OrdersScreen.route
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -99,6 +112,36 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
             Spacer(modifier = Modifier.weight(1f))
         }
     }
+    // Log Out Confirmation Dialog
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false }, // Close dialog on dismiss
+            title = { Text(text = "Confirm Logout") },
+            text = { Text("Are you sure you want to log out?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        FirebaseAuth.getInstance().signOut()
+                        navController.navigate(Screen.LogInScreen.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true // Remove all previous screens from the back stack
+                            }
+                        }
+                        showLogoutDialog = false // Close the dialog after confirming
+                    }
+                ) {
+                    Text("Yes", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showLogoutDialog = false } // Close dialog without action
+                ) {
+                    Text("No", color = Color(0xFF00C4B4))
+                }
+            }
+        )
+    }
 }
 @Composable
 fun SectionWithPadding(title: String, content: @Composable ColumnScope.() -> Unit) {
@@ -112,7 +155,7 @@ fun SectionWithPadding(title: String, content: @Composable ColumnScope.() -> Uni
     }
 }
 @Composable
-fun UserInfoSection(navController: NavController) {
+fun UserInfoSection(navController: NavController, onLogoutClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -147,17 +190,10 @@ fun UserInfoSection(navController: NavController) {
         }
 
         IconButton(
-            onClick = {
-                FirebaseAuth.getInstance().signOut()
-                navController.navigate(Screen.LogInScreen.route) {
-                    popUpTo(navController.graph.startDestinationId) {
-                        inclusive = true // Remove all previous screens from the back stack
-                    }
-                }
-            }
+            onClick = onLogoutClick // Show the dialog instead of logging out immediately
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_logout), // Replace with your logout icon
+                painter = painterResource(id = R.drawable.ic_logout),
                 contentDescription = "Log Out",
                 tint = Color.White,
                 modifier = Modifier.size(40.dp)
@@ -165,8 +201,6 @@ fun UserInfoSection(navController: NavController) {
         }
     }
 }
-
-
 @Composable
 fun SectionHeader(title: String) {
     Text(
