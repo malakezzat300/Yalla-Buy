@@ -190,10 +190,10 @@ fun BrandsList(brands: List<SmartCollection>,navController: NavController) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text("Brands", color = AppColors.Teal, style = MaterialTheme.typography.titleLarge)
-            Text(
+            /*Text(
                 "SEE ALL", style =  MaterialTheme.typography.titleSmall,
                 color = AppColors.RoseLight
-            )
+            )*/
         }
         LazyRow(
             modifier = Modifier.padding(top = 8.dp)
@@ -463,8 +463,8 @@ fun CategoryItem(category: CustomCollection,navController: NavController) {
             )
             Text(
                 text = category.title,
-                style =  MaterialTheme.typography.titleSmall,
-                color = AppColors.MintGreen,
+                style =  MaterialTheme.typography.bodyMedium,
+                color = AppColors.Teal,
                 modifier = Modifier.padding(top = 10.dp, bottom = 10.dp)
             )
         }
@@ -489,10 +489,10 @@ fun LatestProductsSection(products: List<Product>, navController: NavController)
                 ,
                 modifier = Modifier.padding(8.dp)
             )
-            Text(
+            /*Text(
                 "SEE ALL", style =  MaterialTheme.typography.titleSmall,
-                color = AppColors.RoseLight
-            )
+                color = AppColors.RoseLight,
+            )*/
         }
 
         Box(
@@ -632,7 +632,7 @@ fun BottomNavigationBar(navController: NavController) {
                     modifier = Modifier.size(24.dp)
                 )
             },
-            label = { Text("Home", style =  MaterialTheme.typography.titleSmall) },
+            label = { Text("Home",fontSize = 10.sp, style =  MaterialTheme.typography.titleSmall) },
             selected = currentRoute == Screen.HomeScreen.route,
             onClick = {
                 if (currentRoute != Screen.HomeScreen.route) {
@@ -651,7 +651,7 @@ fun BottomNavigationBar(navController: NavController) {
                     modifier = Modifier.size(24.dp)
                 )
             },
-            label = { Text("Categories", style =  MaterialTheme.typography.titleSmall) },
+            label = { Text("Categories", fontSize = 10.sp, style =  MaterialTheme.typography.titleSmall) },
             selected = currentRoute == Screen.CategoriesScreen.route,
             onClick = {
                 if (currentRoute != Screen.CategoriesScreen.route) {
@@ -670,7 +670,7 @@ fun BottomNavigationBar(navController: NavController) {
                     modifier = Modifier.size(24.dp)
                 )
             },
-            label = { Text("My Cart", style =  MaterialTheme.typography.titleSmall) },
+            label = { Text("My Cart",fontSize = 10.sp, style =  MaterialTheme.typography.titleSmall) },
             selected = currentRoute == Screen.ShoppingScreen.route,
             onClick = {
                 if (currentRoute != Screen.ShoppingScreen.route) {
@@ -689,7 +689,7 @@ fun BottomNavigationBar(navController: NavController) {
                     modifier = Modifier.size(24.dp)
                 )
             },
-            label = { Text("Wishlist", style =  MaterialTheme.typography.titleSmall) },
+            label = { Text("Wishlist",fontSize = 10.sp, style =  MaterialTheme.typography.titleSmall) },
             selected = currentRoute == Screen.WishlistScreen.route,
             onClick = {
                 if (currentRoute != Screen.WishlistScreen.route) {
@@ -708,7 +708,7 @@ fun BottomNavigationBar(navController: NavController) {
                     modifier = Modifier.size(24.dp)
                 )
             },
-            label = { Text("Profile", style =  MaterialTheme.typography.titleSmall) },
+            label = { Text("Profile", fontSize = 10.sp,style =  MaterialTheme.typography.titleSmall) },
             selected =  currentRoute == Screen.ProfileScreen.route,
             onClick = {
                 if (currentRoute != Screen.SettingsScreen.route) {
