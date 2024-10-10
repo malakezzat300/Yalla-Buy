@@ -48,9 +48,7 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
                     .background(Color(0xFF00C4B4)) // Your specified color for upper part
                     .padding(16.dp),
             ) {
-                UserInfoSection(
-                    navController = navController,
-                    onLogoutClick = { showLogoutDialog = true } // Show dialog on click
+                UserInfoSection(navController = navController, onLogoutClick = { showLogoutDialog = true } // Show dialog on click
                 )
             }
 
@@ -176,29 +174,39 @@ fun UserInfoSection(navController: NavController, onLogoutClick: () -> Unit) {
         Column(
             modifier = Modifier.weight(1f) // Takes remaining space
         ) {
-            Text(
-                text = FirebaseAuth.getInstance().currentUser?.displayName.toString(), // User name from viewModel
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-            Text(
-                text = FirebaseAuth.getInstance().currentUser?.email.toString(), // User email from viewModel
-                fontSize = 16.sp,
-                color = Color.White
-            )
+            if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
+                Text(
+                    text = "Hello", // User name from viewModel
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }else {
+                Text(
+                    text = FirebaseAuth.getInstance().currentUser?.displayName.toString(), // User name from viewModel
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Text(
+                    text = FirebaseAuth.getInstance().currentUser?.email.toString(), // User email from viewModel
+                    fontSize = 16.sp,
+                    color = Color.White
+                )
+            }
+        }
+        if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
+
+        }else{
+            IconButton(onClick = onLogoutClick ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_logout),
+                    contentDescription = "Log Out",
+                    tint = Color.White,
+                    modifier = Modifier.size(40.dp)
+                ) }
         }
 
-        IconButton(
-            onClick = onLogoutClick // Show the dialog instead of logging out immediately
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_logout),
-                contentDescription = "Log Out",
-                tint = Color.White,
-                modifier = Modifier.size(40.dp)
-            )
-        }
     }
 }
 @Composable

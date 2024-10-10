@@ -87,19 +87,7 @@ fun SignupScreen(viewModel: SignUpViewModel, navController: NavController) {
     }
 
     Column(horizontalAlignment = Alignment.End, modifier = Modifier.fillMaxWidth()) {
-        TextButton(
-            onClick = {
-                auth.signInAnonymously(onSuccess = {
-                    Toast.makeText(context, "Loged in Anonymously", Toast.LENGTH_LONG).show()
-                    navController.navigate(Screen.HomeScreen.route)
-                    Log.i("TAG", "SignupScreen: ${FirebaseAuth.getInstance().currentUser?.isAnonymous}")
-                }, onError = {
-                    Toast.makeText(context, "Faild login Anonymously, pleas try again later", Toast.LENGTH_LONG).show()
-                })
-            },
-        ) {
-            Text(text = " Skip", color = AppColors.MintGreen)
-        } }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -107,13 +95,31 @@ fun SignupScreen(viewModel: SignUpViewModel, navController: NavController) {
             .padding(16.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        // Header
+        Row(modifier = Modifier.align(Alignment.End)) {
+
+            TextButton(
+                onClick = {
+                    auth.signInAnonymously(onSuccess = {
+                        Toast.makeText(context, "Loged in Anonymously", Toast.LENGTH_LONG).show()
+                        navController.navigate(Screen.HomeScreen.route)
+                        Log.i("TAG", "SignupScreen: ${FirebaseAuth.getInstance().currentUser?.isAnonymous}")
+                    }, onError = {
+                        Toast.makeText(context, "Faild login Anonymously, pleas try again later", Toast.LENGTH_LONG).show()
+                    })
+                },
+            ) {
+                Text(text = " Skip", color = AppColors.MintGreen)
+            }
+
+        }
         Text(
             text = "Create an account",
             fontSize = 28.sp,
             color = Color.Black,
             modifier = Modifier.padding(8.dp)
         )
+        // Header
+
 
         Spacer(modifier = Modifier.height(16.dp))
         // Full Name Input
