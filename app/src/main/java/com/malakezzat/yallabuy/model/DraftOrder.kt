@@ -6,7 +6,7 @@ data class DraftOrderRequest(
 
 data class DraftOrder(
     val id: Long? = null,
-    val note: String = "",
+    var note: String = "",
     val line_items: List<LineItem> = emptyList(),
     val email: String = "",
     val customer: Customer? = null,
