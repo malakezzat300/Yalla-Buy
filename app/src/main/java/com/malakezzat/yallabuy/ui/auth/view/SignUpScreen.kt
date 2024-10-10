@@ -45,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,6 +53,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.firebase.auth.FirebaseAuth
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.firebase.FirebaseAuthun
 import com.malakezzat.yallabuy.data.remote.ApiState
@@ -84,7 +86,20 @@ fun SignupScreen(viewModel: SignUpViewModel, navController: NavController) {
         auth.handleSignInResult(task, context, navController)
     }
 
-
+    Column(horizontalAlignment = Alignment.End, modifier = Modifier.fillMaxWidth()) {
+        TextButton(
+            onClick = {
+                auth.signInAnonymously(onSuccess = {
+                    Toast.makeText(context, "Loged in Anonymously", Toast.LENGTH_LONG).show()
+                    navController.navigate(Screen.HomeScreen.route)
+                    Log.i("TAG", "SignupScreen: ${FirebaseAuth.getInstance().currentUser?.isAnonymous}")
+                }, onError = {
+                    Toast.makeText(context, "Faild login Anonymously, pleas try again later", Toast.LENGTH_LONG).show()
+                })
+            },
+        ) {
+            Text(text = " Skip", color = AppColors.MintGreen)
+        } }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -262,7 +277,8 @@ fun SignupScreen(viewModel: SignUpViewModel, navController: NavController) {
                 val signInIntent = googleSignInClient.signInIntent
                 launcher.launch(signInIntent)
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .size(45.dp)
                 .align(Alignment.CenterHorizontally)
 
@@ -333,7 +349,13 @@ fun SignupScreenPreview() {
         verticalArrangement = Arrangement.Center
     ) {
         // Header for the Signup screen
+        Column(horizontalAlignment = Alignment.End, modifier = Modifier.fillMaxWidth()) {
+            TextButton(onClick = { /* Navigate to Login screen */ },
+            ) {
+            Text(text = " Skip", color = AppColors.MintGreen, textAlign = TextAlign.End)
+        } }
         Column(horizontalAlignment = Alignment.Start) {
+
             Text(
                 text = "Create an account",
                 fontSize = 28.sp,
@@ -436,7 +458,7 @@ fun SignupScreenPreview() {
             onClick = { /* Handle account creation */ },
             shape = RoundedCornerShape(30.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Black,        // Default background color
+                containerColor = AppColors.Teal,        // Default background color
                 contentColor = Color.White,         // Text color
                 disabledContainerColor = Color.Gray // Background color when disabled
             ),
