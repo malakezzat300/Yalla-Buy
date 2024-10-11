@@ -1,11 +1,7 @@
 package com.malakezzat.yallabuy.data
 
-import com.example.yallabuyadmin.coupons.model.CouponsRemoteDataSource
 import com.malakezzat.yallabuy.data.remote.ProductsRemoteDataSource
-import com.malakezzat.yallabuy.data.remote.coupons.DiscountCode
-import com.malakezzat.yallabuy.data.remote.coupons.PriceRule
 import com.malakezzat.yallabuy.data.sharedpref.GlobalSharedPreferenceDataSource
-import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.model.AddressRequest
 import com.malakezzat.yallabuy.model.AddressResponse
 import com.malakezzat.yallabuy.model.CurrencyResponse
@@ -14,32 +10,32 @@ import com.malakezzat.yallabuy.model.CustomerAddress
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
 import com.malakezzat.yallabuy.model.CustomerSearchRespnse
+import com.malakezzat.yallabuy.model.DiscountCodesResponse
 import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Order
+import com.malakezzat.yallabuy.model.PriceRuleResponse
+import com.malakezzat.yallabuy.model.PriceRulesResponse
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.ProductResponse
+import com.malakezzat.yallabuy.model.DiscountCodeResponse
 import com.malakezzat.yallabuy.model.SmartCollection
 import com.malakezzat.yallabuy.model.VariantResponse
 import kotlinx.coroutines.flow.Flow
 
 class ProductsRepositoryImpl private constructor(
     private var productsRemoteDataSource: ProductsRemoteDataSource,
-    private var globalSharedPreferenceDataSource: GlobalSharedPreferenceDataSource,
-    private var couponsRemoteDataSource: CouponsRemoteDataSource
+    private var globalSharedPreferenceDataSource: GlobalSharedPreferenceDataSource
     ):ProductsRepository{
 
     companion object{
         private var instance: ProductsRepositoryImpl? = null
         fun getInstance( productsRemoteDataSource: ProductsRemoteDataSource,
-                         globalSharedPreferenceDataSource: GlobalSharedPreferenceDataSource,
-                         couponsRemoteDataSource: CouponsRemoteDataSource
-                        ):ProductsRepositoryImpl{
+                         globalSharedPreferenceDataSource: GlobalSharedPreferenceDataSource):ProductsRepositoryImpl{
             return instance ?: synchronized(this){
                 val temp =ProductsRepositoryImpl(productsRemoteDataSource,
-                    globalSharedPreferenceDataSource,
-                    couponsRemoteDataSource)
+                    globalSharedPreferenceDataSource)
                 instance = temp
                 temp
 
@@ -65,15 +61,6 @@ class ProductsRepositoryImpl private constructor(
 
     override suspend fun getAllOrdersForCustomerByID(id: Long): Flow<List<Order>> {
         return productsRemoteDataSource.getAllOrdersForCustomerByID(id)
-    }
-
-
-    override fun getPriceRules(): Flow<List<PriceRule>> {
-        return couponsRemoteDataSource.getPriceRules()
-    }
-
-    override fun getDiscountCodes(priceRuleId: Long): Flow<List<DiscountCode>> {
-        return couponsRemoteDataSource.getDiscountCodes(priceRuleId)
     }
 
     override suspend fun getAllDraftOrders(): Flow<DraftOrdersResponse> {
@@ -174,6 +161,25 @@ class ProductsRepositoryImpl private constructor(
     override fun setUserEmail(string: String) {
         globalSharedPreferenceDataSource.setUserEmail(string)
 
+    }
+
+    override suspend fun getPriceRules(): Flow<PriceRulesResponse> {
+        return productsRemoteDataSource.getPriceRules()
+    }
+
+    override suspend fun getSinglePriceRule(priceRuleId: Long): Flow<PriceRuleResponse> {
+        return productsRemoteDataSource.getSinglePriceRule(priceRuleId)
+    }
+
+    override suspend fun getDiscountCodes(priceRuleId: Long): Flow<DiscountCodesResponse> {
+        return productsRemoteDataSource.getDiscountCodes(priceRuleId)
+    }
+
+    override suspend fun getSingleDiscountCodes(
+        priceRuleId: Long,
+        discountCodeId: Long
+    ): Flow<DiscountCodeResponse> {
+        return productsRemoteDataSource.getSingleDiscountCodes(priceRuleId, discountCodeId)
     }
 
 

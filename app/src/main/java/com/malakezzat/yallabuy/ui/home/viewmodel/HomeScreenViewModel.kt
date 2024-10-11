@@ -1,19 +1,16 @@
 package com.malakezzat.yallabuy.ui.home.viewmodel
 
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.malakezzat.yallabuy.data.ProductsRepository
 import com.malakezzat.yallabuy.data.remote.ApiState
-import com.malakezzat.yallabuy.data.remote.coupons.DiscountCode
-import com.malakezzat.yallabuy.data.remote.coupons.PriceRule
-import com.malakezzat.yallabuy.data.sharedpref.CurrencyPreferences
+import com.malakezzat.yallabuy.model.DiscountCode
+import com.malakezzat.yallabuy.model.PriceRule
 import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.CustomerSearchRespnse
-import com.malakezzat.yallabuy.model.Order
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.SmartCollection
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -109,7 +106,7 @@ private val _brandsList = MutableStateFlow<ApiState<List<SmartCollection>>>(ApiS
     fun fetchPriceRules() {
         viewModelScope.launch {
             repository.getPriceRules().collect { rules ->
-                _priceRules.value = rules
+                _priceRules.value = rules.price_rules
             }
         }
     }
@@ -117,7 +114,7 @@ private val _brandsList = MutableStateFlow<ApiState<List<SmartCollection>>>(ApiS
     fun fetchDiscountCodes(priceRuleId: Long) {
         viewModelScope.launch {
             repository.getDiscountCodes(priceRuleId).collect { discountCodes ->
-                _discountCodes.value = discountCodes
+                _discountCodes.value = discountCodes.discount_codes
             }
         }
     }

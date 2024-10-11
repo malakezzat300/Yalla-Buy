@@ -3,7 +3,6 @@ package com.malakezzat.yallabuy.data.remote
 import android.util.Log
 import com.malakezzat.yallabuy.data.remot.ProductService
 import com.malakezzat.yallabuy.data.remote.RetrofitHelper.apiCurrency
-import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.model.AddressRequest
 import com.malakezzat.yallabuy.model.AddressResponse
 import com.malakezzat.yallabuy.model.CurrencyResponse
@@ -12,20 +11,21 @@ import com.malakezzat.yallabuy.model.CustomerAddress
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
 import com.malakezzat.yallabuy.model.CustomerSearchRespnse
-import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.DiscountCodesResponse
 import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Order
-import com.malakezzat.yallabuy.model.Orders
+import com.malakezzat.yallabuy.model.PriceRuleResponse
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.ProductResponse
+import com.malakezzat.yallabuy.model.DiscountCodeResponse
 import com.malakezzat.yallabuy.model.SmartCollection
 import com.malakezzat.yallabuy.model.VariantResponse
+import com.malakezzat.yallabuy.model.PriceRulesResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
-import retrofit2.http.Path
 
 class ProductsRemoteDataSourceImpl (var productService: ProductService):
     ProductsRemoteDataSource {
@@ -225,5 +225,36 @@ class ProductsRemoteDataSourceImpl (var productService: ProductService):
 
     override suspend fun deleteAddress(customerId: Long, addressId: Long) {
         productService.deleteAddress(customerId,addressId)
+    }
+
+    override suspend fun getPriceRules(): Flow<PriceRulesResponse> = flow {
+        val response = productService.getPriceRules()
+        emit(response)
+    }.catch { e ->
+        e.printStackTrace()
+    }
+
+    override suspend fun getSinglePriceRule(priceRuleId: Long): Flow<PriceRuleResponse> = flow {
+        val response = productService.getSinglePriceRule(priceRuleId)
+        emit(response)
+    }.catch { e ->
+        e.printStackTrace()
+    }
+
+    override suspend fun getDiscountCodes(priceRuleId: Long): Flow<DiscountCodesResponse> = flow {
+        val response = productService.getDiscountCodes(priceRuleId)
+        emit(response)
+    }.catch { e ->
+        e.printStackTrace()
+    }
+
+    override suspend fun getSingleDiscountCodes(
+        priceRuleId: Long,
+        discountCodeId: Long
+    ): Flow<DiscountCodeResponse> = flow {
+        val response = productService.getSingleDiscountCode(priceRuleId,discountCodeId)
+        emit(response)
+    }.catch { e ->
+        e.printStackTrace()
     }
 }
