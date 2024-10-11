@@ -169,7 +169,7 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
                     if(address.isBlank()) {
                         Button(
                             onClick = {
-                                navController.navigate(Screen.AddressScreen.createRoute(""))
+                                navController.navigate(Screen.AddressScreen.createRoute(0L))
                             },
                             modifier = Modifier
                                 .width(80.dp)
