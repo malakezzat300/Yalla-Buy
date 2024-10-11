@@ -41,9 +41,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,6 +64,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.data.util.CurrencyConverter
+import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.ui.CustomTopBar
 import com.malakezzat.yallabuy.ui.Screen
@@ -80,6 +84,24 @@ fun ProductsByCategoryScreen(
 ) {
     val productState by viewModel.productList.collectAsStateWithLifecycle()
     val categoryId: Long? = id?.toLongOrNull()
+
+    val draftOrderId by viewModel.draftOrderId.collectAsState()
+    val wishListDraftOrderState by viewModel.wishListDraftOrder.collectAsState()
+
+    var draftOrderIdSaved by remember { mutableLongStateOf(0L) }
+    var wishListDraftOrder by remember { mutableStateOf(DraftOrder(0L, "", listOf(), "")) }
+
+    when (draftOrderId) {
+        is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(draftOrderId as ApiState.Error).message}")
+        ApiState.Loading -> {}
+        is ApiState.Success -> draftOrderIdSaved = (draftOrderId as ApiState.Success).data.draft_order.id ?: 0L
+        else -> {}
+    }
+    when (wishListDraftOrderState) {
+        is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(wishListDraftOrderState as ApiState.Error).message}")
+        ApiState.Loading -> {}
+        is ApiState.Success -> wishListDraftOrder = (wishListDraftOrderState as ApiState.Success).data
+    }
 
     LaunchedEffect(Unit) {
         //Log.d(TAG, categoriesState.toString())
