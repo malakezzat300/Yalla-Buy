@@ -112,22 +112,15 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
     var addressState by remember { mutableStateOf(address ?: "") }
     var saveButton by remember { mutableStateOf("Save") }
     var screenTitle by remember { mutableStateOf("New Address") }
-    var searchQuery by remember { mutableStateOf("") }
-
 
     val sharedPreferences = LocalContext.current.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
     LaunchedEffect(Unit) {
         val isAddressId = address?.let { isAddressId(it) }
         if(isAddressId == true){
-                addressState = ""
-            if(address.toLong() != 0L) {
-                viewModel.getAddressDetails(
-                    sharedPreferences.getLong("USER_ID", 0L),
-                    address.toLong()
-                )
-                saveButton = "Update"
-                screenTitle = "Edit Address"
-            }
+            addressState = ""
+            viewModel.getAddressDetails(sharedPreferences.getLong("USER_ID", 0L),address.toLong())
+            saveButton = "Update"
+            screenTitle = "Edit Address"
         } else {
             if (address != null) {
                 addressState = address
@@ -171,12 +164,7 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
         is ApiState.Success -> {
             LaunchedEffect(Unit) {
                 Toast.makeText(context, "Address has been added", Toast.LENGTH_SHORT).show()
-                if(address?.let { isAddressId(it) } == true){
-                    navController.navigateUp()
-                } else {
-                    navController.navigateUp()
-                    navController.navigateUp()
-                }
+                navController.navigateUp()
             }
         }
     }
@@ -201,6 +189,8 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
             addressState = "Permission denied"
         }
     }
+
+
 
 
     androidx.compose.material3.Scaffold(
@@ -534,169 +524,133 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
         })
 
 
+    if (!locationEnabled && permissionGranted) {
+        LocationPrompt()
+    }
+}
 
-            if (!locationEnabled && permissionGranted) {
-                LocationPrompt()
+fun getUserLocation(context: Context, fusedLocationClient: FusedLocationProviderClient,  onLocationReceived: (String) -> Unit) {
+    if (ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        return
+    }
+
+    fusedLocationClient.getCurrentLocation(
+        LocationRequest.PRIORITY_HIGH_ACCURACY,
+        object : CancellationToken() {
+            override fun onCanceledRequested(p0: OnTokenCanceledListener) =
+                CancellationTokenSource().token
+
+            override fun isCancellationRequested() = false
+        }).addOnSuccessListener { location: Location? ->
+        if (location == null)
+            onLocationReceived("Cannot get location.")
+        else {
+            val geocoder = Geocoder(context, Locale.getDefault())
+            val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+            val address = addresses?.get(0)?.getAddressLine(0) ?: "Address not available"
+
+            onLocationReceived(address)
+        }
+
+    }
+
+}
+
+fun isLocationEnabled(context: Context): Boolean {
+    val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+}
+
+@Composable
+fun EnableLocationDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Enable Location") },
+        text = { Text("Please enable location services to use this feature.") },
+        confirmButton = {
+            Button(onClick = {
+                onConfirm()
+                onDismiss()
+            }) {
+                Text("Settings")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Cancel")
             }
         }
+    )
+}
 
-        fun getUserLocation(
-            context: Context,
-            fusedLocationClient: FusedLocationProviderClient,
-            onLocationReceived: (String) -> Unit
-        ) {
-            if (ActivityCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                return
+@Composable
+fun LocationPrompt() {
+    val context = LocalContext.current
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (!isLocationEnabled(context)) {
+        showDialog = true
+    }
+
+    if (showDialog) {
+        EnableLocationDialog(
+            onConfirm = {
+                context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            },
+            onDismiss = {
+                showDialog = false
             }
+        )
+    }
+}
 
-            fusedLocationClient.getCurrentLocation(
-                LocationRequest.PRIORITY_HIGH_ACCURACY,
-                object : CancellationToken() {
-                    override fun onCanceledRequested(p0: OnTokenCanceledListener) =
-                        CancellationTokenSource().token
+fun getCitiesFromCountries(context: Context, countryName: String): List<String> {
+    val json: String
+    try {
+        val inputStream = context.assets.open("cities_countries.json")
+        val size = inputStream.available()
+        val buffer = ByteArray(size)
+        inputStream.read(buffer)
+        inputStream.close()
+        json = String(buffer, Charsets.UTF_8)
+    } catch (ex: IOException) {
+        ex.printStackTrace()
+        return emptyList()
+    }
 
-                    override fun isCancellationRequested() = false
-                }).addOnSuccessListener { location: Location? ->
-                if (location == null)
-                    onLocationReceived("Cannot get location.")
-                else {
-                    val geocoder = Geocoder(context, Locale.getDefault())
-                    val addresses =
-                        geocoder.getFromLocation(location.latitude, location.longitude, 1)
-                    val address = addresses?.get(0)?.getAddressLine(0) ?: "Address not available"
+    val type = object : TypeToken<Map<String, List<String>>>() {}.type
+    val countriesWithCities: Map<String, List<String>> = Gson().fromJson(json, type)
 
-                    onLocationReceived(address)
-                }
+    return countriesWithCities[countryName] ?: emptyList()
+}
 
-            }
+fun getCountries(context: Context): List<String> {
+    val json: String
+    try {
+        val inputStream = context.assets.open("cities_countries.json")
+        val size = inputStream.available()
+        val buffer = ByteArray(size)
+        inputStream.read(buffer)
+        inputStream.close()
+        json = String(buffer, Charsets.UTF_8)
+    } catch (ex: IOException) {
+        ex.printStackTrace()
+        return emptyList()
+    }
 
-        }
+    val type = object : TypeToken<Map<String, List<String>>>() {}.type
+    val countriesWithCities: Map<String, List<String>> = Gson().fromJson(json, type)
 
-        fun isLocationEnabled(context: Context): Boolean {
-            val locationManager =
-                context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        }
+    return countriesWithCities.keys.toList()
+}
 
-        @Composable
-        fun EnableLocationDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
-            AlertDialog(
-                onDismissRequest = onDismiss,
-                title = { Text(text = "Enable Location") },
-                text = { Text("Please enable location services to use this feature.") },
-                confirmButton = {
-                    Button(onClick = {
-                        onConfirm()
-                        onDismiss()
-                    }) {
-                        Text("Settings")
-                    }
-                },
-                dismissButton = {
-                    Button(onClick = onDismiss) {
-                        Text("Cancel")
-                    }
-                }
-            )
-        }
-
-
-        @Composable
-        fun LocationPrompt() {
-            val context = LocalContext.current
-            var showDialog by remember { mutableStateOf(false) }
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                onClick = {
-                    if(phoneNumber.isNotBlank()
-                        && addressState.isNotBlank() && city.isNotBlank() && country.isNotBlank()) {
-                        userId?.let {
-                            val address1 = Address(
-                                customer_id = it,
-                                first_name = firstName,
-                                last_name = lastName,
-                                phone = phoneNumber,
-                                address1 = addressState,
-                                city = city,
-                                country = country
-                            )
-                            if (address?.let { isAddressId(it) } == true && address.toLong() != 0L){
-                                viewModel.updateUserAddress(it, addressId, AddressRequest(address1))
-                            } else {
-                                viewModel.addNewAddress(it, AddressRequest(address1))
-                            }
-                        }
-
-                    } else {
-                        Toast.makeText(context,"Please fill all fields" ,Toast.LENGTH_SHORT).show()
-                    }
-
-            if (!isLocationEnabled(context)) {
-                showDialog = true
-            }
-
-            if (showDialog) {
-                EnableLocationDialog(
-                    onConfirm = {
-                        context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-                    },
-                    onDismiss = {
-                        showDialog = false
-                    }
-                )
-            }
-        }
-
-        fun getCitiesFromCountries(context: Context, countryName: String): List<String> {
-            val json: String
-            try {
-                val inputStream = context.assets.open("cities_countries.json")
-                val size = inputStream.available()
-                val buffer = ByteArray(size)
-                inputStream.read(buffer)
-                inputStream.close()
-                json = String(buffer, Charsets.UTF_8)
-            } catch (ex: IOException) {
-                ex.printStackTrace()
-                return emptyList()
-            }
-
-            val type = object : TypeToken<Map<String, List<String>>>() {}.type
-            val countriesWithCities: Map<String, List<String>> = Gson().fromJson(json, type)
-
-            return countriesWithCities[countryName] ?: emptyList()
-        }
-
-        fun getCountries(context: Context): List<String> {
-            val json: String
-            try {
-                val inputStream = context.assets.open("cities_countries.json")
-                val size = inputStream.available()
-                val buffer = ByteArray(size)
-                inputStream.read(buffer)
-                inputStream.close()
-                json = String(buffer, Charsets.UTF_8)
-            } catch (ex: IOException) {
-                ex.printStackTrace()
-                return emptyList()
-            }
-
-            val type = object : TypeToken<Map<String, List<String>>>() {}.type
-            val countriesWithCities: Map<String, List<String>> = Gson().fromJson(json, type)
-
-            return countriesWithCities.keys.toList()
-        }
-
-        fun isAddressId(input: String): Boolean {
-            return input.toLongOrNull() != null
-        }
+fun isAddressId(input: String): Boolean {
+    return input.toLongOrNull() != null
+}
