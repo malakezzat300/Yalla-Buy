@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,8 +31,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -100,7 +104,8 @@ fun ProductsByCategoryScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(color = AppColors.Teal)
+                        CircularProgressIndicator(color = AppColors.Teal, modifier =Modifier.align(Alignment.Center) )
+
                     }
                 }
 
@@ -227,63 +232,95 @@ fun ProductCard(product: Product, navController: NavController) {
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Box {
-            Row(
-                modifier = Modifier.padding(10.dp),
-                verticalAlignment = Alignment.CenterVertically
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
             ) {
-                product.images.firstOrNull()?.let { image ->
-                    val imageVisibleState = remember { mutableStateOf(false) }
-                    LaunchedEffect(Unit) {
-                        delay(700)
-                        imageVisibleState.value = true
-                    }
-
-                    AnimatedVisibility(
-                        visible = imageVisibleState.value,
-                        enter = scaleIn(initialScale = 0.8f) + fadeIn(animationSpec = tween(durationMillis = 1000)),
-                        modifier = Modifier.size(120.dp)
-                    ) {
-                        Image(
-                            painter = rememberAsyncImagePainter(image.src),
-                            contentDescription = "Product Image",
-                            modifier = Modifier
-                                .size(120.dp)
-                                .clip(RoundedCornerShape(30.dp)),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-                }
-                Column(
-                    modifier = Modifier.padding(start = 10.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val titleVisibleState = remember { mutableStateOf(false) }
-                    LaunchedEffect(Unit) {
-                        delay(1800)
-                        titleVisibleState.value = true
+                    product.images.firstOrNull()?.let { image ->
+                        val imageVisibleState = remember { mutableStateOf(false) }
+                        LaunchedEffect(Unit) {
+                            delay(700)
+                            imageVisibleState.value = true
+                        }
+
+                        AnimatedVisibility(
+                            visible = imageVisibleState.value,
+                            enter = scaleIn(initialScale = 0.8f) + slideInHorizontally(animationSpec = tween(durationMillis = 1000)),
+                            modifier = Modifier.size(120.dp)
+                        ) {
+                            Image(
+                                painter = rememberAsyncImagePainter(image.src),
+                                contentDescription = "Product Image",
+                                modifier = Modifier
+                                    .size(120.dp)
+                                    .clip(RoundedCornerShape(30.dp)),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
                     }
 
-                    AnimatedVisibility(
-                        visible = titleVisibleState.value,
-                        enter = fadeIn(animationSpec = tween(durationMillis = 1000))
+                    Column(
+                        modifier = Modifier.padding(start = 10.dp)
                     ) {
-                        Text(product.title, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
-                    }
+                        val titleVisibleState = remember { mutableStateOf(false) }
+                        LaunchedEffect(Unit) {
+                            delay(1800)
+                            titleVisibleState.value = true
+                        }
 
-                    val vendorVisibleState = remember { mutableStateOf(false) }
-                    LaunchedEffect(Unit) {
-                        delay(2200)
-                        vendorVisibleState.value = true
-                    }
+                        AnimatedVisibility(
+                            visible = titleVisibleState.value,
+                            enter = fadeIn(animationSpec = tween(durationMillis = 1000))
+                        ) {
+                            Text(product.title, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
+                        }
 
-                    AnimatedVisibility(
-                        visible = vendorVisibleState.value,
-                        enter = fadeIn(animationSpec = tween(durationMillis = 1000))
-                    ) {
-                        Text(product.vendor, color = AppColors.Teal)
+                        val vendorVisibleState = remember { mutableStateOf(false) }
+                        LaunchedEffect(Unit) {
+                            delay(2200)
+                            vendorVisibleState.value = true
+                        }
+
+                        AnimatedVisibility(
+                            visible = vendorVisibleState.value,
+                            enter = fadeIn(animationSpec = tween(durationMillis = 1000))
+                        ) {
+                            Text(product.vendor, color = AppColors.Teal)
+                        }
                     }
                 }
+
+            }
+
+            val iconVisibleState = remember { mutableStateOf(false) }
+            LaunchedEffect(Unit) {
+                delay(2500)
+                iconVisibleState.value = true
+            }
+
+            this@Card.AnimatedVisibility(
+                visible = iconVisibleState.value,
+                enter = scaleIn(initialScale = 0.8f),
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(10.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.FavoriteBorder,
+                    contentDescription = "Favorite",
+                    tint = AppColors.Teal,
+                    modifier = Modifier.size(35.dp)
+                )
             }
         }
+
+
+
     }
 }
 
