@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.example.yallabuyadmin.coupons.model.CouponsRemoteDataSource
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.FirebaseApp
 import com.malakezzat.yallabuy.data.ProductsRepositoryImpl
@@ -35,8 +34,7 @@ class MainActivity : ComponentActivity() {
         ProductsRepositoryImpl.getInstance(
             ProductsRemoteDataSourceImpl.
             getInstance( RetrofitHelper.getInstance().create(ProductService::class.java)),
-            GlobalSharedPreferenceDataSourceImp(this.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)),
-            CouponsRemoteDataSource(RetrofitHelper.getInstance().create(ProductService::class.java))
+            GlobalSharedPreferenceDataSourceImp(this.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE))
         )
     }
     private val homeScreenViewModelFactory by lazy {

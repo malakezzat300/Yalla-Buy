@@ -1,24 +1,23 @@
 package com.malakezzat.yallabuy.data.remot
 
 
-import com.malakezzat.yallabuy.data.remote.coupons.DiscountCodeResponse
-import com.malakezzat.yallabuy.data.remote.coupons.priceRuleResponse
-import com.malakezzat.yallabuy.model.Address
+import com.malakezzat.yallabuy.model.DiscountCodesResponse
+import com.malakezzat.yallabuy.model.DiscountCodeResponse
+import com.malakezzat.yallabuy.model.PriceRulesResponse
 import com.malakezzat.yallabuy.model.AddressRequest
 import com.malakezzat.yallabuy.model.AddressResponse
 import com.malakezzat.yallabuy.model.Brands
 import com.malakezzat.yallabuy.model.Category
 import com.malakezzat.yallabuy.model.CurrencyResponse
-import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.CustomerAddress
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
 import com.malakezzat.yallabuy.model.CustomerSearchRespnse
-import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Orders
+import com.malakezzat.yallabuy.model.PriceRuleResponse
 import com.malakezzat.yallabuy.model.ProductResponse
 import com.malakezzat.yallabuy.model.ProductsResponse
 import com.malakezzat.yallabuy.model.VariantResponse
@@ -51,11 +50,20 @@ interface ProductService {
     suspend fun getBrands(): Brands
 
     @GET("price_rules.json")
-    suspend fun getPriceRules(): priceRuleResponse
+    suspend fun getPriceRules(): PriceRulesResponse
+
+    @GET("price_rules/{price_rule_id}.json")
+    suspend fun getSinglePriceRule(@Path("price_rule_id") priceRuleId: Long): PriceRuleResponse
 
     @GET("price_rules/{price_rule_id}/discount_codes.json")
     suspend fun getDiscountCodes(
         @Path("price_rule_id") priceRuleId: Long
+    ): DiscountCodesResponse
+
+    @GET("price_rules/{price_rule_id}/discount_codes/{discount_code_id}.json")
+    suspend fun getSingleDiscountCode(
+        @Path("price_rule_id") priceRuleId: Long,
+        @Path("discount_code_id") discountCodeId: Long
     ): DiscountCodeResponse
 
     @GET("draft_orders.json")

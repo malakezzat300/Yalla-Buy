@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
@@ -73,6 +74,8 @@ fun CheckoutScreen(viewModel: PaymentViewModel,navController: NavController) {
     var orderItems by remember { mutableStateOf( emptyList<LineItem>() ) }
     var itemsCount by remember { mutableIntStateOf(0) }
     var draftOrder by remember { mutableStateOf( DraftOrder() ) }
+    val draftOrderState by viewModel.singleDraftOrders.collectAsState()
+    val finalizeDraftOrderState by viewModel.finalizeDraftOrder.collectAsState()
 
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
@@ -103,6 +106,16 @@ fun CheckoutScreen(viewModel: PaymentViewModel,navController: NavController) {
         is ApiState.Success -> {
             orderItems = (shoppingCartOrderState as ApiState.Success).data.line_items
             draftOrder = (shoppingCartOrderState as ApiState.Success).data
+        }
+    }
+
+    when(finalizeDraftOrderState){
+        is ApiState.Error ->{ Log.i("completeOrderTest", "CheckoutScreen: draftOrder ${(shoppingCartOrder as ApiState.Error).message}") }
+        ApiState.Loading -> {
+            CircularProgressIndicator()
+        }
+        is ApiState.Success -> {
+            navController.navigate(Screen.OrderPlacedScreen.route)
         }
     }
 
@@ -202,7 +215,7 @@ fun CheckoutScreen(viewModel: PaymentViewModel,navController: NavController) {
                     val newDraftOrder = draftOrder
                     newDraftOrder.note = "Placed Order"
                     viewModel.updateDraftOrder(it, DraftOrderRequest(newDraftOrder))
-                    navController.navigate(Screen.OrderPlacedScreen.route)
+
                 }
             },
             modifier = Modifier

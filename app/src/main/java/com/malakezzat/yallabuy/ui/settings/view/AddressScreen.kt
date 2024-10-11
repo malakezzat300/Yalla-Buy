@@ -119,10 +119,15 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
     LaunchedEffect(Unit) {
         val isAddressId = address?.let { isAddressId(it) }
         if(isAddressId == true){
-            addressState = ""
-            viewModel.getAddressDetails(sharedPreferences.getLong("USER_ID", 0L),address.toLong())
-            saveButton = "Update"
-            screenTitle = "Edit Address"
+                addressState = ""
+            if(address.toLong() != 0L) {
+                viewModel.getAddressDetails(
+                    sharedPreferences.getLong("USER_ID", 0L),
+                    address.toLong()
+                )
+                saveButton = "Update"
+                screenTitle = "Edit Address"
+            }
         } else {
             if (address != null) {
                 addressState = address
@@ -602,10 +607,39 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
             )
         }
 
+
         @Composable
         fun LocationPrompt() {
             val context = LocalContext.current
             var showDialog by remember { mutableStateOf(false) }
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                onClick = {
+                    if(phoneNumber.isNotBlank()
+                        && addressState.isNotBlank() && city.isNotBlank() && country.isNotBlank()) {
+                        userId?.let {
+                            val address1 = Address(
+                                customer_id = it,
+                                first_name = firstName,
+                                last_name = lastName,
+                                phone = phoneNumber,
+                                address1 = addressState,
+                                city = city,
+                                country = country
+                            )
+                            if (address?.let { isAddressId(it) } == true && address.toLong() != 0L){
+                                viewModel.updateUserAddress(it, addressId, AddressRequest(address1))
+                            } else {
+                                viewModel.addNewAddress(it, AddressRequest(address1))
+                            }
+                        }
+
+                    } else {
+                        Toast.makeText(context,"Please fill all fields" ,Toast.LENGTH_SHORT).show()
+                    }
 
             if (!isLocationEnabled(context)) {
                 showDialog = true

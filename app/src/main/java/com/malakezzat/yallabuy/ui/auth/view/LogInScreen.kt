@@ -154,7 +154,7 @@ fun LogInScreen(viewModel: LogInViewModel,
                                         } else {
                                             // Handle reload error
                                             isLoading=false
-                                            Toast.makeText(context,"login faild", Toast.LENGTH_LONG).show()
+                                            Toast.makeText(context,"login failed", Toast.LENGTH_LONG).show()
                                             println("Failed to reload user: ${task.exception?.message}")
                                         }
                                     }
@@ -167,7 +167,7 @@ fun LogInScreen(viewModel: LogInViewModel,
                             Log.i("TAG", "SignupScreen: password and confirm password are not the same")
                         }, onError = {
                             isLoading=false
-                            Toast.makeText(context,"login faild", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context,"login failed", Toast.LENGTH_LONG).show()
                         })
 
 
