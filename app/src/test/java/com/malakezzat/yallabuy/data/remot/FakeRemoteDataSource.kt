@@ -3,17 +3,21 @@ package com.malakezzat.yallabuy.data.remot
 import com.malakezzat.yallabuy.data.remote.ProductsRemoteDataSource
 import com.malakezzat.yallabuy.model.AddressRequest
 import com.malakezzat.yallabuy.model.AddressResponse
+import com.malakezzat.yallabuy.model.AppliedDiscount
 import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
+import com.malakezzat.yallabuy.model.Customer
 import com.malakezzat.yallabuy.model.CustomerAddress
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
 import com.malakezzat.yallabuy.model.CustomerSearchRespnse
 import com.malakezzat.yallabuy.model.DiscountCodeResponse
 import com.malakezzat.yallabuy.model.DiscountCodesResponse
+import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
+import com.malakezzat.yallabuy.model.LineItem
 import com.malakezzat.yallabuy.model.Image
 import com.malakezzat.yallabuy.model.ImageCategory
 import com.malakezzat.yallabuy.model.Order
@@ -21,6 +25,7 @@ import com.malakezzat.yallabuy.model.PriceRuleResponse
 import com.malakezzat.yallabuy.model.PriceRulesResponse
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.ProductResponse
+import com.malakezzat.yallabuy.model.Property
 import com.malakezzat.yallabuy.model.SmartCollection
 import com.malakezzat.yallabuy.model.Variant
 import com.malakezzat.yallabuy.model.VariantResponse
@@ -34,6 +39,69 @@ class FakeRemoteDataSource(
     private var categories: List<CustomCollection>? = null,
     private var brands: List<SmartCollection>? = null
 ): ProductsRemoteDataSource {
+
+    val draftOrdersList = listOf(
+        DraftOrder(
+            id = 1,
+            note = "First draft order",
+            line_items = listOf(
+                LineItem(
+                    title = "Cool T-Shirt",
+                    price = "25.00",
+                    variant_id = 101,
+                    quantity = 2,
+                    properties = listOf(
+                        Property(name = "Size", value = "M"),
+                        Property(name = "Color", value = "Blue")
+                    ),
+                    product_id = 201
+                ),
+                LineItem(
+                    title = "Stylish Hat",
+                    price = "15.00",
+                    variant_id = 102,
+                    quantity = 1,
+                    properties = emptyList(),
+                    product_id = 202
+                )
+            ),
+            email = "customer@example.com",
+            customer = Customer(id = 1),
+            total_tax = "4.00",
+            total_price = "64.00",
+            subtotal_price = "60.00",
+            applied_discount = AppliedDiscount(
+                title = "Summer Sale",
+                description = "10% off summer items",
+                value = "10",
+                value_type = "percentage",
+                amount = "6.00"
+            )
+        ),
+        DraftOrder(
+            id = 2,
+            note = "Second draft order",
+            line_items = listOf(
+                LineItem(
+                    title = "Running Shoes",
+                    price = "50.00",
+                    variant_id = 201,
+                    quantity = 1,
+                    properties = listOf(
+                        Property(name = "Size", value = "10")
+                    ),
+                    product_id = 301
+                )
+            ),
+            email = "anothercustomer@example.com",
+            customer = Customer(id = 2),
+            total_tax = "2.00",
+            total_price = "52.00",
+            subtotal_price = "50.00",
+            applied_discount = null // No discount applied
+            )
+    )
+
     private val productsList = listOf(
         Product(
             id = 1,
@@ -173,11 +241,15 @@ class FakeRemoteDataSource(
     }
 
     override suspend fun getAllDraftOrders(): Flow<DraftOrdersResponse> {
-        TODO("Not yet implemented")
+        return flow {
+            emit(DraftOrdersResponse(draftOrdersList))
+        }.catch { emit(DraftOrdersResponse(draftOrdersList)) }
     }
 
     override suspend fun getDraftOrder(draftOrderId: Long): Flow<DraftOrderResponse> {
-        TODO("Not yet implemented")
+        return flow {
+            emit(DraftOrderResponse(draftOrdersList.find { it.id == draftOrderId} ?: DraftOrder()))
+        }.catch { emit(DraftOrderResponse(DraftOrder(id = draftOrderId)))}
     }
 
     override suspend fun createDraftOrder(draftOrder: DraftOrderRequest): Flow<DraftOrderResponse> {
