@@ -11,6 +11,10 @@ import com.malakezzat.yallabuy.model.PriceRule
 import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.CustomerSearchRespnse
+import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.DraftOrderRequest
+import com.malakezzat.yallabuy.model.DraftOrderResponse
+import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.SmartCollection
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,12 +48,23 @@ private val _brandsList = MutableStateFlow<ApiState<List<SmartCollection>>>(ApiS
     private val _conversionRate = MutableStateFlow<ApiState<CurrencyResponse?>>(ApiState.Loading)
     val conversionRate = _conversionRate.asStateFlow()
 
+    private val _draftOrderId = MutableStateFlow<ApiState<DraftOrderResponse>>(ApiState.Loading)
+    val draftOrderId = _draftOrderId.asStateFlow()
+
+    private val _draftOrders = MutableStateFlow<ApiState<DraftOrdersResponse>>(ApiState.Loading)
+    val draftOrders = _draftOrders.asStateFlow()
+
+
+    private val _wishListDraftOrder = MutableStateFlow<ApiState<DraftOrder>>(ApiState.Loading)
+    val wishListDraftOrder = _wishListDraftOrder.asStateFlow()
+
     init {
         getAllProducts()
         getAllCategories()
         fetchPriceRules()
         getBrands()
         getUserByEmail()
+        getDraftOrders()
     }
 
     // Fetch all products
@@ -162,4 +177,80 @@ private val _brandsList = MutableStateFlow<ApiState<List<SmartCollection>>>(ApiS
         }
     }
 
+    fun createDraftOrder(draftOrder: DraftOrderRequest){
+        viewModelScope.launch {
+            repository.createDraftOrder(draftOrder).onStart {
+                _draftOrderId.value = ApiState.Loading
+            }
+                .catch { e ->
+                    _draftOrderId.value = ApiState.Error(e.message ?: "Unknown error")
+                }
+                .collect { draftOrderResponse ->
+                    val draftOrderId = draftOrderResponse.draft_order
+
+                    if (draftOrderId != null) {
+                        _draftOrderId.value = ApiState.Success(draftOrderResponse)
+                    } else {
+                        _draftOrderId.value = ApiState.Error("Draft Order not found")
+                    }
+                }
+        }
+    }
+
+    fun updateDraftOrder(draftOrderId: Long,draftOrder: DraftOrderRequest){
+        viewModelScope.launch {
+            repository.updateDraftOrder(draftOrderId,draftOrder).onStart {
+                _draftOrderId.value = ApiState.Loading
+            }
+                .catch { e ->
+                    _draftOrderId.value = ApiState.Error(e.message ?: "Unknown error")
+                }
+                .collect { draftOrderResponse ->
+                    val draftOrderId = draftOrderResponse.draft_order
+
+                    if (draftOrderId != null) {
+                        _draftOrderId.value = ApiState.Success(draftOrderResponse)
+                    } else {
+                        _draftOrderId.value = ApiState.Error("Draft Order not found")
+                    }
+                }
+        }
+    }
+
+
+    fun getDraftOrders(){
+        viewModelScope.launch {
+            repository.getAllDraftOrders().onStart {
+                _draftOrders.value = ApiState.Loading
+            }
+                .catch { e ->
+                    _draftOrders.value = ApiState.Error(e.message ?: "Unknown error")
+                }
+                .collect { draftOrdersResponse ->
+                    val draftOrders = draftOrdersResponse.draft_orders.filter {
+                        it.email == FirebaseAuth.getInstance().currentUser?.email
+                    }
+                    val shoppingCartDraftOrder = draftOrders.filter{
+                        it.note == "shoppingCart"
+                    }
+                    val wishListDraftOrder = draftOrders.filter{
+                        it.note == "wishList"
+                    }
+                    if (shoppingCartDraftOrder.isNotEmpty()) {
+//                        _shoppingCartDraftOrder.value = ApiState.Success(draftOrders.filter{
+//                            it.note == "shoppingCart"
+//                        }[0])
+                    } else {
+                        //_shoppingCartDraftOrder.value = ApiState.Error("shoppingCart not found")
+                    }
+                    if (wishListDraftOrder.isNotEmpty()) {
+                        _wishListDraftOrder.value = ApiState.Success(draftOrders.filter{
+                            it.note == "wishList"
+                        }[0])
+                    } else {
+                        _wishListDraftOrder.value = ApiState.Error("wishList not found")
+                    }
+                }
+        }
+    }
 }
