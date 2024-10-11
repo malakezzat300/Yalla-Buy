@@ -48,8 +48,10 @@ fun SplashScreen(navController: NavController) {
     LaunchedEffect(Unit) {
         kotlinx.coroutines.delay(5000)
         if(FirebaseAuth.getInstance().currentUser != null){
+            navController.popBackStack(Screen.SplashScreen.route, inclusive = true)
             navController.navigate((Screen.HomeScreen.route))
         }else{
+            navController.popBackStack(Screen.SplashScreen.route, inclusive = true)
             navController.navigate(Screen.LogInScreen.route)
         }
     }
