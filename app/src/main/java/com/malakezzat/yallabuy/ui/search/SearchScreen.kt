@@ -60,6 +60,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
 import com.malakezzat.yallabuy.R
+import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.data.util.CurrencyConverter
 import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderRequest
@@ -91,6 +92,21 @@ fun SearchScreen(viewModel: SearchViewModel,
     LaunchedEffect(Unit) { viewModel.getDraftOrders() }
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
+
+    when (draftOrderId) {
+        is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(draftOrderId as ApiState.Error).message}")
+        ApiState.Loading -> {}
+        is ApiState.Success -> {
+            draftOrderIdSaved = (draftOrderId as ApiState.Success).data.draft_order.id ?: 0L
+        }
+        else -> {}
+    }
+    when (wishListDraftOrderState) {
+        is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(wishListDraftOrderState as ApiState.Error).message}")
+        ApiState.Loading -> {}
+        is ApiState.Success -> wishListDraftOrder = (wishListDraftOrderState as ApiState.Success).data
+    }
+
     Scaffold(
        topBar = { CustomTopBar(navController,"",Color.White) },
         containerColor = Color.White,
