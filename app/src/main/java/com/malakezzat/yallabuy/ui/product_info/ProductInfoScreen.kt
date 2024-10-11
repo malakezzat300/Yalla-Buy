@@ -1,6 +1,7 @@
 package com.malakezzat.yallabuy.ui.product_info
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -52,6 +53,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -76,7 +78,7 @@ fun ProductInfoScreen(
     navController: NavController,
     productId: Long
 ) {
-
+    val context = LocalContext.current
     val productState by viewModel.searchProductsList.collectAsState()
     val draftOrderId by viewModel.draftOrderId.collectAsState()
     val shoppingCartDraftOrderState by viewModel.shoppingCartDraftOrder.collectAsState()
@@ -88,6 +90,7 @@ fun ProductInfoScreen(
 
     var color by remember { mutableStateOf("") }
     var size by remember { mutableStateOf("") }
+    var quantity by remember { mutableStateOf(0L) }
     var index by remember { mutableStateOf(0L) }
 
     var variant by remember { mutableStateOf(0) }
@@ -95,7 +98,9 @@ fun ProductInfoScreen(
     when (draftOrderId) {
         is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(draftOrderId as ApiState.Error).message}")
         ApiState.Loading -> {}
-        is ApiState.Success -> draftOrderIdSaved = (draftOrderId as ApiState.Success).data.draft_order.id ?: 0L
+        is ApiState.Success -> {
+            draftOrderIdSaved = (draftOrderId as ApiState.Success).data.draft_order.id ?: 0L
+        }
         else -> {}
     }
     when (shoppingCartDraftOrderState) {
@@ -118,8 +123,9 @@ fun ProductInfoScreen(
         containerColor = Color.White,
         content = { paddingValues ->
     // Main UI layout
-    Box(modifier = Modifier.fillMaxSize()
-         .padding(paddingValues)
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .padding(paddingValues)
     ) {
 
         when (productState) {
@@ -186,7 +192,11 @@ fun ProductInfoScreen(
                                 .fillMaxWidth()
                                 .height(1000.dp)
                                 .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
-                                .border(1.dp, shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp), color = AppColors.Teal)
+                                .border(
+                                    1.dp,
+                                    shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
+                                    color = AppColors.Teal
+                                )
                             ,
                             shadowElevation = 10.dp,
                             color = Color.White
@@ -207,6 +217,7 @@ fun ProductInfoScreen(
                                 for(item in product.variants){
                                     if((item.option1 == size)&&(item.option2==color)){
                                         price=item.price
+                                        quantity = item.inventory_quantity
                                     }
                                 }
 
@@ -220,6 +231,14 @@ fun ProductInfoScreen(
                                 }
                                 Spacer(modifier = Modifier.height(10.dp))
 
+                                Text(
+                                    text = "In Stock: $quantity",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = AppColors.Teal
+                                )
+
+                                Spacer(modifier = Modifier.height(10.dp))
 
                                 val colors = product.options.get(1).values
                                 ColorCirclesRow(colorNames = colors, onColorChange = {c ->  color = c
@@ -227,6 +246,7 @@ fun ProductInfoScreen(
                                         if((item.option1 == size)&&(item.option2==color)){
                                             price=item.price
                                             index = item.id
+                                            quantity = item.inventory_quantity
                                         }
                                     }
                                 })
@@ -237,6 +257,7 @@ fun ProductInfoScreen(
                                         if((item.option1 == size)&&(item.option2==color)){
                                             price=item.price
                                             index = item.id
+                                            quantity = item.inventory_quantity
                                         }
                                     }
                                 })
@@ -379,6 +400,7 @@ fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : Str
 @Composable
 fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,oldDraftOrder : DraftOrder,price : String,size: String,color: String,id : Long,navController: NavController) {
    var geustClicked by remember { mutableStateOf(false) }
+    val context = LocalContext.current
     Row(modifier = Modifier.fillMaxWidth()) {
         if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
             OutlinedButton(
@@ -390,7 +412,19 @@ fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,o
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(text = "Add To Cart", color = AppColors.Teal)
             }
-        }else{
+        }else if((product.variants.find { it.id == id }?.inventory_quantity ?: 0L) <= 0L){
+            OutlinedButton(
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.Teal),
+                border = BorderStroke(1.dp, AppColors.Teal),
+                onClick = {
+                    Toast.makeText(context, "Out of Stock", Toast.LENGTH_SHORT).show()
+                },
+                modifier = Modifier.weight(1f)) {
+                Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = AppColors.Gray)
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(text = "Add To Cart", color = AppColors.Gray)
+            }
+        } else{
         OutlinedButton(
              onClick = {
              val properties = listOf(Property(name = "imageUrl",value = product.image.src),
@@ -501,8 +535,9 @@ fun ColorCirclesRow(colorNames: List<String> ,onColorChange: (String) -> Unit) {
                         .padding(4.dp)
                         .background(color = color, shape = CircleShape)
                         .border(0.8.dp, shape = CircleShape, color = Color.Black)
-                        .clickable { colorSelection=index
-                                    onColorChange(colorNames[colorSelection])
+                        .clickable {
+                            colorSelection = index
+                            onColorChange(colorNames[colorSelection])
                         }
                 )
             }
@@ -513,7 +548,8 @@ fun ColorCirclesRow(colorNames: List<String> ,onColorChange: (String) -> Unit) {
                         .padding(4.dp)
                         .background(color = color, shape = CircleShape)
                         .border(0.5.dp, shape = CircleShape, color = Color.Gray)
-                        .clickable { colorSelection=index
+                        .clickable {
+                            colorSelection = index
                             onColorChange(colorNames[colorSelection])
                         }
                 )
@@ -559,7 +595,8 @@ fun SizeCirclesRow(Itemsizes: List<String>,onSizeChange: (String) -> Unit) {
                             .padding(4.dp)
                             .background(color = Color.White, shape = RectangleShape)
                             .border(0.5.dp, shape = CircleShape, color = AppColors.Teal)
-                            .clickable { sizeSelection=index
+                            .clickable {
+                                sizeSelection = index
                                 onSizeChange(Itemsizes[sizeSelection])
                             }
                     ){
@@ -574,8 +611,9 @@ fun SizeCirclesRow(Itemsizes: List<String>,onSizeChange: (String) -> Unit) {
                             .padding(4.dp)
                             .background(color = Color.White, shape = RectangleShape)
                             .border(0.8.dp, shape = CircleShape, color = Color.Gray)
-                            .clickable { sizeSelection=index
-                                        onSizeChange(Itemsizes[sizeSelection])
+                            .clickable {
+                                sizeSelection = index
+                                onSizeChange(Itemsizes[sizeSelection])
                             }
                     ){
 

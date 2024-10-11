@@ -117,4 +117,32 @@ dependencies {
     //map
     implementation ("org.osmdroid:osmdroid-android:6.1.11")
 
+    // InstantTaskExecutorRule
+    // AndroidX and Robolectric
+    testImplementation("androidx.test.ext:junit-ktx:1.1.3")
+    testImplementation("androidx.test:core-ktx:1.4.0")
+    testImplementation("org.robolectric:robolectric:4.8")
+
+// AndroidX Test - JVM testing
+    testImplementation("androidx.test:core-ktx:1.4.0")
+
+// AndroidX Test - Instrumented testing
+    androidTestImplementation("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+
+// Timber
+    implementation("com.jakewharton.timber:timber:5.0.1")
+
+// Hamcrest
+    testImplementation("org.hamcrest:hamcrest:2.2")
+// testImplementation("org.hamcrest:hamcrest-all:1.3")
+    //androidTestImplementation("org.hamcrest:hamcrest:2.2")
+
+// Dependencies for local unit tests
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("androidx.arch.core:core-testing:2.1.0")
+    testImplementation("org.robolectric:robolectric:4.5.1")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
+
 }
