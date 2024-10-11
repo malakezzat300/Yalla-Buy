@@ -321,8 +321,11 @@ fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : Str
     }
     IconButton(onClick = {
         clicked=true
-        val properties = listOf(Property(name = "imageUrl",value = product.image.src))
-        Log.i("propertiesTest", "AddToCart: $properties")
+        val properties = listOf(Property(name = "imageUrl",value = product.image.src),
+            Property(name = "size",value = product.variants[0].option1),
+            Property(name = "color",value = product.variants[0].option2))
+
+        Log.i("propertiesTest", "AddToFav: ${oldDraftOrder.id}")
         if(oldDraftOrder.id == 0L) {
             val lineItems = listOf(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties,product.id?:0))
             val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
@@ -515,8 +518,7 @@ fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,o
 }
 
 @Composable
-fun ColorCirclesRow(colorNames: List<String> ,onColorChange: (String) -> Unit
-) {
+fun ColorCirclesRow(colorNames: List<String> ,onColorChange: (String) -> Unit) {
     var colorSelection by remember { mutableStateOf(0) }
     Text(text = "Available Colors:")
     LazyRow(
