@@ -9,21 +9,25 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -44,6 +49,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remote.ApiState
+import com.malakezzat.yallabuy.data.util.CurrencyConverter
 import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.ui.CustomTopBar
 import com.malakezzat.yallabuy.ui.Screen
@@ -158,7 +164,7 @@ fun ProductsByBrandScreen(
 fun LatestProductsSectionById(products: List<Product>, navController: NavController) {
     //
     Column(modifier = Modifier.padding(16.dp)) {
-        Row(
+        /*Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -172,25 +178,24 @@ fun LatestProductsSectionById(products: List<Product>, navController: NavControl
                 "SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
                 color = AppColors.MintGreen
             )
-        }
-
+        }*/
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(400.dp)
+                .height(1000.dp)
+                .padding(top = 25.dp)
         ) {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
+            LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-                contentPadding = PaddingValues(0.dp)
-
+                contentPadding = PaddingValues(0.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 itemsIndexed(products) { _, product ->
                     ProductCard(product = product, navController)
+                    Spacer(modifier = Modifier.height(10.dp))
                 }
             }
+
         }
     }
 }
@@ -200,48 +205,40 @@ fun LatestProductsSectionById(products: List<Product>, navController: NavControl
 fun ProductCard(product: Product, navController: NavController) {
     Card(
         modifier = Modifier
-            .width(150.dp)
+            .fillMaxWidth()
             .clickable {
                 navController.navigate("${Screen.ProductInfScreen.route}/${product.id}")
             },
         shape = RoundedCornerShape(30.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        // Row to arrange image and text side by side
+        Row(
+            modifier = Modifier.padding(10.dp), // Add padding to the Row
+            verticalAlignment = Alignment.CenterVertically // Center items vertically
         ) {
-        Box {
             // Background image of the product
             product.images.firstOrNull()?.let { image ->
                 Image(
                     painter = rememberAsyncImagePainter(image.src),
                     contentDescription = "Product Image",
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
+                        .size(120.dp)
                         .clip(RoundedCornerShape(30.dp)), // Clip the image to match the card shape
                     contentScale = ContentScale.Crop
                 )
             }
 
-            // Wishlist icon positioned at the top right corner
-            Image(
-                painter = painterResource(id = R.drawable.wishlist),
-                contentDescription = "wishlist",
-                modifier = Modifier
-                    .size(40.dp)
-                    .align(Alignment.TopEnd)
-                    .padding(5.dp)
-            )
-
             // Column for product details
             Column(
                 modifier = Modifier
-                    .padding(top = 110.dp) // Ensure text does not overlap with the image
-                    .padding(10.dp) // Add some padding around the text
+                    .padding(start = 10.dp) // Add space between the image and text
             ) {
                 Text(product.title, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
-                Text(product.vendor, color = AppColors.MintGreen)
+                Text(product.vendor, color = AppColors.Teal)
             }
         }
     }
+
 }
