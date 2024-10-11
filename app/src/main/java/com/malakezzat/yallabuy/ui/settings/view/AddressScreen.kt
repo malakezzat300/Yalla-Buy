@@ -112,10 +112,7 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
     var addressState by remember { mutableStateOf(address ?: "") }
     var saveButton by remember { mutableStateOf("Save") }
     var screenTitle by remember { mutableStateOf("New Address") }
-    //search on city and country list
     var searchQuery by remember { mutableStateOf("") }
-    var countrySearchQuery by remember { mutableStateOf("") }
-    var citySearchQuery by remember { mutableStateOf("") }
 
 
     val sharedPreferences = LocalContext.current.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
@@ -202,13 +199,12 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
 
 
     androidx.compose.material3.Scaffold(
-        topBar = { CustomTopBar(navController,"New Address")},
+        topBar = { CustomTopBar(navController,"New Address",AppColors.Teal,{navController.navigateUp()}) },
         containerColor = Color.White,
         content = { paddingValues ->
-
             LazyColumn(modifier = Modifier.padding(16.dp)
                 .padding(paddingValues)
-            ) {
+                .background(color = Color.White)) {
                 item {
                     /*Text(
                         text = "New Address",
@@ -272,8 +268,25 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                             fontSize = 18.sp,
                             modifier = Modifier.align(Alignment.CenterVertically)
                         )
+//                Text(text = "Address",
+//                    fontSize = 18.sp,
+//                    modifier = Modifier.align(Alignment.CenterVertically)
+//                )
                         Row {
-
+//                    Button(
+//                        onClick = {
+//
+//                        },
+//                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+//                        shape = RoundedCornerShape(30.dp)
+//                    ) {
+//                        Text(
+//                            text = "Map",
+//                            color = Color.White,
+//                            fontSize = 16.sp
+//                        )
+//                    }
+//                    Spacer(modifier = Modifier.width(8.dp))
                             Button(
                                 onClick = {
                                     if (ContextCompat.checkSelfPermission(
@@ -351,24 +364,18 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                             expanded = expandedCountry,
                             onDismissRequest = { expandedCountry = false }
                         ) {
-                            TextField(
-                                value = searchQuery,
-                                onValueChange = { searchQuery = it },
-                                label = { Text("Search Country") },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-
-                            countries.filter { it.contains(searchQuery, ignoreCase = true) }.forEach { countryOption ->
+                            countries.forEach { countryOption ->
                                 DropdownMenuItem(onClick = {
                                     country = countryOption
                                     expandedCountry = false
-                                    searchQuery = ""
                                 }) {
                                     Text(text = countryOption)
                                 }
                             }
                         }
                     }
+
+
 
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
@@ -390,7 +397,11 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                         expanded = expandedCity,
                         onExpandedChange = {
                             if (cities.isEmpty()) {
-                                Toast.makeText(context, "Choose a Country First", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "Choose a Country First",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             } else {
                                 expandedCity = !expandedCity
                             }
@@ -416,26 +427,16 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                             expanded = expandedCity,
                             onDismissRequest = { expandedCity = false }
                         ) {
-
-                            TextField(
-                                value = searchQuery,
-                                onValueChange = { searchQuery = it },
-                                label = { Text("Search City") },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-
-                            cities.filter { it.contains(searchQuery, ignoreCase = true) }.forEach { cityOption ->
+                            cities.forEach { cityOption ->
                                 DropdownMenuItem(onClick = {
                                     city = cityOption
                                     expandedCity = false
-                                    searchQuery = ""
                                 }) {
                                     Text(text = cityOption)
                                 }
                             }
                         }
                     }
-
 
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -526,6 +527,7 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                 }
             }
         })
+
 
 
             if (!locationEnabled && permissionGranted) {
