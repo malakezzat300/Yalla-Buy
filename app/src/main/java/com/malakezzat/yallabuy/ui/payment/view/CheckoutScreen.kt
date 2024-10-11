@@ -77,6 +77,7 @@ fun CheckoutScreen(viewModel: PaymentViewModel, navController: NavController) {
     val draftOrderState by viewModel.singleDraftOrders.collectAsState()
     val finalizeDraftOrderState by viewModel.finalizeDraftOrder.collectAsState()
     var draftOrderUpdated by remember { mutableStateOf( DraftOrder() ) }
+    var isLoading by remember { mutableStateOf(true) }
 
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
@@ -110,12 +111,16 @@ fun CheckoutScreen(viewModel: PaymentViewModel, navController: NavController) {
     }
 
     when(shoppingCartOrderState){
-        is ApiState.Error ->{ Log.i("completeOrderTest", "shoppingCartOrderState: draftOrder ${(shoppingCartOrderState as ApiState.Error).message}") }
-        ApiState.Loading -> {}
+        is ApiState.Error ->{
+            isLoading = false
+            Log.i("completeOrderTest", "shoppingCartOrderState: draftOrder ${(shoppingCartOrderState as ApiState.Error).message}") }
+        ApiState.Loading -> {
+            isLoading = true
+        }
         is ApiState.Success -> {
             orderItems = (shoppingCartOrderState as ApiState.Success).data.line_items
             draftOrder = (shoppingCartOrderState as ApiState.Success).data
-
+            isLoading = false
         }
     }
 
@@ -139,7 +144,7 @@ fun CheckoutScreen(viewModel: PaymentViewModel, navController: NavController) {
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = AppColors.Teal)
+              //  CircularProgressIndicator(color = AppColors.Teal)
             }
         }
 
@@ -160,107 +165,123 @@ fun CheckoutScreen(viewModel: PaymentViewModel, navController: NavController) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
-                contentDescription = "Back",
+        if (isLoading) {
+         Column(
+             modifier = Modifier
+                 .fillMaxSize(),
+             horizontalAlignment = Alignment.CenterHorizontally,
+             verticalArrangement = Arrangement.Center
+         ) {
+             CircularProgressIndicator(
+                 color = AppColors.Teal
+             )
+         }
+        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .size(24.dp)
-                    .clickable {
-                        navController.navigateUp()
-                    }
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Text(
-                text = "Checkout",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    navController.navigate(Screen.ItemsScreen.route)
-                }
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = "Items (${itemsCount})")
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowRight,
-                contentDescription = "Arrow Right"
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-
-        HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            "Shipping Address",
-            style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Normal)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Column {
-            if (defaultAddress.name?.isNotBlank() == true) {
-                InfoRow(label = "Full Name", value = "${defaultAddress.name}")
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back",
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable {
+                            navController.navigateUp()
+                        }
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = "Checkout",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.weight(1f)
+                )
             }
-            InfoRow(label = "Mobile Number", value = "${defaultAddress.phone}")
-            InfoRow(label = "Country", value = "${defaultAddress.country}")
-            InfoRow(label = "City", value = "${defaultAddress.city}")
-            InfoRow(label = "Address", value = "${defaultAddress.address1}")
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        navController.navigate(Screen.ItemsScreen.route)
+                    }
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(text = "Items (${itemsCount})")
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowRight,
+                    contentDescription = "Arrow Right"
+                )
+            }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Text("Order Info", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Normal))
-        Spacer(modifier = Modifier.height(8.dp))
-        Column {
-            CurrencyConverter.changeCurrency(draftOrder.subtotal_price.toDouble())
-                ?.let { InfoRow(label = "Subtotal", value = it) }
-            CurrencyConverter.changeCurrency(draftOrder.total_tax.toDouble())
-                ?.let { InfoRow(label = "Tax", value = it) }
-            CurrencyConverter.changeCurrency(draftOrder.total_price.toDouble())
-                ?.let { InfoRow(label = "Total", value = it, isBold = true) }
-        }
 
-        Spacer(modifier = Modifier.height(24.dp))
+            HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
 
-        Button(
-            onClick = {
-                draftOrder.id?.let {
-                    val newDraftOrder = draftOrder
-                    newDraftOrder.note = "Placed Order"
-                    Log.i("completeOrderTest", "onClick: draftOrder ${newDraftOrder.toString()}")
-                    viewModel.updateDraftOrder(it, DraftOrderRequest(newDraftOrder))
+            Spacer(modifier = Modifier.height(8.dp))
 
+            Text(
+                "Shipping Address",
+                style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Normal)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Column {
+                if (defaultAddress.name?.isNotBlank() == true) {
+                    InfoRow(label = "Full Name", value = "${defaultAddress.name}")
                 }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp),
+                InfoRow(label = "Mobile Number", value = "${defaultAddress.phone}")
+                InfoRow(label = "Country", value = "${defaultAddress.country}")
+                InfoRow(label = "City", value = "${defaultAddress.city}")
+                InfoRow(label = "Address", value = "${defaultAddress.address1}")
+            }
 
-            shape = RoundedCornerShape(30.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
-        ) {
-            Text("Place Order")
+            Spacer(modifier = Modifier.height(16.dp))
+
+            HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text("Order Info", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Normal))
+            Spacer(modifier = Modifier.height(8.dp))
+            Column {
+                CurrencyConverter.changeCurrency(draftOrder.subtotal_price.toDouble())
+                    ?.let { InfoRow(label = "Subtotal", value = it) }
+                CurrencyConverter.changeCurrency(draftOrder.total_tax.toDouble())
+                    ?.let { InfoRow(label = "Tax", value = it) }
+                CurrencyConverter.changeCurrency(draftOrder.total_price.toDouble())
+                    ?.let { InfoRow(label = "Total", value = it, isBold = true) }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = {
+                    draftOrder.id?.let {
+                        val newDraftOrder = draftOrder
+                        newDraftOrder.note = "Placed Order"
+                        Log.i(
+                            "completeOrderTest",
+                            "onClick: draftOrder ${newDraftOrder.toString()}"
+                        )
+                        viewModel.updateDraftOrder(it, DraftOrderRequest(newDraftOrder))
+
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+
+                shape = RoundedCornerShape(30.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
+            ) {
+                Text("Place Order")
+            }
         }
     }
 }

@@ -797,25 +797,3 @@ fun DeleteConfirmationDialog(
         )
     }
 }
-
-fun checkMaxQuantity(variantId : Long,variantSet : Set<Variant>) : Int{
-    for(item in variantSet){
-        Log.i("quantityTest", "ShoppingItem: quantity ${item.inventory_quantity}")
-        if(item.id == variantId){
-            if(item.inventory_quantity < 2){
-                return 1
-            } else {
-                return (item.inventory_quantity / 2).toInt()
-            }
-        }
-    }
-    return 1
-}
-
-/*
-@Composable
-fun ShoppingScreenPreview() {
-    YallaBuyTheme {
-        ShoppingCartScreen()
-    }
-}*/
