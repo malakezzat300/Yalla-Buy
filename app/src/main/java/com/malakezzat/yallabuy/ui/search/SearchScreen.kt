@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -155,41 +156,61 @@ fun SearchScreen(viewModel: SearchViewModel,
 @Composable
 fun RecentSearchItem(product: Product,navController: NavController) {
 
-    Column(
+    Box(
         modifier = Modifier
             .padding(8.dp)
             .background(Color.White, shape = RoundedCornerShape(8.dp))
             .clickable { /* Handle click */ }
-            .padding(16.dp)
     ) {
-        // Placeholder for product image
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp)
-            .background(Color.White)
-            .clickable { navController.navigate("${Screen.ProductInfScreen.route}/${product.id}") }
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
         ) {
-            if(product.image != null){
-                AsyncImage(
-                    model = product.image.src,
-                    contentDescription = product.title,
-                    modifier = Modifier
-                        .size(128.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.LightGray),
-                    contentScale = ContentScale.Crop)
+            // Placeholder for product image
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .background(Color.White)
+                    .clickable { navController.navigate("${Screen.ProductInfScreen.route}/${product.id}") }
+            ) {
+                if (product.image != null) {
+                    AsyncImage(
+                        model = product.image.src,
+                        contentDescription = product.title,
+                        modifier = Modifier
+                            .size(128.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color.LightGray),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
-          
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Product name and price
+            Text(text = product?.title ?: "title", style = MaterialTheme.typography.bodyMedium)
+            val price2 = product?.variants?.get(0)?.price ?: "200"
+            CurrencyConverter.changeCurrency(price2.toDouble())?.let {
+                Text(text = it, style = MaterialTheme.typography.bodyMedium)
+            }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Product name and price
-        Text(text = product?.title?:"title", style = MaterialTheme.typography.bodyMedium)
-        val price2=product?.variants?.get(0)?.price?:"200"
-        CurrencyConverter.changeCurrency(price2.toDouble())?.let {
-            Text(text = it, style = MaterialTheme.typography.bodyMedium)
+        // Icon positioned at the end of the box
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd) // Adjust this alignment as needed
+                .padding(10.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.FavoriteBorder,
+                contentDescription = "Favorite",
+                tint = AppColors.Teal,
+                modifier = Modifier.size(35.dp)
+            )
         }
-
     }
+
 }
