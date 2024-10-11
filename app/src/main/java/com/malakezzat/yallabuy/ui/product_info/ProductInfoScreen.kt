@@ -304,7 +304,7 @@ fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : Str
             Property(name = "size",value = product.variants[0].option1),
             Property(name = "color",value = product.variants[0].option2))
 
-        Log.i("propertiesTest", "AddToFav: ")
+        Log.i("propertiesTest", "AddToFav: ${oldDraftOrder.id}")
         if(oldDraftOrder.id == 0L) {
             val lineItems = listOf(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties,product.id?:0))
             val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
@@ -484,8 +484,7 @@ fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,o
 }
 
 @Composable
-fun ColorCirclesRow(colorNames: List<String> ,onColorChange: (String) -> Unit
-) {
+fun ColorCirclesRow(colorNames: List<String> ,onColorChange: (String) -> Unit) {
     var colorSelection by remember { mutableStateOf(0) }
     Text(text = "Available Colors:")
     LazyRow(
