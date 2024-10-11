@@ -1,6 +1,11 @@
 package com.malakezzat.yallabuy.ui.productbycategory.view
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,6 +38,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,6 +64,7 @@ import com.malakezzat.yallabuy.ui.home.view.LatestProductsSection
 import com.malakezzat.yallabuy.ui.home.view.TAG
 import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollectionIdViewModel
 import com.malakezzat.yallabuy.ui.theme.AppColors
+import kotlinx.coroutines.delay
 
 val TAG = "ProductsByCollectionIdS"
 @Composable
@@ -88,7 +96,12 @@ fun ProductsByCategoryScreen(
         ) {
             when (productState) {
                 is ApiState.Loading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = AppColors.Teal)
+                    }
                 }
 
                 is ApiState.Success -> {
@@ -138,7 +151,12 @@ fun ProductsByBrandScreen(
         ) {
             when (productState) {
                 is ApiState.Loading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = AppColors.Teal)
+                    }
                 }
 
                 is ApiState.Success -> {
@@ -158,27 +176,9 @@ fun ProductsByBrandScreen(
     }
 }
 
-
-
 @Composable
 fun LatestProductsSectionById(products: List<Product>, navController: NavController) {
-    //
     Column(modifier = Modifier.padding(16.dp)) {
-        /*Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                "All Products",
-                style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(26.dp)
-            )
-            Text(
-                "SEE ALL", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
-                color = AppColors.MintGreen
-            )
-        }*/
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -190,16 +190,29 @@ fun LatestProductsSectionById(products: List<Product>, navController: NavControl
                 contentPadding = PaddingValues(0.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                itemsIndexed(products) { _, product ->
-                    ProductCard(product = product, navController)
+                itemsIndexed(products) { index, product ->
+                    val visibleState = remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) {
+                        delay(index * 200L)
+                        visibleState.value = true
+                    }
+
+                    this@Column.AnimatedVisibility(
+                        visible = visibleState.value,
+                        enter = slideInVertically(
+                            initialOffsetY = { it },
+                            animationSpec = tween(durationMillis = 800)
+                        ) + fadeIn(animationSpec = tween(durationMillis = 800)),
+                        modifier = Modifier
+                    ) {
+                        ProductCard(product = product, navController)
+                    }
                     Spacer(modifier = Modifier.height(10.dp))
                 }
             }
-
         }
     }
 }
-
 
 @Composable
 fun ProductCard(product: Product, navController: NavController) {
@@ -213,32 +226,64 @@ fun ProductCard(product: Product, navController: NavController) {
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        // Row to arrange image and text side by side
-        Row(
-            modifier = Modifier.padding(10.dp), // Add padding to the Row
-            verticalAlignment = Alignment.CenterVertically // Center items vertically
-        ) {
-            // Background image of the product
-            product.images.firstOrNull()?.let { image ->
-                Image(
-                    painter = rememberAsyncImagePainter(image.src),
-                    contentDescription = "Product Image",
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(RoundedCornerShape(30.dp)), // Clip the image to match the card shape
-                    contentScale = ContentScale.Crop
-                )
-            }
-
-            // Column for product details
-            Column(
-                modifier = Modifier
-                    .padding(start = 10.dp) // Add space between the image and text
+        Box {
+            Row(
+                modifier = Modifier.padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(product.title, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
-                Text(product.vendor, color = AppColors.Teal)
+                product.images.firstOrNull()?.let { image ->
+                    val imageVisibleState = remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) {
+                        delay(700)
+                        imageVisibleState.value = true
+                    }
+
+                    AnimatedVisibility(
+                        visible = imageVisibleState.value,
+                        enter = scaleIn(initialScale = 0.8f) + fadeIn(animationSpec = tween(durationMillis = 1000)),
+                        modifier = Modifier.size(120.dp)
+                    ) {
+                        Image(
+                            painter = rememberAsyncImagePainter(image.src),
+                            contentDescription = "Product Image",
+                            modifier = Modifier
+                                .size(120.dp)
+                                .clip(RoundedCornerShape(30.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+                Column(
+                    modifier = Modifier.padding(start = 10.dp)
+                ) {
+                    val titleVisibleState = remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) {
+                        delay(1800)
+                        titleVisibleState.value = true
+                    }
+
+                    AnimatedVisibility(
+                        visible = titleVisibleState.value,
+                        enter = fadeIn(animationSpec = tween(durationMillis = 1000))
+                    ) {
+                        Text(product.title, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
+                    }
+
+                    val vendorVisibleState = remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) {
+                        delay(2200)
+                        vendorVisibleState.value = true
+                    }
+
+                    AnimatedVisibility(
+                        visible = vendorVisibleState.value,
+                        enter = fadeIn(animationSpec = tween(durationMillis = 1000))
+                    ) {
+                        Text(product.vendor, color = AppColors.Teal)
+                    }
+                }
             }
         }
     }
-
 }
+
