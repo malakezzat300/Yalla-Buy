@@ -353,7 +353,7 @@ fun ProductCard(product: Product, navController: NavController,viewModel: Produc
 //                )
                 var email = FirebaseAuth.getInstance().currentUser?.email
                 //Log.i(TAG, "ProductCard: ${product.variants[0]}")
-                AddToFavorites(viewModel,product,email?:"",oldDraftOrder,navController)
+                AddToFavorites(viewModel,product,email.toString(),oldDraftOrder,navController)
             }
         }
 
@@ -364,8 +364,18 @@ fun ProductCard(product: Product, navController: NavController,viewModel: Produc
 @Composable
 fun AddToFavorites(viewModel: ProductsByCollectionIdViewModel, product : Product, email : String, oldDraftOrder : DraftOrder, navController: NavController){
    // Log.i(TAG, "AddToFavorites: $product")
+    val productState by viewModel.searchProductsList.collectAsState()
     var geustClicked by remember { mutableStateOf(false) }
     var clicked by remember { mutableStateOf(false) }
+    viewModel.getProductById(product.id?:0L)
+    when (productState) {
+        is ApiState.Error -> {}
+        ApiState.Loading -> {}
+        is ApiState.Success -> {
+            val pro = (productState as ApiState.Success<Product>).data
+            product.variants=pro.variants
+        }
+    }
     if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
         IconButton(onClick = {geustClicked=true}) {
             Icon(
@@ -376,13 +386,13 @@ fun AddToFavorites(viewModel: ProductsByCollectionIdViewModel, product : Product
             )
         }
     }else{
-        
-        for(item in oldDraftOrder.line_items){
-            if(product.id == item.product_id){
-                clicked=true
-            }
-        }
         IconButton(onClick = {
+
+            for(item in oldDraftOrder.line_items){
+                if(product.id == item.product_id){
+                    clicked=true
+                }
+            }
             clicked=true
             val properties = listOf(
                 Property(name = "imageUrl",value = product.image.src),
@@ -392,18 +402,18 @@ fun AddToFavorites(viewModel: ProductsByCollectionIdViewModel, product : Product
 
             Log.i("propertiesTest", "AddToFav: ${oldDraftOrder.id}")
             if(oldDraftOrder.id == 0L) {
-                val lineItems = listOf(LineItem(product.title,"0",8L,1, properties = properties,product.id?:0))
+                val lineItems = listOf(LineItem(product.title,product.variants.get(0).price,product.variants.get(0).id,1, properties = properties,product.id?:0))
                 val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
                 Log.i("favTest", "AddToFavorites: ${draftOrder.toString()}")
                 val draftOrderRequest = DraftOrderRequest(draftOrder)
                 viewModel.createDraftOrder(draftOrderRequest)
             } else {
-                if(!oldDraftOrder.line_items.contains(LineItem(product.title,"0",9L,1, properties = properties,product.id?:0))) {
+                if(!oldDraftOrder.line_items.contains(LineItem(product.title,product.variants.get(0).price,product.variants.get(0).id,1, properties = properties,product.id?:0))) {
                     val lineItems = oldDraftOrder.line_items + listOf(
                         LineItem(
                             product.title,
-                            "6",
-                            7L,
+                            product.variants.get(0).price,
+                            product.variants.get(0).id,
                             1,
                             properties = properties,
                             product.id?:0
@@ -434,7 +444,9 @@ fun AddToFavorites(viewModel: ProductsByCollectionIdViewModel, product : Product
             }
 
         }
-    }
+        }
+     // product =
+
     if(geustClicked){
         AlertDialog(
             onDismissRequest = { geustClicked = false }, // Close dialog on dismiss

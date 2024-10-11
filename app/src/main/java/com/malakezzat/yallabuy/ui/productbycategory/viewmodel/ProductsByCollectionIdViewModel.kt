@@ -24,6 +24,9 @@ class ProductsByCollectionIdViewModel(private val repository: ProductsRepository
     private val _productList = MutableStateFlow<ApiState<List<Product>>>(ApiState.Loading)
     val productList: StateFlow<ApiState<List<Product>>> get() = _productList
 
+    private val _searchProductsList = MutableStateFlow<ApiState<Product>>(ApiState.Loading)
+    val searchProductsList = _searchProductsList.asStateFlow()
+
     private val _draftOrderId = MutableStateFlow<ApiState<DraftOrderResponse>>(ApiState.Loading)
     val draftOrderId = _draftOrderId.asStateFlow()
 
@@ -37,7 +40,27 @@ class ProductsByCollectionIdViewModel(private val repository: ProductsRepository
         getProductsByCollectionId(338050220214)
         getDraftOrders()
     }
+    fun getProductById(id : Long) {
+        viewModelScope.launch {
+            repository.getAllProducts()
+                .onStart {
+                    _searchProductsList.value = ApiState.Loading // Set loading state
+                }
+                .catch { e ->
+                    _searchProductsList.value = ApiState.Error(e.message ?: "Unknown error")
+                    // _errorMessage.value = e.message // Set error message
+                }
+                .collect { productList ->
+                    val product = productList.find { it.id == id }
 
+                    if (product != null) {
+                        _searchProductsList.value = ApiState.Success(product) // Set success state with the matching product
+                    } else {
+                        _searchProductsList.value = ApiState.Error("Product not found") // Set error state if no product matches
+                    }
+                }
+        }
+    }
     fun getProductsByCollectionId(id:Long){
         viewModelScope.launch {
         repository.getProductsByCollectionId(id)
