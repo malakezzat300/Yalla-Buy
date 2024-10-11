@@ -388,17 +388,17 @@ fun AddToFavorites(viewModel: ProductsByCollectionIdViewModel, product : Product
 
             Log.i("propertiesTest", "AddToFav: ${oldDraftOrder.id}")
             if(oldDraftOrder.id == 0L) {
-                val lineItems = listOf(LineItem(product.title,"70",0L,1, properties = properties,product.id?:0))
+                val lineItems = listOf(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties,product.id?:0))
                 val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
                 val draftOrderRequest = DraftOrderRequest(draftOrder)
                 viewModel.createDraftOrder(draftOrderRequest)
             } else {
-                if(!oldDraftOrder.line_items.contains(LineItem(product.title,"100",0L,1, properties = properties,product.id?:0))) {
+                if(!oldDraftOrder.line_items.contains(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties,product.id?:0))) {
                     val lineItems = oldDraftOrder.line_items + listOf(
                         LineItem(
                             product.title,
-                            "200",
-                            0L,
+                            product.variants[0].price,
+                            product.variants[0].id,
                             1,
                             properties = properties,
                             product.id?:0
