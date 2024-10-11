@@ -40,9 +40,12 @@ import androidx.compose.material.ChipDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Snackbar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -310,13 +313,6 @@ fun AdList(viewModel: HomeScreenViewModel) {
             discountCodeIds.add(item.code)
         }
     }
-
-
-    //val discountCode by viewModel.discountCodes.collectAsState()
-
-    // Log list sizes for debugging
-
-
     LazyRow(state = scrollState) {
         // Static ads first
         item {
@@ -380,7 +376,6 @@ fun AdCard(painter: Painter) {
     }
 
 }
-
 @Composable
 fun CouponsCard(code: String?) {
     val discount = code?.takeLast(2)
@@ -545,46 +540,54 @@ fun ProductCard(product: Product, navController: NavController) {
         elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
 
         ) {
-        Column(
+        Box(
             modifier = Modifier
                 .padding(8.dp)
-                .verticalScroll(scrollState),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .verticalScroll(scrollState)
         ) {
-            // Background image of the product
-            product.images.firstOrNull()?.let { image ->
-                // Determine animation value based on scroll position
-                val offsetY = animateFloatAsState(targetValue = -scrollState.value / 4f)
-
-                Image(
-                    painter = rememberAsyncImagePainter(image.src),
-                    contentDescription = "Product Image",
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(RoundedCornerShape(16.dp)) // Clip the image to match the card shape
-                        .graphicsLayer(translationY = offsetY.value), // Add image movement
-
-                    contentScale = ContentScale.Fit
-                )
-            }
-            // Column for product details
             Column(
-                modifier = Modifier
-                    .padding(start = 10.dp) // Add space between the image and text
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-            Text(product.title, style = MaterialTheme.typography.titleSmall)
-            Text(product.vendor, color = AppColors.Teal)
-            val price = product.variants.first().price
-            CurrencyConverter.changeCurrency(price.toDouble())?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+                product.images.firstOrNull()?.let { image ->
+                    val offsetY = animateFloatAsState(targetValue = -scrollState.value / 4f)
+
+                    Image(
+                        painter = rememberAsyncImagePainter(image.src),
+                        contentDescription = "Product Image",
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .graphicsLayer(translationY = offsetY.value),
+                        contentScale = ContentScale.Fit
+                    )
+                }
+
+                Column(
+                    modifier = Modifier.padding(start = 10.dp)
+                ) {
+                    Text(product.title, style = MaterialTheme.typography.titleSmall)
+                    Text(product.vendor, color = AppColors.Teal)
+                    val price = product.variants.first().price
+                    CurrencyConverter.changeCurrency(price.toDouble())?.let {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
             }
 
-
+            Icon(
+                imageVector = Icons.Default.FavoriteBorder,
+                contentDescription = "Favorite",
+                tint = AppColors.Teal,
+                modifier = Modifier
+                    .size(50.dp)
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+            )
         }
+
     }
 }
 
