@@ -1,8 +1,6 @@
 package com.malakezzat.yallabuy.ui.product_info
 
-import android.app.Dialog
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,7 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,7 +28,6 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.sharp.Favorite
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -39,11 +35,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -53,16 +47,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -77,129 +68,7 @@ import com.malakezzat.yallabuy.model.*
 import com.malakezzat.yallabuy.ui.CustomTopBar
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.theme.AppColors
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 
-
-//@Composable
-//fun ProductInfoScreen (viewModel: ProductInfoViewModel, navController: NavController,productId : Long) {
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(16.dp)
-//    ) {
-//        val productState by viewModel.searchProductsList.collectAsState()
-//        val customerId by viewModel.customerId.collectAsState()
-//        val draftOrderId by viewModel.draftOrderId.collectAsState()
-//        var draftOrderIdSaved by remember { mutableLongStateOf(0L) }
-//        var shoppingCartDraftOrder by remember { mutableStateOf(DraftOrder(0L,"", listOf(),"")) }
-//        var wishListDraftOrder by remember { mutableStateOf(DraftOrder(0L,"", listOf(),"")) }
-//        val shoppingCartDraftOrderState by viewModel.shoppingCartDraftOrder.collectAsState()
-//        val wishListDraftOrderState by viewModel.wishListDraftOrder.collectAsState()
-//
-//
-//        when(draftOrderId){
-//            is ApiState.Error -> Log.i("draftOrderTest", "ProductInfoScreen: draftOrder ${(draftOrderId as ApiState.Error).message}")
-//            ApiState.Loading -> {}
-//            is ApiState.Success ->
-//                draftOrderIdSaved = (draftOrderId as ApiState.Success).data.draft_order.id ?: 0L
-//        }
-//
-////        when(customerId){
-////            is ApiState.Error -> Log.i("draftOrderTest", "ProductInfoScreen: customer ${(customerId as ApiState.Error).message}")
-////            ApiState.Loading -> {}
-////            is ApiState.Success -> Log.i("draftOrderTest", "ProductInfoScreen: customer ${(customerId as ApiState.Success).data.customers[0].id}")
-////        }
-//
-//        when(shoppingCartDraftOrderState){
-//            is ApiState.Error -> Log.i("draftOrderTest", "ProductInfoScreen: draftOrder ${(shoppingCartDraftOrderState as ApiState.Error).message}")
-//            ApiState.Loading -> {}
-//            is ApiState.Success -> shoppingCartDraftOrder = (shoppingCartDraftOrderState as ApiState.Success).data
-//        }
-//
-//        when(wishListDraftOrderState){
-//            is ApiState.Error -> Log.i("draftOrderTest", "ProductInfoScreen: draftOrder ${(wishListDraftOrderState as ApiState.Error).message}")
-//            ApiState.Loading -> {}
-//            is ApiState.Success -> wishListDraftOrder = (wishListDraftOrderState as ApiState.Success).data
-//        }
-//
-//
-//        // Trigger the function to get the product by id
-//        LaunchedEffect(key1 = productId) {
-//            viewModel.getProductById(productId)
-////            viewModel.getCustomerId(FirebaseAuth.getInstance().currentUser?.email.toString())
-//        }
-//
-//        // UI based on the state
-//        when (productState) {
-//            is ApiState.Loading -> {
-//                // Show a loading indicator
-//                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//                    CircularProgressIndicator()
-//                }
-//            }
-//
-//            is ApiState.Success -> {
-//                //Log.i("productTest", "ProductInfoScreen: ${(productState as ApiState.Success<Product>).data.toString()}")
-//                // Show the product details
-//                val product = (productState as ApiState.Success<Product>).data
-//                //ProductInfoSection(product)
-//                val context = LocalContext.current
-//                CurrencyConverter.initialize(context)
-//                LazyColumn {
-//                    item{
-//                        Column {
-//                            LazyRow {
-//                                items(product.images) { imageUrl ->
-//                                    Image(
-//                                        painter = rememberAsyncImagePainter(imageUrl.src),
-//                                        contentDescription = null,
-//                                        modifier = Modifier
-//                                            .size(300.dp)
-//                                            .padding(4.dp)
-//                                    )
-//                                }
-//                            }
-//
-//                            Text(text = product.title, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-////        if (product.sizes.isNotEmpty()) {
-////            Text(text = "Available Sizes: ${product.sizes.joinToString()}")
-////        }
-//                            val price = product.variants.get(0).price
-//                            CurrencyConverter.changeCurrency(price.toDouble())?.let {
-//                                Text(text = it,
-//                                    style = MaterialTheme.typography.bodyMedium)
-//                            }
-//                            Text(text = "Rating:  ⭐")
-//                            Text(text = "Description", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-//                            //ScrollableColumn {
-//                            Text(text = product.body_html)
-//                        }
-//                        Spacer(modifier = Modifier.height(16.dp))
-//
-//                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-//                            AddToCart(
-//                                viewModel,
-//                                product,
-//                                FirebaseAuth.getInstance().currentUser?.email.toString(),
-//                                shoppingCartDraftOrder)
-//                            AddToFavorites(
-//                                viewModel,
-//                                product,
-//                                FirebaseAuth.getInstance().currentUser?.email.toString(),
-//                                wishListDraftOrder)
-//                        } } } }
-//            is ApiState.Error -> {
-//                // Show the error message
-//                val errorMessage = (productState as ApiState.Error).message
-//                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//                    Text(text = "Error: $errorMessage", color = MaterialTheme.colorScheme.error)
-//                }
-//            }
-//        }
-//
-//    }
-//}
 
 @Composable
 fun ProductInfoScreen(
@@ -473,34 +342,10 @@ fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : Str
         }
 
     }
-        if(geustClicked){
-            var showDialog by remember { mutableStateOf(false) }
-            AlertDialog(
-                onDismissRequest = { showDialog = false }, // Close dialog on dismiss
-                title = { Text(text = "Guest") },
-                text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals, and to save your favorite products") },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            navController.navigate(Screen.LogInScreen.route) {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    inclusive = true // Remove all previous screens from the back stack
-                                }
-                            }
-                            showDialog = false // Close the dialog after confirming
-                        }
-                    ) {
-                        Text("Login", color = AppColors.Teal)
-                    }
-                },
-
-            )
-        }
     }
     if(geustClicked){
-        var showDialog by remember { mutableStateOf(false) }
         AlertDialog(
-            onDismissRequest = { showDialog = false }, // Close dialog on dismiss
+            onDismissRequest = { geustClicked = false }, // Close dialog on dismiss
             title = { Text(text = "Guest") },
             text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals, and to save your favorite products") },
             confirmButton = {
@@ -511,17 +356,17 @@ fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : Str
                                 inclusive = true // Remove all previous screens from the back stack
                             }
                         }
-                        showDialog = false // Close the dialog after confirming
+                        geustClicked = false // Close the dialog after confirming
                     }
                 ) {
-                    Text("Login", color = Color.Red)
+                    Text("Login", color = AppColors.Teal)
                 }
             },
             dismissButton = {
                 TextButton(
-                    onClick = { showDialog = false } // Close dialog without action
+                    onClick = { geustClicked = false }
                 ) {
-                    Text("Cancel", color = Color(0xFF00C4B4))
+                    Text("Cancel", color = AppColors.Rose)
                 }
             }
         )
@@ -611,20 +456,25 @@ fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,o
    }
     }
     if(geustClicked){
-        var showDialog by remember { mutableStateOf(true) }
     AlertDialog(
         containerColor = Color.White,
-        onDismissRequest = { showDialog = false},
+        onDismissRequest = { geustClicked = false},
         title = { Text("Guest") },
         text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals, and to save your favorite products") },
         confirmButton = {
             TextButton(onClick = {
-                showDialog = false
+                geustClicked=false
                 navController.navigate(Screen.LogInScreen.route)
             }) {
                 Text("Login", color = AppColors.Teal)
             }
-        },
+        },dismissButton = {
+            TextButton(
+                onClick = { geustClicked = false }
+            ) {
+                Text("Cancel", color = AppColors.Rose)
+            }
+        }
 
         )
     }
@@ -737,22 +587,4 @@ fun SizeCirclesRow(Itemsizes: List<String>,onSizeChange: (String) -> Unit) {
     }
 }
 
-@Composable
-fun GeustDialog(navController: NavController) {
-    AlertDialog(
-        containerColor = Color.White,
-        onDismissRequest = { },
-        title = { Text("Guest") },
-        text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals, and to save your favorite products") },
-        confirmButton = {
-            TextButton(onClick = {
-                navController.navigate(Screen.LogInScreen.route)
-            }) {
-                Text("Login", color = AppColors.Teal)
-            }
-        },
-
-    )
-
-}
 
