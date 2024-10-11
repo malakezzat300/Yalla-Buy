@@ -216,6 +216,18 @@ fun ShoppingCartScreen(
             } else {
                 if(!isLoading) {
                     ShoppingEmpty(navController)
+                } else {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally),
+                            color = AppColors.Teal
+
+                        )
+                    }
+
                 }
             }
         }
