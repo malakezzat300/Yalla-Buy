@@ -43,6 +43,7 @@ import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -79,6 +80,12 @@ fun SearchScreen(viewModel: SearchViewModel,
     val filteredProducts by viewModel.filteredProducts.collectAsState()
     var query by remember { mutableStateOf("") }
     var sliderPosition by remember { mutableStateOf(100.0f) }
+
+    val draftOrderId by viewModel.draftOrderId.collectAsState()
+    val wishListDraftOrderState by viewModel.wishListDraftOrder.collectAsState()
+
+    var draftOrderIdSaved by remember { mutableLongStateOf(0L) }
+    var wishListDraftOrder by remember { mutableStateOf(DraftOrder(0L, "", listOf(), "")) }
     //Currency
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
