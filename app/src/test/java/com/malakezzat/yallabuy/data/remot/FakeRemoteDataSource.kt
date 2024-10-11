@@ -22,22 +22,53 @@ import com.malakezzat.yallabuy.model.ProductResponse
 import com.malakezzat.yallabuy.model.SmartCollection
 import com.malakezzat.yallabuy.model.VariantResponse
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 
-class FakeRemoteDataSource: ProductsRemoteDataSource {
+class FakeRemoteDataSource(
+    private var products: List<Product>? = null,
+    private var productsByCollection: List<Product>? = null,
+    private var categories: List<CustomCollection>? = null,
+    private var brands: List<SmartCollection>? = null
+): ProductsRemoteDataSource {
     override suspend fun getAllProducts(): Flow<List<Product>> {
-        TODO("Not yet implemented")
+        return flow {
+            products?.let {
+                emit(it)
+            } ?: emit(emptyList())
+        }.catch { e ->
+            emit(emptyList())
+        }
     }
 
     override suspend fun getProductsByCollectionId(id: Long): Flow<List<Product>> {
-        TODO("Not yet implemented")
+        return flow {
+            productsByCollection?.let {
+                emit(it)
+            } ?: emit(emptyList())
+        }.catch { e ->
+            emit(emptyList())
+        }
     }
 
     override suspend fun getCategories(): Flow<List<CustomCollection>> {
-        TODO("Not yet implemented")
+        return flow {
+            categories?.let {
+                emit(it)
+            } ?: emit(emptyList())
+        }.catch { e ->
+            emit(emptyList())
+        }
     }
 
     override suspend fun getBrands(): Flow<List<SmartCollection>> {
-        TODO("Not yet implemented")
+        return flow {
+            brands?.let {
+                emit(it)
+            } ?: emit(emptyList())
+        }.catch { e ->
+            emit(emptyList())
+        }
     }
 
     override suspend fun getAllOrdersForCustomerByID(id: Long): Flow<List<Order>> {

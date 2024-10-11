@@ -1,12 +1,13 @@
 package com.malakezzat.yallabuy.data.sharedpref
 
 class FakeSharedDataSource:GlobalSharedPreferenceDataSource {
+    var id : Long = 10L
     override fun getUserId(): Long {
-        TODO("Not yet implemented")
+        return id
     }
 
     override fun setUserId(id: Long) {
-        TODO("Not yet implemented")
+        this.id = id
     }
 
     override fun getUserEmail(): String {
