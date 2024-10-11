@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.malakezzat.yallabuy.data.ProductsRepository
 import com.malakezzat.yallabuy.data.remote.ApiState
+import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.DraftOrderResponse
+import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Product
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,6 +28,15 @@ class SearchViewModel(var repository : ProductsRepository) : ViewModel(){
 
     private val _filterByPrice = MutableStateFlow(0f)
     val filterByPrice = _filterByPrice.asStateFlow()
+
+    private val _draftOrderId = MutableStateFlow<ApiState<DraftOrderResponse>>(ApiState.Loading)
+    val draftOrderId = _draftOrderId.asStateFlow()
+
+    private val _draftOrders = MutableStateFlow<ApiState<DraftOrdersResponse>>(ApiState.Loading)
+    val draftOrders = _draftOrders.asStateFlow()
+
+    private val _wishListDraftOrder = MutableStateFlow<ApiState<DraftOrder>>(ApiState.Loading)
+    val wishListDraftOrder = _wishListDraftOrder.asStateFlow()
 
     val TAG = "searchViewModel"
 
