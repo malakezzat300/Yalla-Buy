@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -103,7 +104,12 @@ fun WishlistScreen(viewModel: WishlistViewModel, navController: NavController) {
         }
         ApiState.Loading -> {
             isLoading = true
-            CircularProgressIndicator(color = AppColors.Teal)
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = AppColors.Teal)
+            }
         }
         is ApiState.Success -> {
             isLoading = false
@@ -280,7 +286,7 @@ fun EmptyWishlistScreen(navController: NavController) {
 
         Text(
             text = "Your wishlist is empty",
-            color = AppColors.Rose,
+            color = AppColors.Teal,
             style = MaterialTheme.typography.headlineLarge,
             textAlign = TextAlign.Center
         )
@@ -298,8 +304,8 @@ fun EmptyWishlistScreen(navController: NavController) {
         Button(
             onClick = { navController.navigate(Screen.CategoriesScreen.route) },
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = AppColors.Rose),
-            shape = RoundedCornerShape(20.dp)
+            colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
+            shape = RoundedCornerShape(30.dp)
         ) {
             Text(text = "Explore Categories", color = Color.White)
         }
