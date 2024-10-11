@@ -104,6 +104,8 @@ fun ShoppingCartScreen(
     var variantSet by remember { mutableStateOf(mutableSetOf<Variant>() ) }
     var itemsCount by remember { mutableIntStateOf(0) }
     var emptyScreen by remember { mutableStateOf( true ) }
+    var draftOrderForTotal by remember { mutableStateOf( DraftOrder() ) }
+    var discountFirstTime by remember { mutableDoubleStateOf(0.0) }
 
     LaunchedEffect(Unit) {
         viewModel.getDraftOrders()
@@ -139,24 +141,40 @@ fun ShoppingCartScreen(
                     viewModel.getVariantById(orderItems.get(0).variant_id)
                 }
             }
-            subtotal = calculateSubtotal(orderItems)
+
             emptyScreen = true
         }
     }
+    if(draftOrderForTotal == DraftOrder()) {
+        subtotal = calculateSubtotal(orderItems)
+    } else {
+        subtotal = calculateSubtotal(draftOrderForTotal.line_items)
+    }
+//    LaunchedEffect (subtotal,draftOrder) {
+//        total = subtotal + (subtotal * (draftOrder.applied_discount?.value?.toDouble() ?: 0.0)) * -1 / 100
+//        discountAmount = total - subtotal
+//    }
 
-    LaunchedEffect(total,subtotal){
-        discountAmount = total - subtotal
+    LaunchedEffect(draftOrder) {
+        discountFirstTime = (draftOrder.applied_discount?.value?.toDouble() ?: 0.0)
     }
 
-    LaunchedEffect (subtotal,draftOrder) {
-        discountAmount = draftOrder.applied_discount?.amount?.toDouble() ?: 0.0
-        total = draftOrder.subtotal_price.toDouble()
+    LaunchedEffect (subtotal,draftOrderForTotal,discountFirstTime) {
+        if(draftOrderForTotal == DraftOrder()) {
+            total = subtotal + (subtotal * discountFirstTime) * -1 / 100
+        } else {
+            total = subtotal + (subtotal * (draftOrderForTotal.applied_discount?.value?.toDouble() ?: 0.0)) * -1 / 100
+        }
+        discountAmount = total - subtotal
     }
 
     ModalBottomSheetLayout(
         sheetState = bottomSheetState,
         sheetContent = {
-            VoucherBottomSheet(viewModel,draftOrder)
+            VoucherBottomSheet(viewModel,draftOrder){ updatedDraftOrder ->
+                draftOrder = updatedDraftOrder
+                draftOrderForTotal = updatedDraftOrder
+            }
         },
         content = {
 
@@ -186,10 +204,10 @@ fun ShoppingCartScreen(
                                         itemsCount = 0
                                         orderItems.forEach { itemsCount += it.quantity }
                                         val orderItem = orderItems[index]
-                                        ShoppingItem(viewModel,orderItem,draftOrder,variantSet,subtotal,{
+                                        ShoppingItem(viewModel,orderItem,draftOrder,variantSet,subtotal,{ updatedDraftOrder ->
                                             subtotal = calculateSubtotal(orderItems)
-                                            total = subtotal
-
+                                            draftOrder = updatedDraftOrder
+                                            draftOrderForTotal = updatedDraftOrder
                                         },
                                         navController,
                                             itemsCount)
@@ -292,7 +310,7 @@ fun ShoppingItem(
     draftOrder: DraftOrder,
     variantSet: Set<Variant>,
     subtotal : Double,
-    onItemUpdated: () -> Unit,
+    onItemUpdated: (DraftOrder) -> Unit,
     navController: NavController,
     itemsCount: Int
 ) {
@@ -302,7 +320,8 @@ fun ShoppingItem(
     var showDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
-
+    var itemQuantity by remember { mutableStateOf(item.quantity) }
+    var updatedDraftOrder by remember { mutableStateOf(DraftOrder()) }
 
     Card(
         modifier = Modifier
@@ -375,8 +394,8 @@ fun ShoppingItem(
                     // Minus Button
                     IconButton(
                         onClick = {
-                            val newQuantity = (item.quantity - 1).coerceAtLeast(1)
-                            item.quantity = newQuantity
+                            val newQuantity = (itemQuantity - 1).coerceAtLeast(1)
+                            itemQuantity = newQuantity
                             val updatedDraftItems = draftOrder.line_items.map { currentItem ->
                                 if (currentItem == item) {
                                     currentItem.copy(quantity = newQuantity)
@@ -384,16 +403,15 @@ fun ShoppingItem(
                                     currentItem
                                 }
                             }
-                            val updatedDraftOrder = draftOrder.copy(line_items = updatedDraftItems)
+                            updatedDraftOrder = draftOrder.copy(line_items = updatedDraftItems)
                             val updatedDraftItemsRequest = DraftOrderRequest(updatedDraftOrder)
 
                             coroutineScope.launch {
-                                delay(200)
                                 draftOrder.id?.let {
                                     viewModel.updateDraftOrder(it, updatedDraftItemsRequest)
                                 }
                             }
-                            onItemUpdated()
+                            onItemUpdated(updatedDraftOrder)
                         },
                         enabled = isMinusEnabled
                     ) {
@@ -404,7 +422,7 @@ fun ShoppingItem(
                     }
 
                     Text(
-                        text = item.quantity.toString(),
+                        text = itemQuantity.toString(),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -419,12 +437,12 @@ fun ShoppingItem(
                                 Toast.makeText(context, "Maximum items count reached", Toast.LENGTH_SHORT)
                                     .show()
                             } else {
-                                val newQuantity = (item.quantity + 1).coerceAtMost(variantSet.find { it.id == item.variant_id }?.inventory_quantity?.toInt() ?: 1)
-                                if(item.quantity == newQuantity){
+                                val newQuantity = (itemQuantity + 1).coerceAtMost(variantSet.find { it.id == item.variant_id }?.inventory_quantity?.toInt() ?: 1)
+                                if(itemQuantity == newQuantity){
                                     Toast.makeText(context, "Out of Stock", Toast.LENGTH_SHORT)
                                         .show()
                                 }
-                                item.quantity = newQuantity
+                                itemQuantity = newQuantity
 //                                val max = variantSet.find { it.id == item.variant_id }?.inventory_quantity
                                 val updatedDraftItems = draftOrder.line_items.map { currentItem ->
                                     if (currentItem == item) {
@@ -433,16 +451,15 @@ fun ShoppingItem(
                                         currentItem
                                     }
                                 }
-                                val updatedDraftOrder = draftOrder.copy(line_items = updatedDraftItems)
+                                updatedDraftOrder = draftOrder.copy(line_items = updatedDraftItems)
                                 val updatedDraftItemsRequest = DraftOrderRequest(updatedDraftOrder)
 
                                 coroutineScope.launch {
-                                    delay(200)
                                     draftOrder.id?.let {
                                         viewModel.updateDraftOrder(it, updatedDraftItemsRequest)
                                     }
                                 }
-                                onItemUpdated()
+                                onItemUpdated(updatedDraftOrder)
                             }
                         },
                     ) {
@@ -478,7 +495,7 @@ fun ShoppingItem(
                 showDialog = false
                 if (draftOrder.line_items.size > 1) {
                     val updatedDraftItems = draftOrder.line_items.filter { it != item }
-                    val updatedDraftOrder = draftOrder.copy(line_items = updatedDraftItems)
+                    updatedDraftOrder = draftOrder.copy(line_items = updatedDraftItems)
                     val updatedDraftItemsRequest = DraftOrderRequest(updatedDraftOrder)
                     draftOrder.id?.let {
                         viewModel.updateDraftOrder(it, updatedDraftItemsRequest)
@@ -488,7 +505,7 @@ fun ShoppingItem(
                     navController.popBackStack(Screen.ShoppingScreen.route, inclusive = true)
                     navController.navigate(Screen.ShoppingScreen.route)
                 }
-                onItemUpdated()
+                onItemUpdated(updatedDraftOrder)
             }
         )
     }
@@ -646,7 +663,11 @@ fun ShoppingEmpty(navController: NavController){
 }
 
 @Composable
-fun VoucherBottomSheet(viewModel: ShoppingCartViewModel,draftOrder: DraftOrder) {
+fun VoucherBottomSheet(
+    viewModel: ShoppingCartViewModel,
+    draftOrder: DraftOrder,
+    onItemUpdated: (DraftOrder) -> Unit
+    ) {
     var voucherCode by remember { mutableStateOf("") }
     var discountApplied by remember { mutableStateOf(false) }
     var discountMessage by remember { mutableStateOf("") }
@@ -694,6 +715,7 @@ fun VoucherBottomSheet(viewModel: ShoppingCartViewModel,draftOrder: DraftOrder) 
             }
             discountMessage = "${(priceRule.value * -1)}% discount applied!"
             discountApplied = true
+            onItemUpdated(newDraftOrder)
         }
     }
 
