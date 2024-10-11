@@ -42,6 +42,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Snackbar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.sharp.Favorite
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -55,6 +56,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -88,10 +90,15 @@ import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.data.sharedpref.CurrencyPreferences
 import com.malakezzat.yallabuy.data.util.CurrencyConverter
 import com.malakezzat.yallabuy.model.CustomCollection
+import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.DraftOrderRequest
+import com.malakezzat.yallabuy.model.LineItem
 import com.malakezzat.yallabuy.model.Product
+import com.malakezzat.yallabuy.model.Property
 import com.malakezzat.yallabuy.model.SmartCollection
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
+import com.malakezzat.yallabuy.ui.product_info.ProductInfoViewModel
 import com.malakezzat.yallabuy.ui.theme.AppColors
 import kotlinx.coroutines.delay
 import kotlin.random.Random
@@ -106,6 +113,14 @@ fun HomeScreen(
     val productState by viewModel.productList.collectAsStateWithLifecycle()
     val categoriesState by viewModel.categoriesList.collectAsStateWithLifecycle()
     val brandsState by viewModel.brandsList.collectAsStateWithLifecycle()
+
+    val draftOrderId by viewModel.draftOrderId.collectAsState()
+    val wishListDraftOrderState by viewModel.wishListDraftOrder.collectAsState()
+
+    var draftOrderIdSaved by remember { mutableLongStateOf(0L) }
+    var wishListDraftOrder by remember { mutableStateOf(DraftOrder(0L, "", listOf(), "")) }
+
+
     //Currency
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
@@ -113,8 +128,21 @@ fun HomeScreen(
         Log.d(TAG, categoriesState.toString())
         viewModel.getAllProducts()
         viewModel.getAllCategories()
+        viewModel.getDraftOrders()
     }
-
+    when (draftOrderId) {
+        is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(draftOrderId as ApiState.Error).message}")
+        ApiState.Loading -> {}
+        is ApiState.Success -> {
+            draftOrderIdSaved = (draftOrderId as ApiState.Success).data.draft_order.id ?: 0L
+        }
+        else -> {}
+    }
+    when (wishListDraftOrderState) {
+        is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(wishListDraftOrderState as ApiState.Error).message}")
+        ApiState.Loading -> {}
+        is ApiState.Success -> wishListDraftOrder = (wishListDraftOrderState as ApiState.Success).data
+    }
     Scaffold(
         topBar = { CustomTopBarHome(navController) },
         containerColor = Color.White,
@@ -176,7 +204,7 @@ fun HomeScreen(
 
                 is ApiState.Success -> {
                     val products = (productState as ApiState.Success<List<Product>>).data
-                    LatestProductsSection(products, navController)
+                    LatestProductsSection(products, navController,viewModel,wishListDraftOrder)
                 }
 
                 is ApiState.Error -> {
@@ -478,7 +506,7 @@ fun CategoryItem(category: CustomCollection, navController: NavController) {
 
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun LatestProductsSection(products: List<Product>, navController: NavController) {
+fun LatestProductsSection(products: List<Product>, navController: NavController,viewModel: HomeScreenViewModel,oldDraftOrder : DraftOrder) {
     //
     Column(modifier = Modifier.padding(16.dp)) {
         Row(
@@ -512,7 +540,7 @@ fun LatestProductsSection(products: List<Product>, navController: NavController)
 
             ) {
                 itemsIndexed(products) { _, product ->
-                    ProductCard(product = product, navController)
+                    ProductCard(product = product, navController,viewModel,oldDraftOrder)
                 }
             }
         }
@@ -521,7 +549,7 @@ fun LatestProductsSection(products: List<Product>, navController: NavController)
 
 
 @Composable
-fun ProductCard(product: Product, navController: NavController) {
+fun ProductCard(product: Product, navController: NavController,viewModel: HomeScreenViewModel,oldDraftOrder : DraftOrder) {
     //Currency
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
@@ -577,17 +605,123 @@ fun ProductCard(product: Product, navController: NavController) {
                 }
             }
 
+//            Icon(
+//                imageVector = Icons.Default.FavoriteBorder,
+//                contentDescription = "Favorite",
+//                tint = AppColors.Teal,
+//                modifier = Modifier
+//                    .size(50.dp)
+//                    .align(Alignment.TopEnd)
+//                    .padding(8.dp)
+//            )
+            AddToFavorites(
+                viewModel,
+                product,
+                FirebaseAuth.getInstance().currentUser?.email.toString(),
+                oldDraftOrder,
+                navController
+            )
+
+        }
+
+    }
+}
+@Composable
+fun AddToFavorites(viewModel: HomeScreenViewModel, product : Product, email : String, oldDraftOrder : DraftOrder, navController: NavController){
+    var geustClicked by remember { mutableStateOf(false) }
+    var clicked by remember { mutableStateOf(false) }
+    if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
+        IconButton(onClick = {geustClicked=true}) {
             Icon(
                 imageVector = Icons.Default.FavoriteBorder,
                 contentDescription = "Favorite",
                 tint = AppColors.Teal,
-                modifier = Modifier
-                    .size(50.dp)
-                    .align(Alignment.TopEnd)
-                    .padding(8.dp)
+                modifier = Modifier.size(35.dp)
             )
         }
+    }else{
+        for(item in oldDraftOrder.line_items){
+            if(product.id == item.product_id){
+                clicked=true
+            }
+        }
+        IconButton(onClick = {
+            clicked=true
+            val properties = listOf(
+                Property(name = "imageUrl",value = product.image.src),
+                Property(name = "size",value = product.variants[0].option1),
+                Property(name = "color",value = product.variants[0].option2)
+            )
 
+            Log.i("propertiesTest", "AddToFav: ${oldDraftOrder.id}")
+            if(oldDraftOrder.id == 0L) {
+                val lineItems = listOf(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties,product.id?:0))
+                val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
+                val draftOrderRequest = DraftOrderRequest(draftOrder)
+                viewModel.createDraftOrder(draftOrderRequest)
+            } else {
+                if(!oldDraftOrder.line_items.contains(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties,product.id?:0))) {
+                    val lineItems = oldDraftOrder.line_items + listOf(
+                        LineItem(
+                            product.title,
+                            product.variants[0].price,
+                            product.variants[0].id,
+                            1,
+                            properties = properties,
+                            product.id?:0
+                        )
+                    )
+                    val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
+                    val draftOrderRequest = DraftOrderRequest(draftOrder)
+                    oldDraftOrder.id?.let { viewModel.updateDraftOrder(it,draftOrderRequest) }
+                }
+            }
+        }) {
+            if (clicked) {
+                Icon(
+                    imageVector = Icons.Sharp.Favorite,
+                    contentDescription = "Favorite",
+                    tint = AppColors.Teal,
+                    modifier = Modifier.size(35.dp)
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.FavoriteBorder,
+                    contentDescription = "Favorite",
+                    tint = AppColors.Teal,
+                    modifier = Modifier.size(35.dp)
+                )
+            }
+
+        }
+    }
+    if(geustClicked){
+        AlertDialog(
+            onDismissRequest = { geustClicked = false }, // Close dialog on dismiss
+            title = { Text(text = "Guest") },
+            text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals, and to save your favorite products") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        navController.navigate(Screen.LogInScreen.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true // Remove all previous screens from the back stack
+                            }
+                        }
+                        geustClicked = false // Close the dialog after confirming
+                    }
+                ) {
+                    Text("Login", color = AppColors.Teal)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { geustClicked = false }
+                ) {
+                    Text("Cancel", color = AppColors.Rose)
+                }
+            }
+        )
     }
 }
 
