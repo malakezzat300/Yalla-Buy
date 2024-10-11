@@ -61,7 +61,6 @@ import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.ui.Screen
-import com.malakezzat.yallabuy.ui.orders.view.CustomTopBarr
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
 import com.malakezzat.yallabuy.ui.theme.AppColors
 import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
@@ -169,7 +168,7 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
                     if(address.isBlank()) {
                         Button(
                             onClick = {
-                                navController.navigate(Screen.AddressScreen.createRoute(""))
+                                navController.navigate(Screen.AddressScreen.createRoute(0L))
                             },
                             modifier = Modifier
                                 .width(80.dp)

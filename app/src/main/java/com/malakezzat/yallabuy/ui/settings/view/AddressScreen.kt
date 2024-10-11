@@ -116,10 +116,15 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
     LaunchedEffect(Unit) {
         val isAddressId = address?.let { isAddressId(it) }
         if(isAddressId == true){
-            addressState = ""
-            viewModel.getAddressDetails(sharedPreferences.getLong("USER_ID", 0L),address.toLong())
-            saveButton = "Update"
-            screenTitle = "Edit Address"
+                addressState = ""
+            if(address.toLong() != 0L) {
+                viewModel.getAddressDetails(
+                    sharedPreferences.getLong("USER_ID", 0L),
+                    address.toLong()
+                )
+                saveButton = "Update"
+                screenTitle = "Edit Address"
+            }
         } else {
             if (address != null) {
                 addressState = address
@@ -455,7 +460,7 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                                 city = city,
                                 country = country
                             )
-                            if (address?.let { isAddressId(it) } == true) {
+                            if (address?.let { isAddressId(it) } == true && address.toLong() != 0L){
                                 viewModel.updateUserAddress(it, addressId, AddressRequest(address1))
                             } else {
                                 viewModel.addNewAddress(it, AddressRequest(address1))
