@@ -104,7 +104,9 @@ fun ProductsByCategoryScreen(
     when (draftOrderId) {
         is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(draftOrderId as ApiState.Error).message}")
         ApiState.Loading -> {}
-        is ApiState.Success -> draftOrderIdSaved = (draftOrderId as ApiState.Success).data.draft_order.id ?: 0L
+        is ApiState.Success -> {draftOrderIdSaved = (draftOrderId as ApiState.Success).data.draft_order.id ?: 0L
+            Log.i("TAGGGGG", "ProductsByCategoryScreen: ${(draftOrderId as ApiState.Success).data.draft_order.id}")
+        }
         else -> {}
     }
     when (wishListDraftOrderState) {
@@ -112,12 +114,13 @@ fun ProductsByCategoryScreen(
         ApiState.Loading -> {}
         is ApiState.Success -> wishListDraftOrder = (wishListDraftOrderState as ApiState.Success).data
     }
-
+    Log.i("TAG", "ProductsByCategoryScreen: ${draftOrderIdSaved}")
     LaunchedEffect(Unit) {
         //Log.d(TAG, categoriesState.toString())
         categoryId?.let {
         viewModel.getProductsByCollectionId(it)
     }
+        viewModel.getDraftOrders()
     }
     Scaffold(
         topBar = { body?.let { CustomTopBar(navController, it) } },
@@ -360,7 +363,7 @@ fun ProductCard(product: Product, navController: NavController,viewModel: Produc
 }
 @Composable
 fun AddToFavorites(viewModel: ProductsByCollectionIdViewModel, product : Product, email : String, oldDraftOrder : DraftOrder, navController: NavController){
-    Log.i(TAG, "AddToFavorites: $product")
+   // Log.i(TAG, "AddToFavorites: $product")
     var geustClicked by remember { mutableStateOf(false) }
     var clicked by remember { mutableStateOf(false) }
     if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
@@ -373,6 +376,7 @@ fun AddToFavorites(viewModel: ProductsByCollectionIdViewModel, product : Product
             )
         }
     }else{
+        
         for(item in oldDraftOrder.line_items){
             if(product.id == item.product_id){
                 clicked=true
@@ -383,22 +387,23 @@ fun AddToFavorites(viewModel: ProductsByCollectionIdViewModel, product : Product
             val properties = listOf(
                 Property(name = "imageUrl",value = product.image.src),
 //                Property(name = "size",value = product.variants[0].option1),
-              //  Property(name = "color",value = product.variants[0].option2)
+//                Property(name = "color",value = product.variants[0].option2)
             )
 
             Log.i("propertiesTest", "AddToFav: ${oldDraftOrder.id}")
             if(oldDraftOrder.id == 0L) {
-                val lineItems = listOf(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties,product.id?:0))
+                val lineItems = listOf(LineItem(product.title,"0",8L,1, properties = properties,product.id?:0))
                 val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
+                Log.i("favTest", "AddToFavorites: ${draftOrder.toString()}")
                 val draftOrderRequest = DraftOrderRequest(draftOrder)
                 viewModel.createDraftOrder(draftOrderRequest)
             } else {
-                if(!oldDraftOrder.line_items.contains(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties,product.id?:0))) {
+                if(!oldDraftOrder.line_items.contains(LineItem(product.title,"0",9L,1, properties = properties,product.id?:0))) {
                     val lineItems = oldDraftOrder.line_items + listOf(
                         LineItem(
                             product.title,
-                            product.variants[0].price,
-                            product.variants[0].id,
+                            "6",
+                            7L,
                             1,
                             properties = properties,
                             product.id?:0
@@ -406,7 +411,9 @@ fun AddToFavorites(viewModel: ProductsByCollectionIdViewModel, product : Product
                     )
                     val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
                     val draftOrderRequest = DraftOrderRequest(draftOrder)
-                    oldDraftOrder.id?.let { viewModel.updateDraftOrder(it,draftOrderRequest) }
+                    oldDraftOrder.id?.let {
+                        Log.i("favTest", "AddToFavorites: ${draftOrder.toString()}")
+                        viewModel.updateDraftOrder(it,draftOrderRequest) }
                 }
             }
         }) {

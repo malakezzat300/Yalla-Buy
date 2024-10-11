@@ -32,8 +32,10 @@ class ProductsByCollectionIdViewModel(private val repository: ProductsRepository
 
     private val _wishListDraftOrder = MutableStateFlow<ApiState<DraftOrder>>(ApiState.Loading)
     val wishListDraftOrder = _wishListDraftOrder.asStateFlow()
+
     init {
         getProductsByCollectionId(338050220214)
+        getDraftOrders()
     }
 
     fun getProductsByCollectionId(id:Long){
@@ -109,10 +111,19 @@ class ProductsByCollectionIdViewModel(private val repository: ProductsRepository
                     val draftOrders = draftOrdersResponse.draft_orders.filter {
                         it.email == FirebaseAuth.getInstance().currentUser?.email
                     }
+                    val shoppingCartDraftOrder = draftOrders.filter{
+                        it.note == "shoppingCart"
+                    }
                     val wishListDraftOrder = draftOrders.filter{
                         it.note == "wishList"
                     }
-
+                    if (shoppingCartDraftOrder.isNotEmpty()) {
+//                        _shoppingCartDraftOrder.value = ApiState.Success(draftOrders.filter{
+//                            it.note == "shoppingCart"
+//                        }[0])
+                    } else {
+//                        _shoppingCartDraftOrder.value = ApiState.Error("shoppingCart not found")
+                    }
                     if (wishListDraftOrder.isNotEmpty()) {
                         _wishListDraftOrder.value = ApiState.Success(draftOrders.filter{
                             it.note == "wishList"
