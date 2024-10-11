@@ -128,6 +128,7 @@ fun HomeScreen(
         Log.d(TAG, categoriesState.toString())
         viewModel.getAllProducts()
         viewModel.getAllCategories()
+        viewModel.getDraftOrders()
     }
     when (draftOrderId) {
         is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(draftOrderId as ApiState.Error).message}")
