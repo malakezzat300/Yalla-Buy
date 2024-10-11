@@ -40,12 +40,14 @@ import androidx.compose.material.ChipDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Snackbar
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -627,7 +629,7 @@ fun ProductCard() {
 fun BottomNavigationBar(navController: NavController) {
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry.value?.destination?.route
-
+    var geustClicked by remember { mutableStateOf(false) }
     BottomNavigation(
         backgroundColor = Color.White,
         contentColor = Color.Black,
@@ -695,7 +697,7 @@ fun BottomNavigationBar(navController: NavController) {
             selected = currentRoute == Screen.ShoppingScreen.route,
             onClick = {
                 if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
-
+                    geustClicked=true
                 }else{
                     if (currentRoute != Screen.ShoppingScreen.route) {
                         navController.popBackStack(Screen.ShoppingScreen.route, inclusive = false)
@@ -725,7 +727,7 @@ fun BottomNavigationBar(navController: NavController) {
             selected = currentRoute == Screen.WishlistScreen.route,
             onClick = {
                 if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
-
+                    geustClicked=true
                 }else {
                     if (currentRoute != Screen.WishlistScreen.route) {
                         navController.popBackStack(Screen.WishlistScreen.route, inclusive = false)
@@ -753,14 +755,45 @@ fun BottomNavigationBar(navController: NavController) {
             },
             selected = currentRoute == Screen.ProfileScreen.route,
             onClick = {
-                if (currentRoute != Screen.SettingsScreen.route) {
-                    navController.popBackStack(Screen.ProfileScreen.route, inclusive = false)
-                    navController.navigate(Screen.ProfileScreen.route) {
-                        launchSingleTop = true
+                if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
+                    geustClicked=true
+                }else {
+                    if (currentRoute != Screen.SettingsScreen.route) {
+                        navController.popBackStack(Screen.ProfileScreen.route, inclusive = false)
+                        navController.navigate(Screen.ProfileScreen.route) {
+                            launchSingleTop = true
+                        }
                     }
                 }
             }
         )
     }
-
+    if(geustClicked){
+        AlertDialog(
+            onDismissRequest = { geustClicked = false }, // Close dialog on dismiss
+            title = { Text(text = "Guest") },
+            text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals, and to save your favorite products") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        navController.navigate(Screen.LogInScreen.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true // Remove all previous screens from the back stack
+                            }
+                        }
+                        geustClicked = false // Close the dialog after confirming
+                    }
+                ) {
+                    Text("Login", color = AppColors.Teal)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { geustClicked = false }
+                ) {
+                    Text("Cancel", color = AppColors.Rose)
+                }
+            }
+        )
+    }
 }
