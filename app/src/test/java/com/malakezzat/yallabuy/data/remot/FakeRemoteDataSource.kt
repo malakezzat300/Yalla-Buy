@@ -4,6 +4,7 @@ import com.malakezzat.yallabuy.data.remote.ProductsRemoteDataSource
 import com.malakezzat.yallabuy.model.AddressRequest
 import com.malakezzat.yallabuy.model.AddressResponse
 import com.malakezzat.yallabuy.model.AppliedDiscount
+import com.malakezzat.yallabuy.model.ConversionRates
 import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.Customer
@@ -102,7 +103,7 @@ class FakeRemoteDataSource(
             )
     )
 
-    private val productsList = listOf(
+    val productsList = listOf(
         Product(
             id = 1,
             title = "Cool T-Shirt",
@@ -194,6 +195,27 @@ class FakeRemoteDataSource(
             body_html = "<p>Embrace the beauty of autumn with our latest collection!</p>"
         )
     )
+
+    val conversionRates = ConversionRates(
+        EGP = 1L,
+        USD = 0.02,
+        AED = 0.075,
+        SAR = 0.077,
+        EUR = 0.018
+    )
+
+    val currencyResponse = CurrencyResponse(
+        result = "success",
+        documentation = "https://www.exchangerate-api.com/docs",
+        terms_of_use = "https://www.exchangerate-api.com/terms",
+        time_last_update_unix = 1638477600L,
+        time_last_update_utc = "2024-10-08 12:00 UTC",
+        time_next_update_unix = 1638564000L,
+        time_next_update_utc = "2024-10-09 12:00 UTC",
+        base_code = "EGP",
+        conversion_rates = conversionRates
+    )
+
 
 
     override suspend fun getAllProducts(): Flow<List<Product>> {
@@ -292,7 +314,9 @@ class FakeRemoteDataSource(
     }
 
     override suspend fun getConversionRate(): Flow<CurrencyResponse> {
-        TODO("Not yet implemented")
+        return flow {
+            emit(currencyResponse)
+        }
     }
 
     override suspend fun addNewAddress(
