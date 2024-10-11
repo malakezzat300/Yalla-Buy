@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -65,6 +66,8 @@ import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
 import com.malakezzat.yallabuy.ui.theme.AppColors
 import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
+import kotlinx.coroutines.delay
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,7 +84,8 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
     var addressesList by remember { mutableStateOf(listOf<String>()) }
     val defaultAddressState by viewModel.defaultAddressEvent.collectAsState()
     var defaultAddress by remember { mutableStateOf(Address()) }
-
+    var isLoading by remember { mutableStateOf(false) }
+    var navigateAfterDelay by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val userId by remember {
@@ -96,6 +100,14 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
     LaunchedEffect(Unit) {
         viewModel.getUserAddresses(userId)
     }
+
+    LaunchedEffect(navigateAfterDelay) {
+        if (navigateAfterDelay) {
+            delay(2000)
+            navController.navigate(Screen.CheckoutScreen.route)
+        }
+    }
+
 
     when (userAddressesState) {
         is ApiState.Error -> Log.i(
@@ -134,6 +146,7 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(24.dp))
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
@@ -352,41 +365,53 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
                 }
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Button(
-                    onClick = {
-                        if (address.isNotBlank()) {
-                            if (selectedPaymentMethod == "Credit Card") {
-                                if (cardHolderName.isNotBlank() && cardNumber.isNotBlank()
-                                    && expiration.text.isNotBlank() && cvv.isNotBlank()
-                                ) {
-                                    navController.navigate(Screen.CheckoutScreen.route)
+                    Button(
+                        onClick = {
+                            if (address.isNotBlank()) {
+                                if (selectedPaymentMethod == "Credit Card") {
+                                    if (cardHolderName.isNotBlank() && cardNumber.isNotBlank()
+                                        && expiration.text.isNotBlank() && cvv.isNotBlank()
+                                    ) {
+                                        isLoading = true
+                                        navigateAfterDelay = true
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            "Please fill all fields",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 } else {
-                                    Toast.makeText(
-                                        context,
-                                        "Please fill all fields",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    isLoading = true
+                                    navigateAfterDelay = true
                                 }
                             } else {
-                                navController.navigate(Screen.CheckoutScreen.route)
+                                Toast.makeText(
+                                    context,
+                                    "You Should Have at least one Address",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        shape = RoundedCornerShape(30.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
+                        enabled = !isLoading
+                    ) {
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = AppColors.Teal,
+                                strokeWidth = 2.dp
+                            )
                         } else {
-                            Toast.makeText(
-                                context,
-                                "You Should Have at least one Address",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Text("Checkout")
                         }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    shape = RoundedCornerShape(30.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
-                ) {
-                    Text("Checkout")
-                }
-            }
+                    }
+
+        }
         }
     )
 }

@@ -95,6 +95,7 @@ import com.malakezzat.yallabuy.ui.CustomTopBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,address: String? = null){
+    val context = LocalContext.current
     var addressId by remember { mutableStateOf(0L) }
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
@@ -112,8 +113,14 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
     var addressState by remember { mutableStateOf(address ?: "") }
     var saveButton by remember { mutableStateOf("Save") }
     var screenTitle by remember { mutableStateOf("New Address") }
+    var searchTextCity by remember { mutableStateOf("") }
+    var filteredCities by remember { mutableStateOf(cities) }
+    val countries = getCountries(context)
+    var searchTextCountry by remember { mutableStateOf("") }
+    var filteredCountries by remember { mutableStateOf(countries) }
 
-    val sharedPreferences = LocalContext.current.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
+
+    val sharedPreferences = context.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
     LaunchedEffect(Unit) {
         val isAddressId = address?.let { isAddressId(it) }
         if(isAddressId == true){
@@ -144,9 +151,7 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
         }
     }
 
-    val context = LocalContext.current
 
-    val countries = getCountries(context)
 
     LaunchedEffect(Unit) {
         viewModel.getUserId()
@@ -337,12 +342,17 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                     )
                     ExposedDropdownMenuBox(
                         expanded = expandedCountry,
-                        onExpandedChange = { expandedCountry = !expandedCountry }
+                        onExpandedChange = {
+                            expandedCountry = !expandedCountry
+                            filteredCountries = countries.filter { it.contains(searchTextCountry, ignoreCase = true) }
+                        }
                     ) {
                         TextField(
-                            value = country,
-                            onValueChange = { /* No change here since it's readOnly */ },
-                            readOnly = true,
+                            value = searchTextCountry,
+                            onValueChange = { newText ->
+                                searchTextCountry = newText
+                                filteredCountries = countries.filter { it.contains(newText, ignoreCase = true) }
+                            },
                             label = { Text(text = "Country") },
                             trailingIcon = {
                                 Icon(Icons.Default.ArrowDropDown, contentDescription = null)
@@ -359,12 +369,19 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                             expanded = expandedCountry,
                             onDismissRequest = { expandedCountry = false }
                         ) {
-                            countries.forEach { countryOption ->
+                            filteredCountries.forEach { countryOption ->
                                 DropdownMenuItem(onClick = {
                                     country = countryOption
+                                    searchTextCountry = countryOption
                                     expandedCountry = false
                                 }) {
                                     Text(text = countryOption)
+                                }
+                            }
+
+                            if (filteredCountries.isEmpty()) {
+                                DropdownMenuItem(onClick = { /* No action */ }) {
+                                    Text(text = "No countries found", color = Color.Gray)
                                 }
                             }
                         }
@@ -399,13 +416,16 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                                 ).show()
                             } else {
                                 expandedCity = !expandedCity
+                                filteredCities = cities.filter { it.contains(searchTextCity, ignoreCase = true) }
                             }
                         }
                     ) {
                         TextField(
-                            value = city,
-                            onValueChange = { /* No change here since it's readOnly */ },
-                            readOnly = true,
+                            value = searchTextCity,
+                            onValueChange = { newText ->
+                                searchTextCity = newText
+                                filteredCities = cities.filter { it.contains(newText, ignoreCase = true) }
+                            },
                             label = { Text(text = "City") },
                             trailingIcon = {
                                 Icon(Icons.Default.ArrowDropDown, contentDescription = null)
@@ -417,17 +437,23 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                                 .fillMaxWidth()
                                 .menuAnchor()
                         )
-
                         ExposedDropdownMenu(
                             expanded = expandedCity,
                             onDismissRequest = { expandedCity = false }
                         ) {
-                            cities.forEach { cityOption ->
+                            filteredCities.forEach { cityOption ->
                                 DropdownMenuItem(onClick = {
                                     city = cityOption
+                                    searchTextCity = cityOption
                                     expandedCity = false
                                 }) {
                                     Text(text = cityOption)
+                                }
+                            }
+
+                            if (filteredCities.isEmpty()) {
+                                DropdownMenuItem(onClick = { /* No action */ }) {
+                                    Text(text = "No cities found", color = Color.Gray)
                                 }
                             }
                         }
