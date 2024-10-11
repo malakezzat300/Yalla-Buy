@@ -1,5 +1,6 @@
 package com.malakezzat.yallabuy.ui.search
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,6 +25,8 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.sharp.Favorite
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +37,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderColors
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
@@ -55,10 +59,15 @@ import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.util.CurrencyConverter
+import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.DraftOrderRequest
+import com.malakezzat.yallabuy.model.LineItem
 import com.malakezzat.yallabuy.model.Product
+import com.malakezzat.yallabuy.model.Property
 import com.malakezzat.yallabuy.ui.CustomTopBar
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.product_info.AddToFavorites
+import com.malakezzat.yallabuy.ui.product_info.ProductInfoViewModel
 import com.malakezzat.yallabuy.ui.theme.AppColors
 
 //@Preview(showSystemUi = true)
@@ -213,4 +222,102 @@ fun RecentSearchItem(product: Product,navController: NavController) {
         }
     }
 
+}
+@Composable
+fun AddToFavorites(viewModel: SearchViewModel, product : Product, email : String, oldDraftOrder : DraftOrder, navController: NavController){
+    var geustClicked by remember { mutableStateOf(false) }
+    var clicked by remember { mutableStateOf(false) }
+    if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
+        IconButton(onClick = {geustClicked=true}) {
+            Icon(
+                imageVector = Icons.Default.FavoriteBorder,
+                contentDescription = "Favorite",
+                tint = AppColors.Teal,
+                modifier = Modifier.size(35.dp)
+            )
+        }
+    }else{
+        for(item in oldDraftOrder.line_items){
+            if(product.id == item.product_id){
+                clicked=true
+            }
+        }
+        IconButton(onClick = {
+            clicked=true
+            val properties = listOf(
+                Property(name = "imageUrl",value = product.image.src),
+                Property(name = "size",value = product.variants[0].option1),
+                Property(name = "color",value = product.variants[0].option2)
+            )
+
+            Log.i("propertiesTest", "AddToFav: ${oldDraftOrder.id}")
+            if(oldDraftOrder.id == 0L) {
+                val lineItems = listOf(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties,product.id?:0))
+                val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
+                val draftOrderRequest = DraftOrderRequest(draftOrder)
+                viewModel.createDraftOrder(draftOrderRequest)
+            } else {
+                if(!oldDraftOrder.line_items.contains(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties,product.id?:0))) {
+                    val lineItems = oldDraftOrder.line_items + listOf(
+                        LineItem(
+                            product.title,
+                            product.variants[0].price,
+                            product.variants[0].id,
+                            1,
+                            properties = properties,
+                            product.id?:0
+                        )
+                    )
+                    val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
+                    val draftOrderRequest = DraftOrderRequest(draftOrder)
+                    oldDraftOrder.id?.let { viewModel.updateDraftOrder(it,draftOrderRequest) }
+                }
+            }
+        }) {
+            if (clicked) {
+                Icon(
+                    imageVector = Icons.Sharp.Favorite,
+                    contentDescription = "Favorite",
+                    tint = AppColors.Teal,
+                    modifier = Modifier.size(35.dp)
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.FavoriteBorder,
+                    contentDescription = "Favorite",
+                    tint = AppColors.Teal,
+                    modifier = Modifier.size(35.dp)
+                )
+            }
+
+        }
+    }
+    if(geustClicked){
+        AlertDialog(
+            onDismissRequest = { geustClicked = false }, // Close dialog on dismiss
+            title = { Text(text = "Guest") },
+            text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals, and to save your favorite products") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        navController.navigate(Screen.LogInScreen.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true // Remove all previous screens from the back stack
+                            }
+                        }
+                        geustClicked = false // Close the dialog after confirming
+                    }
+                ) {
+                    Text("Login", color = AppColors.Teal)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { geustClicked = false }
+                ) {
+                    Text("Cancel", color = AppColors.Rose)
+                }
+            }
+        )
+    }
 }
