@@ -2,36 +2,36 @@ package com.malakezzat.yallabuy.model
 
 
 data class Product(
-    val id: Long? = null,
-    val title: String,
-    val body_html: String,
-    val vendor: String,
-    val product_type: String,
-    val tags: String,
-    val images: List<Image> = listOf(),  // Assuming Image is a separate data class for images.
-    val image: Image,
-    val variants: List<Variant> = listOf() ,// Add this for variants.
-    val options : List<Option>
+    var id: Long? = null,
+    var title: String,
+    var body_html: String,
+    var vendor: String,
+    var product_type: String,
+    var tags: String,
+    var images: List<Image> = listOf(),  // Assuming Image is a separate data class for images.
+    var image: Image,
+    var variants: List<Variant> = listOf() ,// Add this for variants.
+    var options : List<Option>
 )
 
 data class Variant(
-    val id: Long = 0,
-    val title: String = "",
-    val price: String = "",
-    val sku: String = "",
-    val inventory_quantity  : Long = 0,
-    val product_id : Long =0,
-    val option1 : String ="",
-    val option2 : String=""
+    var id: Long = 0,
+    var title: String = "",
+    var price: String = "",
+    var sku: String = "",
+    var inventory_quantity  : Long = 0,
+    var product_id : Long =0,
+    var option1 : String ="",
+    var option2 : String=""
 )
 data class Option( val id :Long,
-    val product_id : Long ,
-    val name : String,
-    val values : List<String>
+    var product_id : Long ,
+    var name : String,
+    var values : List<String>
 )
 data class Image(
-    val id: Long,
-    val src: String // URL of the product image
+    var id: Long,
+    var src: String // URL of the product image
 )
 data class ProductResponse(
     val product: Product
