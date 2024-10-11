@@ -245,8 +245,8 @@ private val _brandsList = MutableStateFlow<ApiState<List<SmartCollection>>>(ApiS
                     }
                     if (wishListDraftOrder.isNotEmpty()) {
                         _wishListDraftOrder.value = ApiState.Success(draftOrders.filter{
-                            it.note == "wishList"
-                        }[0])
+                            it.note == "wishList" }[0])
+                        Log.i("wishList", "getDraftOrders: ${_wishListDraftOrder.value}")
                     } else {
                         _wishListDraftOrder.value = ApiState.Error("wishList not found")
                     }
