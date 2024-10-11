@@ -82,6 +82,7 @@ import com.malakezzat.yallabuy.ui.product_info.ProductInfoViewModel
 import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollectionIdViewModel
 import com.malakezzat.yallabuy.ui.theme.AppColors
 import kotlinx.coroutines.delay
+import kotlin.math.log
 
 val TAG = "ProductsByCollectionIdS"
 @Composable
@@ -142,7 +143,7 @@ fun ProductsByCategoryScreen(
 
                 is ApiState.Success -> {
                     val products = (productState as ApiState.Success<List<Product>>).data
-                    LatestProductsSectionById(products, navController)
+                    LatestProductsSectionById(products, navController,viewModel,wishListDraftOrder)
                 }
 
                 is ApiState.Error -> {
@@ -197,7 +198,7 @@ fun ProductsByBrandScreen(
 
                 is ApiState.Success -> {
                     val products = (productState as ApiState.Success<List<Product>>).data
-                    LatestProductsSectionById(products, navController)
+                   // LatestProductsSectionById(products, navController,viewModel,oldDraftOrder)
                 }
 
                 is ApiState.Error -> {
@@ -213,7 +214,7 @@ fun ProductsByBrandScreen(
 }
 
 @Composable
-fun LatestProductsSectionById(products: List<Product>, navController: NavController) {
+fun LatestProductsSectionById(products: List<Product>, navController: NavController,viewModel: ProductsByCollectionIdViewModel,oldDraftOrder : DraftOrder) {
     Column(modifier = Modifier.padding(16.dp)) {
         Box(
             modifier = Modifier
@@ -241,7 +242,7 @@ fun LatestProductsSectionById(products: List<Product>, navController: NavControl
                         ) + fadeIn(animationSpec = tween(durationMillis = 800)),
                         modifier = Modifier
                     ) {
-                        ProductCard(product = product, navController)
+                        ProductCard(product = product, navController, viewModel ,oldDraftOrder)
                     }
                     Spacer(modifier = Modifier.height(10.dp))
                 }
@@ -251,7 +252,7 @@ fun LatestProductsSectionById(products: List<Product>, navController: NavControl
 }
 
 @Composable
-fun ProductCard(product: Product, navController: NavController) {
+fun ProductCard(product: Product, navController: NavController,viewModel: ProductsByCollectionIdViewModel,oldDraftOrder : DraftOrder) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -341,12 +342,15 @@ fun ProductCard(product: Product, navController: NavController) {
                     .align(Alignment.TopEnd)
                     .padding(10.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.FavoriteBorder,
-                    contentDescription = "Favorite",
-                    tint = AppColors.Teal,
-                    modifier = Modifier.size(35.dp)
-                )
+//                Icon(
+//                    imageVector = Icons.Default.FavoriteBorder,
+//                    contentDescription = "Favorite",
+//                    tint = AppColors.Teal,
+//                    modifier = Modifier.size(35.dp)
+//                )
+                var email = FirebaseAuth.getInstance().currentUser?.email
+                //Log.i(TAG, "ProductCard: ${product.variants[0]}")
+                AddToFavorites(viewModel,product,email?:"",oldDraftOrder,navController)
             }
         }
 
@@ -356,6 +360,7 @@ fun ProductCard(product: Product, navController: NavController) {
 }
 @Composable
 fun AddToFavorites(viewModel: ProductsByCollectionIdViewModel, product : Product, email : String, oldDraftOrder : DraftOrder, navController: NavController){
+    Log.i(TAG, "AddToFavorites: $product")
     var geustClicked by remember { mutableStateOf(false) }
     var clicked by remember { mutableStateOf(false) }
     if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
@@ -377,23 +382,23 @@ fun AddToFavorites(viewModel: ProductsByCollectionIdViewModel, product : Product
             clicked=true
             val properties = listOf(
                 Property(name = "imageUrl",value = product.image.src),
-                Property(name = "size",value = product.variants[0].option1),
-                Property(name = "color",value = product.variants[0].option2)
+//                Property(name = "size",value = product.variants[0].option1),
+              //  Property(name = "color",value = product.variants[0].option2)
             )
 
             Log.i("propertiesTest", "AddToFav: ${oldDraftOrder.id}")
             if(oldDraftOrder.id == 0L) {
-                val lineItems = listOf(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties,product.id?:0))
+                val lineItems = listOf(LineItem(product.title,"70",0L,1, properties = properties,product.id?:0))
                 val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
                 val draftOrderRequest = DraftOrderRequest(draftOrder)
                 viewModel.createDraftOrder(draftOrderRequest)
             } else {
-                if(!oldDraftOrder.line_items.contains(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties,product.id?:0))) {
+                if(!oldDraftOrder.line_items.contains(LineItem(product.title,"100",0L,1, properties = properties,product.id?:0))) {
                     val lineItems = oldDraftOrder.line_items + listOf(
                         LineItem(
                             product.title,
-                            product.variants[0].price,
-                            product.variants[0].id,
+                            "200",
+                            0L,
                             1,
                             properties = properties,
                             product.id?:0
