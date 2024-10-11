@@ -33,6 +33,7 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -67,7 +68,7 @@ import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController) {
+fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavController) {
     var address by remember { mutableStateOf("") }
     var cardHolderName by remember { mutableStateOf("") }
     var cardNumber by remember { mutableStateOf("") }
@@ -83,14 +84,25 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
 
 
     val context = LocalContext.current
-    val userId by remember { mutableStateOf(context.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE).getLong("USER_ID",0L)) }
+    val userId by remember {
+        mutableStateOf(
+            context.getSharedPreferences(
+                "MySharedPrefs",
+                Context.MODE_PRIVATE
+            ).getLong("USER_ID", 0L)
+        )
+    }
 
     LaunchedEffect(Unit) {
         viewModel.getUserAddresses(userId)
     }
 
-    when(userAddressesState){
-        is ApiState.Error -> Log.i("paymentTest", "PaymentMethodScreen: userAddressesState ${(userAddressesState as ApiState.Error).message}")
+    when (userAddressesState) {
+        is ApiState.Error -> Log.i(
+            "paymentTest",
+            "PaymentMethodScreen: userAddressesState ${(userAddressesState as ApiState.Error).message}"
+        )
+
         ApiState.Loading -> {}
         is ApiState.Success -> {
             userAddresses = (userAddressesState as ApiState.Success).data.addresses
@@ -111,7 +123,7 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
         containerColor = Color.White,
         content = { paddingValues ->
             var addressLabel = "address"
-            if(addressesList.isEmpty()){
+            if (addressesList.isEmpty()) {
                 addressLabel = "Make a new Address \uD83D\uDC49"
             }
             Column(
@@ -138,11 +150,14 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
                             label = { Text(addressLabel) },
                             trailingIcon = { Icon(Icons.Default.ArrowDropDown, null) },
                             modifier = Modifier.menuAnchor(),
-                            shape = RoundedCornerShape(10.dp),
+                            shape = RoundedCornerShape(30.dp),
                             readOnly = true,
                             colors = TextFieldDefaults.outlinedTextFieldColors(
                                 disabledTextColor = LocalContentColor.current.copy(LocalContentAlpha.current),
-                                disabledLabelColor = LocalContentColor.current.copy(LocalContentAlpha.current)
+                                disabledLabelColor = LocalContentColor.current.copy(
+                                    LocalContentAlpha.current
+                                ),
+                                unfocusedBorderColor = AppColors.Teal
                             )
                         )
 
@@ -165,7 +180,7 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
                         }
                     }
                     Spacer(modifier = Modifier.width(4.dp))
-                    if(address.isBlank()) {
+                    if (address.isBlank()) {
                         Button(
                             onClick = {
                                 navController.navigate(Screen.AddressScreen.createRoute(0L))
@@ -174,7 +189,7 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
                                 .width(80.dp)
                                 .height(64.dp)
                                 .padding(top = 8.dp),
-                            shape = RoundedCornerShape(10.dp),
+                            shape = RoundedCornerShape(30.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
                         ) {
                             Text("New")
@@ -185,7 +200,10 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(text = "Payment Method \uD83D\uDCB2", style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = "Payment Method \uD83D\uDCB2",
+                    style = MaterialTheme.typography.bodyMedium
+                )
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -195,12 +213,20 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
                     RadioButton(
                         selected = selectedPaymentMethod == "Cash on Delivery",
                         onClick = { selectedPaymentMethod = "Cash on Delivery" },
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = AppColors.Teal,
+                            unselectedColor = Color.Gray
+                        )
                     )
                     Text(text = "Cash on Delivery \uD83D\uDCB5")
 
                     RadioButton(
                         selected = selectedPaymentMethod == "Credit Card",
-                        onClick = { selectedPaymentMethod = "Credit Card" }
+                        onClick = { selectedPaymentMethod = "Credit Card" },
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = AppColors.Teal,
+                            unselectedColor = Color.Gray
+                        )
                     )
                     Text(text = "Credit Card \uD83D\uDCB3")
                 }
@@ -213,14 +239,14 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
                         label = { Text("Card Holder Name") },
                         placeholder = { Text("Enter card holder name") },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(10.dp),
+                        shape = RoundedCornerShape(30.dp),
                         isError = cardHolderName.isEmpty(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = AppColors.MintGreen,
+                            focusedBorderColor = AppColors.Teal,
                             unfocusedBorderColor = Color.Gray,
-                            focusedLabelColor = AppColors.MintGreen,
-                            unfocusedLabelColor = AppColors.MintGreen,
+                            focusedLabelColor = AppColors.Teal,
+                            unfocusedLabelColor = AppColors.Teal,
                             errorBorderColor = Color.Red
                         )
                     )
@@ -237,14 +263,14 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
                         label = { Text("Card Number") },
                         placeholder = { Text("4111 1111 1111 1111") },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(10.dp),
+                        shape = RoundedCornerShape(30.dp),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         isError = cardNumber.length != 16,
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = AppColors.MintGreen,
+                            focusedBorderColor = AppColors.Teal,
                             unfocusedBorderColor = Color.Gray,
-                            focusedLabelColor = AppColors.MintGreen,
-                            unfocusedLabelColor = AppColors.MintGreen,
+                            focusedLabelColor = AppColors.Teal,
+                            unfocusedLabelColor = AppColors.Teal,
                             errorBorderColor = Color.Red
                         )
                     )
@@ -289,14 +315,14 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
                             label = { Text("Expiration") },
                             placeholder = { Text("MM/YY") },
                             modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(10.dp),
+                            shape = RoundedCornerShape(30.dp),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             isError = expiration.text.length != 5,
                             colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedBorderColor = AppColors.MintGreen,
+                                focusedBorderColor = AppColors.Teal,
                                 unfocusedBorderColor = Color.Gray,
-                                focusedLabelColor = AppColors.MintGreen,
-                                unfocusedLabelColor = AppColors.MintGreen,
+                                focusedLabelColor = AppColors.Teal,
+                                unfocusedLabelColor = AppColors.Teal,
                                 errorBorderColor = Color.Red
                             )
                         )
@@ -311,14 +337,14 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
                             label = { Text("CVV") },
                             placeholder = { Text("123") },
                             modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(10.dp),
+                            shape = RoundedCornerShape(30.dp),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             isError = cvv.length != 3,
                             colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedBorderColor = AppColors.MintGreen,
+                                focusedBorderColor = AppColors.Teal,
                                 unfocusedBorderColor = Color.Gray,
-                                focusedLabelColor = AppColors.MintGreen,
-                                unfocusedLabelColor = AppColors.MintGreen,
+                                focusedLabelColor = AppColors.Teal,
+                                unfocusedLabelColor = AppColors.Teal,
                                 errorBorderColor = Color.Red
                             )
                         )
@@ -328,22 +354,23 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
 
                 Button(
                     onClick = {
-                        if (address.isNotBlank()){
-                        if (selectedPaymentMethod == "Credit Card") {
-                            if (cardHolderName.isNotBlank() && cardNumber.isNotBlank()
-                                && expiration.text.isNotBlank() && cvv.isNotBlank()
-                            ) {
-                                navController.navigate(Screen.CheckoutScreen.route)
+                        if (address.isNotBlank()) {
+                            if (selectedPaymentMethod == "Credit Card") {
+                                if (cardHolderName.isNotBlank() && cardNumber.isNotBlank()
+                                    && expiration.text.isNotBlank() && cvv.isNotBlank()
+                                ) {
+                                    navController.navigate(Screen.CheckoutScreen.route)
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Please fill all fields",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             } else {
-                                Toast.makeText(
-                                    context,
-                                    "Please fill all fields",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                navController.navigate(Screen.CheckoutScreen.route)
                             }
                         } else {
-                                navController.navigate(Screen.CheckoutScreen.route)
-                        } } else {
                             Toast.makeText(
                                 context,
                                 "You Should Have at least one Address",
@@ -354,7 +381,7 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel,navController: NavController
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
-                    shape = RoundedCornerShape(10.dp),
+                    shape = RoundedCornerShape(30.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
                 ) {
                     Text("Checkout")
@@ -387,8 +414,7 @@ fun CustomTopBar(navController: NavController) {
                 text = "Payment Method",
                 style = TextStyle(
                     fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                    , color = AppColors.Teal
+                    fontWeight = FontWeight.Bold, color = AppColors.Teal
                 ),
                 modifier = Modifier.padding(start = 4.dp)
             )

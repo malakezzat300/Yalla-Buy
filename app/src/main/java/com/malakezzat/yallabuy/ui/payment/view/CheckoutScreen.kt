@@ -64,28 +64,36 @@ import com.malakezzat.yallabuy.ui.shoppingcart.view.calculateSubtotal
 import com.malakezzat.yallabuy.ui.theme.AppColors
 
 @Composable
-fun CheckoutScreen(viewModel: PaymentViewModel,navController: NavController) {
+fun CheckoutScreen(viewModel: PaymentViewModel, navController: NavController) {
     val userAddressesState by viewModel.userAddresses.collectAsState()
     val shoppingCartOrderState by viewModel.shoppingCartDraftOrder.collectAsState()
     var userAddresses by remember { mutableStateOf(listOf<Address>()) }
     var addressesList by remember { mutableStateOf(listOf<String>()) }
     var defaultAddress by remember { mutableStateOf(Address()) }
     val shoppingCartOrder by remember { mutableStateOf(Address()) }
-    var orderItems by remember { mutableStateOf( emptyList<LineItem>() ) }
+    var orderItems by remember { mutableStateOf(emptyList<LineItem>()) }
     var itemsCount by remember { mutableIntStateOf(0) }
-    var draftOrder by remember { mutableStateOf( DraftOrder() ) }
+    var draftOrder by remember { mutableStateOf(DraftOrder()) }
     val draftOrderState by viewModel.singleDraftOrders.collectAsState()
     val finalizeDraftOrderState by viewModel.finalizeDraftOrder.collectAsState()
     var draftOrderUpdated by remember { mutableStateOf( DraftOrder() ) }
 
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
-    val userId by remember { mutableStateOf(context.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE).getLong("USER_ID",0L)) }
+    val userId by remember {
+        mutableStateOf(
+            context.getSharedPreferences(
+                "MySharedPrefs",
+                Context.MODE_PRIVATE
+            ).getLong("USER_ID", 0L)
+        )
+    }
 
     LaunchedEffect(Unit) {
         viewModel.getUserAddresses(userId)
         viewModel.getDraftOrders()
     }
+
 
     when(userAddressesState){
         is ApiState.Error -> Log.i("completeOrderTest", "CheckoutScreen: userAddressesState ${(userAddressesState as ApiState.Error).message}")
@@ -127,8 +135,14 @@ fun CheckoutScreen(viewModel: PaymentViewModel,navController: NavController) {
     when(finalizeDraftOrderState){
         is ApiState.Error ->{ Log.i("completeOrderTest", "finalizeDraftOrderState: draftOrder ${(finalizeDraftOrderState as ApiState.Error).message}") }
         ApiState.Loading -> {
-            CircularProgressIndicator()
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = AppColors.Teal)
+            }
         }
+
         is ApiState.Success -> {
             LaunchedEffect (Unit){
                 Log.i("completeOrderTest", "finalizeDraftOrderState: done ")
@@ -137,7 +151,7 @@ fun CheckoutScreen(viewModel: PaymentViewModel,navController: NavController) {
         }
     }
 
-    LaunchedEffect(orderItems){
+    LaunchedEffect(orderItems) {
         itemsCount = orderItems.size
     }
 
@@ -195,10 +209,13 @@ fun CheckoutScreen(viewModel: PaymentViewModel,navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Text("Shipping Address",style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Normal))
+        Text(
+            "Shipping Address",
+            style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Normal)
+        )
         Spacer(modifier = Modifier.height(8.dp))
         Column {
-            if(defaultAddress.name?.isNotBlank() == true){
+            if (defaultAddress.name?.isNotBlank() == true) {
                 InfoRow(label = "Full Name", value = "${defaultAddress.name}")
             }
             InfoRow(label = "Mobile Number", value = "${defaultAddress.phone}")
@@ -249,8 +266,7 @@ fun CheckoutScreen(viewModel: PaymentViewModel,navController: NavController) {
 }
 
 @Composable
-fun InfoRow(label: String, value: String, isBold: Boolean = false)
-{
+fun InfoRow(label: String, value: String, isBold: Boolean = false) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

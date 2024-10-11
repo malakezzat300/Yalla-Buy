@@ -24,6 +24,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -43,15 +44,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.data.sharedpref.CurrencyPreferences
 import com.malakezzat.yallabuy.model.Address
+import com.malakezzat.yallabuy.ui.CustomTopBar
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.settings.viewmodel.SettingsViewModel
 import com.malakezzat.yallabuy.ui.shoppingcart.view.DeleteConfirmationDialog
+import com.malakezzat.yallabuy.ui.theme.AppColors
 
 @Composable
 fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel/*,address: Address*/) {
@@ -117,93 +122,101 @@ fun SettingsScreen(navController: NavController,viewModel: SettingsViewModel/*,a
         CurrencyPreferences.getInstance(context).getTargetCurrency()?.let { viewModel.getRate() }
     }
 
-    Column(modifier = Modifier.padding(16.dp)) {
-
-        Text(text = "Settings",
-            style = MaterialTheme.typography.headlineLarge,
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
+    androidx.compose.material3.Scaffold(
+        topBar = { CustomTopBar(navController,"Settings", AppColors.Teal,{navController.navigateUp()}) },
+        containerColor = Color.White,
+        content = { paddingValues ->
 
 
-        var expanded by remember { mutableStateOf(false) }
-        val currencies = listOf("EGP", "USD", "EUR", "AED", "SAR")
+            Column(modifier = Modifier.padding(16.dp).padding(paddingValues)) {
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { expanded = true }
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = "Currency",
-                style = MaterialTheme.typography.headlineSmall)
-            Row {
-                selectedCurrency?.let {
-                    Text(text = it,
-                        style = MaterialTheme.typography.headlineSmall)
-                }
-                Spacer(modifier = Modifier.width(4.dp))
-                Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = "ArrowDropDown",
-                    Modifier.size(30.dp)
-                )
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
+                /*Text(text = "Settings",
+                    style = MaterialTheme.typography.headlineLarge,
+                )*/
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+
+                var expanded by remember { mutableStateOf(false) }
+                val currencies = listOf("EGP", "USD", "EUR", "AED", "SAR")
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { expanded = true }
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    currencies.forEach { currency ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(text = currency,
-                                    style = MaterialTheme.typography.headlineSmall)
-                            },
-                            onClick = {
-                                onCurrencyChange(currency)
-                                expanded = false
-                            })
+                    Text(text = "Currency", color = AppColors.Teal,
+                        style = MaterialTheme.typography.headlineSmall)
+                    Row {
+                        selectedCurrency?.let {
+                            Text(text = it,
+                                style = MaterialTheme.typography.headlineSmall)
+                        }
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = "ArrowDropDown",
+                            Modifier.size(30.dp)
+                        )
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
+                        ) {
+                            currencies.forEach { currency ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(text = currency,
+                                            style = MaterialTheme.typography.headlineSmall)
+                                    },
+                                    onClick = {
+                                        onCurrencyChange(currency)
+                                        expanded = false
+                                    })
+                            }
+                        }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row( modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween){
+                    Text(text = "Address", color = AppColors.Teal,
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier.align(Alignment.CenterVertically))
+                    Spacer(modifier = Modifier.width(50.dp))
+
+                    Button(
+                        onClick = onAddNewAddress
+                        ,
+                        colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text(
+                            text = "Add new",
+                            color = Color.White,
+                            fontSize = 16.sp
+                        )
+                    }
+
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+
+                LazyColumn(
+                    modifier = Modifier.fillMaxHeight()
+                ) {
+                    items(userAddresses.size){
+                        addressItem(navController,viewModel,userAddresses[it],userId)
+                    }
+                }
+
+
+
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row( modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween){
-            Text(text = "Address",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.align(Alignment.CenterVertically))
-            Spacer(modifier = Modifier.width(50.dp))
-
-            Button(
-                onClick = onAddNewAddress
-                ,
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Text(
-                    text = "Add new",
-                    color = Color.White,
-                    fontSize = 16.sp
-                )
-            }
-
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-
-        LazyColumn(
-            modifier = Modifier.fillMaxHeight()
-        ) {
-            items(userAddresses.size){
-                addressItem(navController,viewModel,userAddresses[it],userId)
-            }
-        }
-
-
-
-    }
+    )
 
     if (showAddressDialog) {
         AddressDialog(
@@ -240,6 +253,7 @@ fun addressItem(navController: NavController,viewModel: SettingsViewModel,addres
             },
         elevation = CardDefaults.cardElevation(12.dp),
         shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(
             modifier = Modifier
@@ -256,7 +270,8 @@ fun addressItem(navController: NavController,viewModel: SettingsViewModel,addres
                 )
                 Text(
                     text = "${address.phone}",
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = AppColors.Teal
                 )
             }
 
@@ -308,8 +323,9 @@ fun addressItem(navController: NavController,viewModel: SettingsViewModel,addres
                         showDialog = true
                     }) {
                         Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete"
+                            painter = painterResource(R.drawable.ic_delete),
+                            contentDescription = "Delete",
+                            tint = Color.Red
                         )
                     }
                 }

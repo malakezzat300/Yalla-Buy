@@ -215,7 +215,7 @@ fun ShoppingCartScreen(
                 )
             } else {
                 if(!isLoading) {
-                    ShoppingEmpty()
+                    ShoppingEmpty(navController)
                 }
             }
         }
@@ -552,7 +552,7 @@ fun ShoppingView(
                     .height(56.dp)
                     .align(Alignment.CenterHorizontally),
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
-                shape = RoundedCornerShape(10.dp)
+                shape = RoundedCornerShape(30.dp)
             ) {
                 Text(
                     text = "Checkout ($itemsCount)",
@@ -567,7 +567,7 @@ fun ShoppingView(
 
 
 @Composable
-fun ShoppingEmpty(){
+fun ShoppingEmpty(navController: NavController){
     Scaffold(
         containerColor = Color.White,
         content = { paddingValues ->
@@ -587,18 +587,29 @@ fun ShoppingEmpty(){
 
                 Text(
                     text = "Your cart is empty",
-                    color = AppColors.Rose,
+                    color = AppColors.Teal,
                     style = MaterialTheme.typography.headlineLarge,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
                 Text(
-                    text = "Looks like you have not added anything in your cart. Go ahead and explore top categories.",
+                    text = "Looks like you have not added anything in your cart.Go ahead and explore top categories.",
                     color = AppColors.GrayDark,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 24.dp)
                 )
+                Spacer(modifier = Modifier.height(32.dp))
+                Button(
+                    onClick = { navController.navigate(Screen.CategoriesScreen.route) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
+                    shape = RoundedCornerShape(20.dp)
+                ) {
+                    Text(text = "Explore Categories", color = Color.White)
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
 
 
 //        Button(

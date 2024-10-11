@@ -28,8 +28,9 @@ import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.theme.AppColors
 
 @Composable
-fun OrderPlacedScreen(navController: NavController){
+fun OrderPlacedScreen(navController: NavController) {
     Scaffold(
+        topBar = { com.malakezzat.yallabuy.ui.CustomTopBar(navController, "", Color.White) },
         containerColor = Color.White,
         content = { paddingValues ->
             Column(
@@ -48,8 +49,9 @@ fun OrderPlacedScreen(navController: NavController){
 
                 Text(
                     text = "Your order has been placed successfully",
-                    color = AppColors.Rose,
+                    color = AppColors.Teal,
                     style = MaterialTheme.typography.headlineLarge,
+                    textAlign = TextAlign.Center,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
@@ -62,24 +64,24 @@ fun OrderPlacedScreen(navController: NavController){
                 )
 
 
-        Button(
-            onClick = {
-                navController.popBackStack(Screen.OrderPlacedScreen.route, inclusive = true)
-                navController.navigate(Screen.HomeScreen.route)
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp)
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-            shape = RoundedCornerShape(10.dp)
-        ) {
-            Text(
-                text = "Continue Shopping",
-                color = Color.White,
-                fontSize = 16.sp
-            )
-        }
+                Button(
+                    onClick = {
+                        navController.popBackStack(Screen.OrderPlacedScreen.route, inclusive = true)
+                        navController.navigate(Screen.HomeScreen.route)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
+                    shape = RoundedCornerShape(30.dp)
+                ) {
+                    Text(
+                        text = "Continue Shopping",
+                        color = Color.White,
+                        fontSize = 16.sp
+                    )
+                }
             }
         })
     //  bottomBar = { BottomNavigationBar(navController) }
