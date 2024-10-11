@@ -18,6 +18,8 @@ import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.LineItem
+import com.malakezzat.yallabuy.model.Image
+import com.malakezzat.yallabuy.model.ImageCategory
 import com.malakezzat.yallabuy.model.Order
 import com.malakezzat.yallabuy.model.PriceRuleResponse
 import com.malakezzat.yallabuy.model.PriceRulesResponse
@@ -25,6 +27,7 @@ import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.ProductResponse
 import com.malakezzat.yallabuy.model.Property
 import com.malakezzat.yallabuy.model.SmartCollection
+import com.malakezzat.yallabuy.model.Variant
 import com.malakezzat.yallabuy.model.VariantResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -99,9 +102,103 @@ class FakeRemoteDataSource(
             )
     )
 
+    private val productsList = listOf(
+        Product(
+            id = 1,
+            title = "Cool T-Shirt",
+            body_html = "<p>This is a cool t-shirt.</p>",
+            vendor = "T-Shirt Co.",
+            product_type = "Apparel",
+            tags = "tshirt,cool,apparel",
+            images = emptyList(),
+            image = Image(0L,""),
+            variants = emptyList(),
+            options = emptyList()
+        ),
+        Product(
+            id = 2,
+            title = "Cool T-Shirt",
+            body_html = "<p>This is a cool t-shirt.</p>",
+            vendor = "T-Shirt Co.",
+            product_type = "Apparel",
+            tags = "tshirt,cool,apparel",
+            images = emptyList(),
+            image = Image(0L,""),
+            variants = emptyList(),
+            options = emptyList()
+        ),
+        Product(
+            id = 3,
+            title = "Cool T-Shirt",
+            body_html = "<p>This is a cool t-shirt.</p>",
+            vendor = "T-Shirt Co.",
+            product_type = "Apparel",
+            tags = "tshirt,cool,apparel",
+            images = emptyList(),
+            image = Image(0L,""),
+            variants = emptyList(),
+            options = emptyList()
+        )
+    )
+
+    private val customCollectionsList = listOf(
+        CustomCollection(
+            published_scope = "global",
+            updated_at = "2023-10-01T12:00:00Z",
+            admin_graphql_api_id = "gid://shopify/Collection/1234567890",
+            handle = "summer-collection",
+            id = 1,
+            title = "Summer Collection",
+            published_at = "2023-06-01T12:00:00Z",
+            sort_order = "manual",
+            image = ImageCategory(
+                src = "https://example.com/images/summer-collection.jpg",
+                width = 800,
+                created_at = "2023-05-01T12:00:00Z",
+                height = 600
+            ),
+            body_html = "<p>Check out our exclusive summer collection!</p>"
+        ),
+        CustomCollection(
+            published_scope = "global",
+            updated_at = "2023-09-15T12:00:00Z",
+            admin_graphql_api_id = "gid://shopify/Collection/0987654321",
+            handle = "winter-collection",
+            id = 2,
+            title = "Winter Collection",
+            published_at = "2023-11-01T12:00:00Z",
+            sort_order = "manual",
+            image = ImageCategory(
+                src = "https://example.com/images/winter-collection.jpg",
+                width = 800,
+                created_at = "2023-10-01T12:00:00Z",
+                height = 600
+            ),
+            body_html = "<p>Discover our cozy winter collection!</p>"
+        ),
+        CustomCollection(
+            published_scope = "global",
+            updated_at = "2023-08-20T12:00:00Z",
+            admin_graphql_api_id = "gid://shopify/Collection/1122334455",
+            handle = "autumn-collection",
+            id = 3,
+            title = "Autumn Collection",
+            published_at = "2023-09-01T12:00:00Z",
+            sort_order = "manual",
+            image = ImageCategory(
+                src = "https://example.com/images/autumn-collection.jpg",
+                width = 800,
+                created_at = "2023-08-01T12:00:00Z",
+                height = 600
+            ),
+            body_html = "<p>Embrace the beauty of autumn with our latest collection!</p>"
+        )
+    )
+
+
     override suspend fun getAllProducts(): Flow<List<Product>> {
         return flow {
-            products?.let {
+            productsList?.let {
                 emit(it)
             } ?: emit(emptyList())
         }.catch { e ->
@@ -111,7 +208,7 @@ class FakeRemoteDataSource(
 
     override suspend fun getProductsByCollectionId(id: Long): Flow<List<Product>> {
         return flow {
-            productsByCollection?.let {
+            productsList?.let {
                 emit(it)
             } ?: emit(emptyList())
         }.catch { e ->

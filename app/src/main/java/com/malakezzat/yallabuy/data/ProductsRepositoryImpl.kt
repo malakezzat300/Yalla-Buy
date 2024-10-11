@@ -32,7 +32,8 @@ class ProductsRepositoryImpl private constructor(
     companion object{
         private var instance: ProductsRepositoryImpl? = null
         fun getInstance( productsRemoteDataSource: ProductsRemoteDataSource,
-                         globalSharedPreferenceDataSource: GlobalSharedPreferenceDataSource):ProductsRepositoryImpl{
+                         globalSharedPreferenceDataSource: GlobalSharedPreferenceDataSource)
+        :ProductsRepositoryImpl{
             return instance ?: synchronized(this){
                 val temp =ProductsRepositoryImpl(productsRemoteDataSource,
                     globalSharedPreferenceDataSource)
