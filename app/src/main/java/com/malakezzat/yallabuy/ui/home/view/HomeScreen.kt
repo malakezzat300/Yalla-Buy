@@ -125,7 +125,10 @@ fun HomeScreen(
 
             when (brandsState) {
                 is ApiState.Loading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally),
+                        color = AppColors.Teal
+
+                    )
                 }
 
                 is ApiState.Success -> {
@@ -142,7 +145,8 @@ fun HomeScreen(
             }
             when (categoriesState) {
                 is ApiState.Loading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally),
+                        color = AppColors.Teal)
                 }
 
                 is ApiState.Success -> {
@@ -161,7 +165,8 @@ fun HomeScreen(
             }
             when (productState) {
                 is ApiState.Loading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally),
+                        color = AppColors.Teal)
                 }
 
                 is ApiState.Success -> {

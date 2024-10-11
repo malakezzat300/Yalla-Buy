@@ -28,7 +28,7 @@ import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.theme.AppColors
 
 @Composable
-fun OrderPlacedScreen(navController: NavController){
+fun OrderPlacedScreen(navController: NavController) {
     Scaffold(
         containerColor = Color.White,
         content = { paddingValues ->
@@ -62,24 +62,24 @@ fun OrderPlacedScreen(navController: NavController){
                 )
 
 
-        Button(
-            onClick = {
-                navController.popBackStack(Screen.OrderPlacedScreen.route, inclusive = true)
-                navController.navigate(Screen.HomeScreen.route)
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp)
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-            shape = RoundedCornerShape(10.dp)
-        ) {
-            Text(
-                text = "Continue Shopping",
-                color = Color.White,
-                fontSize = 16.sp
-            )
-        }
+                Button(
+                    onClick = {
+                        navController.popBackStack(Screen.OrderPlacedScreen.route, inclusive = true)
+                        navController.navigate(Screen.HomeScreen.route)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text(
+                        text = "Continue Shopping",
+                        color = Color.White,
+                        fontSize = 16.sp
+                    )
+                }
             }
         })
     //  bottomBar = { BottomNavigationBar(navController) }

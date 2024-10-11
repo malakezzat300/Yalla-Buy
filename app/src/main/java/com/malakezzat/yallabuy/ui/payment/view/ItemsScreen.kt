@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -55,6 +56,7 @@ import com.malakezzat.yallabuy.model.LineItem
 import com.malakezzat.yallabuy.model.Variant
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
+import com.malakezzat.yallabuy.ui.theme.AppColors
 import com.malakezzat.yallabuy.ui.wishlist.DeleteConfirmationDialog2
 import com.malakezzat.yallabuy.ui.wishlist.EmptyWishlistScreen
 import com.malakezzat.yallabuy.ui.wishlist.WishlistViewModel
@@ -64,41 +66,48 @@ import com.malakezzat.yallabuy.ui.wishlist.WishlistViewModel
 fun ItemsScreen(viewModel: PaymentViewModel, navController: NavController) {
 
     val wishlistItems by viewModel.shoppingCartDraftOrder.collectAsStateWithLifecycle()
-    var isLoading by remember { mutableStateOf( false ) }
-    var orderItems by remember { mutableStateOf( emptyList<LineItem>() ) }
-    var draftOrder by remember { mutableStateOf( DraftOrder() ) }
+    var isLoading by remember { mutableStateOf(false) }
+    var orderItems by remember { mutableStateOf(emptyList<LineItem>()) }
+    var draftOrder by remember { mutableStateOf(DraftOrder()) }
     var showDialog by remember { mutableStateOf(false) }
     var isWishlistEmpty by remember { mutableStateOf(false) }
     val variantState by viewModel.variantId.collectAsState()
     var variant by remember { mutableStateOf(Variant()) }
-    var variantSet by remember { mutableStateOf(mutableSetOf<Variant>() ) }
+    var variantSet by remember { mutableStateOf(mutableSetOf<Variant>()) }
 
     LaunchedEffect(Unit) {
         viewModel.getDraftOrders()
     }
 
-    when(wishlistItems){
-        is ApiState.Error ->{
+    when (wishlistItems) {
+        is ApiState.Error -> {
             isLoading = false
 
             // Log.i("shoppingCartTest", "ShoppingCartScreen: draftOrder ${(shoppingCartOrder as ApiState.Error).message}")
         }
+
         ApiState.Loading -> {
             isLoading = true
-            CircularProgressIndicator()
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = AppColors.Teal)
+            }
         }
+
         is ApiState.Success -> {
             isLoading = false
             orderItems = (wishlistItems as ApiState.Success).data.line_items
             draftOrder = (wishlistItems as ApiState.Success).data
-            LaunchedEffect (Unit){
-                if(orderItems.isNotEmpty()) {
+            LaunchedEffect(Unit) {
+                if (orderItems.isNotEmpty()) {
                     viewModel.getVariantById(orderItems.get(0).variant_id)
                 }
             }
         }
     }
-    if(orderItems.isNotEmpty()){
+    if (orderItems.isNotEmpty()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -124,7 +133,7 @@ fun ItemsScreen(viewModel: PaymentViewModel, navController: NavController) {
 
             LazyColumn {
                 items(orderItems) { product ->
-                    Item(viewModel,product,draftOrder,navController)
+                    Item(viewModel, product, draftOrder, navController)
                 }
             }
         }
@@ -133,10 +142,11 @@ fun ItemsScreen(viewModel: PaymentViewModel, navController: NavController) {
 }
 
 @Composable
-fun Item(viewModel: PaymentViewModel,
-                 item: LineItem,
-                 draftOrder: DraftOrder,
-                 navController: NavController
+fun Item(
+    viewModel: PaymentViewModel,
+    item: LineItem,
+    draftOrder: DraftOrder,
+    navController: NavController
 ) {
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
@@ -183,17 +193,25 @@ fun Item(viewModel: PaymentViewModel,
                 Spacer(modifier = Modifier.height(4.dp))
                 val price = item.price
                 CurrencyConverter.changeCurrency(price.toDouble())?.let {
-                    Text(text = it,
-                        style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "quantity : ${item.quantity}",
-                    style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = "quantity : ${item.quantity}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
             var showDialog by remember { mutableStateOf(false) }
 
             IconButton(onClick = { showDialog = true }) {
-                Icon(painter = painterResource(R.drawable.ic_delete), contentDescription = "Delete item", tint = Color.Red)
+                Icon(
+                    painter = painterResource(R.drawable.ic_delete),
+                    contentDescription = "Delete item",
+                    tint = Color.Red
+                )
             }
 
             if (showDialog) {
@@ -211,7 +229,10 @@ fun Item(viewModel: PaymentViewModel,
                             }
                         } else {
                             draftOrder.id?.let { viewModel.deleteDraftOrder(it) }
-                            navController.popBackStack(Screen.ShoppingScreen.route, inclusive = true)
+                            navController.popBackStack(
+                                Screen.ShoppingScreen.route,
+                                inclusive = true
+                            )
                             navController.navigate(Screen.ShoppingScreen.route)
 
 
