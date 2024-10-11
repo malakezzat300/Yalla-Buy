@@ -76,6 +76,7 @@ fun CheckoutScreen(viewModel: PaymentViewModel, navController: NavController) {
     var draftOrder by remember { mutableStateOf(DraftOrder()) }
     val draftOrderState by viewModel.singleDraftOrders.collectAsState()
     val finalizeDraftOrderState by viewModel.finalizeDraftOrder.collectAsState()
+    var draftOrderUpdated by remember { mutableStateOf( DraftOrder() ) }
 
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
@@ -93,12 +94,9 @@ fun CheckoutScreen(viewModel: PaymentViewModel, navController: NavController) {
         viewModel.getDraftOrders()
     }
 
-    when (userAddressesState) {
-        is ApiState.Error -> Log.i(
-            "checkoutTest",
-            "CheckoutScreen: userAddressesState ${(userAddressesState as ApiState.Error).message}"
-        )
 
+    when(userAddressesState){
+        is ApiState.Error -> Log.i("completeOrderTest", "CheckoutScreen: userAddressesState ${(userAddressesState as ApiState.Error).message}")
         ApiState.Loading -> {}
         is ApiState.Success -> {
             userAddresses = (userAddressesState as ApiState.Success).data.addresses
@@ -111,29 +109,31 @@ fun CheckoutScreen(viewModel: PaymentViewModel, navController: NavController) {
         }
     }
 
-    when (shoppingCartOrderState) {
-        is ApiState.Error -> {
-            Log.i(
-                "checkoutTest",
-                "CheckoutScreen: draftOrder ${(shoppingCartOrder as ApiState.Error).message}"
-            )
-        }
-
+    when(shoppingCartOrderState){
+        is ApiState.Error ->{ Log.i("completeOrderTest", "shoppingCartOrderState: draftOrder ${(shoppingCartOrderState as ApiState.Error).message}") }
         ApiState.Loading -> {}
         is ApiState.Success -> {
             orderItems = (shoppingCartOrderState as ApiState.Success).data.line_items
             draftOrder = (shoppingCartOrderState as ApiState.Success).data
+
         }
     }
 
-    when (finalizeDraftOrderState) {
-        is ApiState.Error -> {
-            Log.i(
-                "completeOrderTest",
-                "CheckoutScreen: draftOrder ${(shoppingCartOrder as ApiState.Error).message}"
-            )
-        }
+    when(draftOrderState){
+        is ApiState.Error ->{ Log.i("completeOrderTest", "draftOrderState: draftOrder ${(draftOrderState as ApiState.Error).message}") }
+        ApiState.Loading -> {}
+        is ApiState.Success -> {
+            draftOrderUpdated = (draftOrderState as ApiState.Success).data.draft_order
+            Log.i("completeOrderTest", "draftOrderUpdated: draftOrder ${draftOrderUpdated.toString()}")
+            LaunchedEffect(Unit) {
+                draftOrderUpdated.id?.let { viewModel.finalizeDraftOrder(it) }
 
+            }
+        }
+    }
+
+    when(finalizeDraftOrderState){
+        is ApiState.Error ->{ Log.i("completeOrderTest", "finalizeDraftOrderState: draftOrder ${(finalizeDraftOrderState as ApiState.Error).message}") }
         ApiState.Loading -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -144,7 +144,10 @@ fun CheckoutScreen(viewModel: PaymentViewModel, navController: NavController) {
         }
 
         is ApiState.Success -> {
-            navController.navigate(Screen.OrderPlacedScreen.route)
+            LaunchedEffect (Unit){
+                Log.i("completeOrderTest", "finalizeDraftOrderState: done ")
+                navController.navigate(Screen.OrderPlacedScreen.route)
+            }
         }
     }
 
@@ -243,9 +246,9 @@ fun CheckoutScreen(viewModel: PaymentViewModel, navController: NavController) {
         Button(
             onClick = {
                 draftOrder.id?.let {
-                    viewModel.finalizeDraftOrder(it)
                     val newDraftOrder = draftOrder
                     newDraftOrder.note = "Placed Order"
+                    Log.i("completeOrderTest", "onClick: draftOrder ${newDraftOrder.toString()}")
                     viewModel.updateDraftOrder(it, DraftOrderRequest(newDraftOrder))
 
                 }
