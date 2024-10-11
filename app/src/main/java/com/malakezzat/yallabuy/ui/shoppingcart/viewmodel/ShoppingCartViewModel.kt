@@ -82,20 +82,20 @@ class ShoppingCartViewModel(private val repository: ProductsRepository) : ViewMo
         }
     }
 
-    fun getDraftOrder(draftOrderId: Long) {
-        viewModelScope.launch {
-            repository.getDraftOrder(draftOrderId)
-                .onStart {
-                    _singleDraftOrders.value = ApiState.Loading
-                }
-                .catch { e ->
-                    _singleDraftOrders.value = ApiState.Error(e.message ?: "Unknown error")
-                }
-                .collect { draftOrderResponse ->
-                    _singleDraftOrders.value = ApiState.Success(draftOrderResponse)
-                }
-        }
-    }
+//    fun getDraftOrder(draftOrderId: Long) {
+//        viewModelScope.launch {
+//            repository.getDraftOrder(draftOrderId)
+//                .onStart {
+//                    _singleDraftOrders.value = ApiState.Loading
+//                }
+//                .catch { e ->
+//                    _singleDraftOrders.value = ApiState.Error(e.message ?: "Unknown error")
+//                }
+//                .collect { draftOrderResponse ->
+//                    _singleDraftOrders.value = ApiState.Success(draftOrderResponse)
+//                }
+//        }
+//    }
 
     fun updateDraftOrder(draftOrderId: Long, draftOrder: DraftOrderRequest) {
         viewModelScope.launch {
@@ -124,21 +124,21 @@ class ShoppingCartViewModel(private val repository: ProductsRepository) : ViewMo
         }
     }
 
-    fun finalizeDraftOrder(draftOrderId: Long) {
-        viewModelScope.launch {
-            repository.finalizeDraftOrder(draftOrderId)
-                .onStart {
-                    _singleDraftOrders.value = ApiState.Loading
-                }
-                .catch { e ->
-                    _singleDraftOrders.value = ApiState.Error(e.message ?: "Failed to finalize draft order")
-                }
-                .collect { response ->
-                    _singleDraftOrders.value = ApiState.Success(response)
-                    getDraftOrders()
-                }
-        }
-    }
+//    fun finalizeDraftOrder(draftOrderId: Long) {
+//        viewModelScope.launch {
+//            repository.finalizeDraftOrder(draftOrderId)
+//                .onStart {
+//                    _singleDraftOrders.value = ApiState.Loading
+//                }
+//                .catch { e ->
+//                    _singleDraftOrders.value = ApiState.Error(e.message ?: "Failed to finalize draft order")
+//                }
+//                .collect { response ->
+//                    _singleDraftOrders.value = ApiState.Success(response)
+//                    getDraftOrders()
+//                }
+//        }
+//    }
 
 
     fun getVariantById(variantId : Long){
@@ -197,18 +197,18 @@ class ShoppingCartViewModel(private val repository: ProductsRepository) : ViewMo
         }
     }
 
-    fun getDiscountCode(priceRuleId : Long,discountCodeId : Long){
-        viewModelScope.launch {
-            repository.getSingleDiscountCodes(priceRuleId,discountCodeId).onStart {
-                _discountCode.value = ApiState.Loading
-            }
-                .catch { e ->
-                    _discountCode.value = ApiState.Error(e.message ?: "Unknown error")
-                }
-                .collect { data ->
-                    _discountCode.value = ApiState.Success(data)
-                }
-        }
-    }
+//    fun getDiscountCode(priceRuleId : Long,discountCodeId : Long){
+//        viewModelScope.launch {
+//            repository.getSingleDiscountCodes(priceRuleId,discountCodeId).onStart {
+//                _discountCode.value = ApiState.Loading
+//            }
+//                .catch { e ->
+//                    _discountCode.value = ApiState.Error(e.message ?: "Unknown error")
+//                }
+//                .collect { data ->
+//                    _discountCode.value = ApiState.Success(data)
+//                }
+//        }
+//    }
 
 }
