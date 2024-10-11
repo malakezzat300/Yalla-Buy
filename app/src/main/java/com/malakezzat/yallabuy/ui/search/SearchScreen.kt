@@ -41,6 +41,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -87,6 +88,7 @@ fun SearchScreen(viewModel: SearchViewModel,
     var draftOrderIdSaved by remember { mutableLongStateOf(0L) }
     var wishListDraftOrder by remember { mutableStateOf(DraftOrder(0L, "", listOf(), "")) }
     //Currency
+    LaunchedEffect(Unit) { viewModel.getDraftOrders() }
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
     Scaffold(
