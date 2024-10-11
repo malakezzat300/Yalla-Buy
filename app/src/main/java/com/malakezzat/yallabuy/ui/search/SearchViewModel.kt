@@ -3,9 +3,11 @@ package com.malakezzat.yallabuy.ui.search
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.malakezzat.yallabuy.data.ProductsRepository
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
 import com.malakezzat.yallabuy.model.Product
@@ -92,5 +94,81 @@ class SearchViewModel(var repository : ProductsRepository) : ViewModel(){
     fun onSearchQueryChanged(query: String,price : Float) {
         _searchQuery.value = query
         _filterByPrice.value = price
+    }
+    fun createDraftOrder(draftOrder: DraftOrderRequest){
+        viewModelScope.launch {
+            repository.createDraftOrder(draftOrder).onStart {
+                _draftOrderId.value = ApiState.Loading
+            }
+                .catch { e ->
+                    _draftOrderId.value = ApiState.Error(e.message ?: "Unknown error")
+                }
+                .collect { draftOrderResponse ->
+                    val draftOrderId = draftOrderResponse.draft_order
+
+                    if (draftOrderId != null) {
+                        _draftOrderId.value = ApiState.Success(draftOrderResponse)
+                    } else {
+                        _draftOrderId.value = ApiState.Error("Draft Order not found")
+                    }
+                }
+        }
+    }
+
+    fun updateDraftOrder(draftOrderId: Long,draftOrder: DraftOrderRequest){
+        viewModelScope.launch {
+            repository.updateDraftOrder(draftOrderId,draftOrder).onStart {
+                _draftOrderId.value = ApiState.Loading
+            }
+                .catch { e ->
+                    _draftOrderId.value = ApiState.Error(e.message ?: "Unknown error")
+                }
+                .collect { draftOrderResponse ->
+                    val draftOrderId = draftOrderResponse.draft_order
+
+                    if (draftOrderId != null) {
+                        _draftOrderId.value = ApiState.Success(draftOrderResponse)
+                    } else {
+                        _draftOrderId.value = ApiState.Error("Draft Order not found")
+                    }
+                }
+        }
+    }
+
+
+    fun getDraftOrders(){
+        viewModelScope.launch {
+            repository.getAllDraftOrders().onStart {
+                _draftOrders.value = ApiState.Loading
+            }
+                .catch { e ->
+                    _draftOrders.value = ApiState.Error(e.message ?: "Unknown error")
+                }
+                .collect { draftOrdersResponse ->
+                    val draftOrders = draftOrdersResponse.draft_orders.filter {
+                        it.email == FirebaseAuth.getInstance().currentUser?.email
+                    }
+                    val shoppingCartDraftOrder = draftOrders.filter{
+                        it.note == "shoppingCart"
+                    }
+                    val wishListDraftOrder = draftOrders.filter{
+                        it.note == "wishList"
+                    }
+                    if (shoppingCartDraftOrder.isNotEmpty()) {
+//                        _shoppingCartDraftOrder.value = ApiState.Success(draftOrders.filter{
+//                            it.note == "shoppingCart"
+//                        }[0])
+                    } else {
+//                        _shoppingCartDraftOrder.value = ApiState.Error("shoppingCart not found")
+                    }
+                    if (wishListDraftOrder.isNotEmpty()) {
+                        _wishListDraftOrder.value = ApiState.Success(draftOrders.filter{
+                            it.note == "wishList"
+                        }[0])
+                    } else {
+                        _wishListDraftOrder.value = ApiState.Error("wishList not found")
+                    }
+                }
+        }
     }
 }
