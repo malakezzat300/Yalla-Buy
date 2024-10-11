@@ -178,7 +178,7 @@ fun SearchScreen(viewModel: SearchViewModel,
                         modifier = Modifier.background(Color.White)
                     ) {
                         items(filteredProducts) { searchItem ->
-                            RecentSearchItem(searchItem,navController)
+                            RecentSearchItem(searchItem,navController,viewModel,wishListDraftOrder)
                         }
                     }
                 }
@@ -188,7 +188,7 @@ fun SearchScreen(viewModel: SearchViewModel,
 
 }
 @Composable
-fun RecentSearchItem(product: Product,navController: NavController) {
+fun RecentSearchItem(product: Product,navController: NavController,viewModel: SearchViewModel,oldDraftOrder : DraftOrder) {
 
     Box(
         modifier = Modifier
@@ -238,12 +238,13 @@ fun RecentSearchItem(product: Product,navController: NavController) {
                 .align(Alignment.TopEnd) // Adjust this alignment as needed
                 .padding(10.dp)
         ) {
-            Icon(
-                imageVector = Icons.Default.FavoriteBorder,
-                contentDescription = "Favorite",
-                tint = AppColors.Teal,
-                modifier = Modifier.size(35.dp)
-            )
+//            Icon(
+//                imageVector = Icons.Default.FavoriteBorder,
+//                contentDescription = "Favorite",
+//                tint = AppColors.Teal,
+//                modifier = Modifier.size(35.dp)
+//            )
+            AddToFavorites(viewModel, product, FirebaseAuth.getInstance().currentUser?.email.toString(), oldDraftOrder,navController)
         }
     }
 
