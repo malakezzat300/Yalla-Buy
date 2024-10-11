@@ -367,7 +367,8 @@ fun AddToFavorites(viewModel: ProductsByCollectionIdViewModel, product : Product
     val productState by viewModel.searchProductsList.collectAsState()
     var geustClicked by remember { mutableStateOf(false) }
     var clicked by remember { mutableStateOf(false) }
-    viewModel.getProductById(product.id?:0L)
+    LaunchedEffect(Unit) { viewModel.getProductById(product.id?:0L) }
+
     when (productState) {
         is ApiState.Error -> {}
         ApiState.Loading -> {}
