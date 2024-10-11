@@ -630,6 +630,7 @@ fun ProductCard(product: Product, navController: NavController,viewModel: HomeSc
 fun AddToFavorites(viewModel: HomeScreenViewModel, product : Product, email : String, oldDraftOrder : DraftOrder, navController: NavController){
     var geustClicked by remember { mutableStateOf(false) }
     var clicked by remember { mutableStateOf(false) }
+    var contains by remember { mutableStateOf(false) }
     if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
         IconButton(onClick = {geustClicked=true}) {
             Icon(
@@ -640,18 +641,29 @@ fun AddToFavorites(viewModel: HomeScreenViewModel, product : Product, email : St
             )
         }
     }else{
-        for(item in oldDraftOrder.line_items){
-            if(product.id == item.product_id){
-                clicked=true
+        LaunchedEffect(Unit) {
+            for(item in oldDraftOrder.line_items){
+                if(product.id == item.product_id){
+                    clicked=true
+                }
             }
         }
+        val properties = listOf(
+            Property(name = "imageUrl",value = product.image.src),
+            Property(name = "size",value = product.variants[0].option1),
+            Property(name = "color",value = product.variants[0].option2)
+        )
+        contains = oldDraftOrder.line_items.contains(LineItem(
+            product.title,
+            product.variants[0].price,
+            product.variants[0].id,
+            1,
+            properties = properties,
+            product.id?:0
+        ))
         IconButton(onClick = {
-            clicked=true
-            val properties = listOf(
-                Property(name = "imageUrl",value = product.image.src),
-                Property(name = "size",value = product.variants[0].option1),
-                Property(name = "color",value = product.variants[0].option2)
-            )
+
+
 
             Log.i("propertiesTest", "AddToFav: ${oldDraftOrder.id}")
             if(oldDraftOrder.id == 0L) {
@@ -660,22 +672,31 @@ fun AddToFavorites(viewModel: HomeScreenViewModel, product : Product, email : St
                 val draftOrderRequest = DraftOrderRequest(draftOrder)
                 viewModel.createDraftOrder(draftOrderRequest)
             } else {
-                if(!oldDraftOrder.line_items.contains(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties,product.id?:0))) {
-                    val lineItems = oldDraftOrder.line_items + listOf(
-                        LineItem(
-                            product.title,
-                            product.variants[0].price,
-                            product.variants[0].id,
-                            1,
-                            properties = properties,
-                            product.id?:0
+                    var lineItems = listOf<LineItem>()
+
+                    if(contains){
+                        clicked=false
+                        lineItems = oldDraftOrder.line_items.filter { it.variant_id != product.variants[0].id }
+                        Log.i(TAG, "AddToFavorites: contains ${lineItems}")
+                    } else {
+                        clicked=true
+                        lineItems = oldDraftOrder.line_items + listOf(
+                            LineItem(
+                                product.title,
+                                product.variants[0].price,
+                                product.variants[0].id,
+                                1,
+                                properties = properties,
+                                product.id ?: 0
+                            )
                         )
-                    )
+                        Log.i(TAG, "AddToFavorites: not contains ${lineItems}")
+                    }
                     val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
                     val draftOrderRequest = DraftOrderRequest(draftOrder)
                     oldDraftOrder.id?.let { viewModel.updateDraftOrder(it,draftOrderRequest) }
                 }
-            }
+
         }) {
             if (clicked) {
                 Icon(
