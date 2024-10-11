@@ -82,6 +82,7 @@ import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.home.view.CustomTopBarHome
 import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModel
 import com.malakezzat.yallabuy.ui.theme.AppColors
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlin.math.round
 
@@ -109,6 +110,7 @@ fun ShoppingCartScreen(
     var emptyScreen by remember { mutableStateOf( true ) }
     var draftOrderForTotal by remember { mutableStateOf( DraftOrder() ) }
     var discountFirstTime by remember { mutableDoubleStateOf(0.0) }
+    var orderItemsForCount by remember { mutableStateOf( emptyList<LineItem>() ) }
 
     LaunchedEffect(Unit) {
         viewModel.getDraftOrders()
@@ -150,8 +152,10 @@ fun ShoppingCartScreen(
     }
     if(draftOrderForTotal == DraftOrder()) {
         subtotal = calculateSubtotal(orderItems)
+        orderItemsForCount = orderItems
     } else {
         subtotal = calculateSubtotal(draftOrderForTotal.line_items)
+        orderItemsForCount = draftOrderForTotal.line_items
     }
 //    LaunchedEffect (subtotal,draftOrder) {
 //        total = subtotal + (subtotal * (draftOrder.applied_discount?.value?.toDouble() ?: 0.0)) * -1 / 100
@@ -208,7 +212,7 @@ fun ShoppingCartScreen(
                                         key = { item -> orderItems[item].variant_id }
                                     ) { index ->
                                         itemsCount = 0
-                                        orderItems.forEach { itemsCount += it.quantity }
+                                        orderItemsForCount.forEach { itemsCount += it.quantity }
                                         val orderItem = orderItems[index]
                                         ShoppingItem(viewModel,orderItem,draftOrder,variantSet,subtotal,{ updatedDraftOrder ->
                                             subtotal = calculateSubtotal(orderItems)
@@ -329,6 +333,8 @@ fun ShoppingItem(
     var itemQuantity by remember { mutableStateOf(item.quantity) }
     var updatedDraftOrder by remember { mutableStateOf(DraftOrder()) }
     var isDeleted by remember { mutableStateOf(false) }
+    var updateJob by remember { mutableStateOf<Job?>(null) }
+
 
     AnimatedVisibility(
         visible = !isDeleted,
@@ -405,6 +411,7 @@ fun ShoppingItem(
                         // Minus Button
                         IconButton(
                             onClick = {
+
                                 val newQuantity = (itemQuantity - 1).coerceAtLeast(1)
                                 itemQuantity = newQuantity
                                 val updatedDraftItems = draftOrder.line_items.map { currentItem ->
@@ -416,13 +423,18 @@ fun ShoppingItem(
                                 }
                                 updatedDraftOrder = draftOrder.copy(line_items = updatedDraftItems)
                                 val updatedDraftItemsRequest = DraftOrderRequest(updatedDraftOrder)
+                                Log.i("updateTest", "ShoppingItem: - clicked")
+                                updateJob?.cancel()
 
-                                coroutineScope.launch {
+                                updateJob = coroutineScope.launch {
+                                    delay(1000)
                                     draftOrder.id?.let {
+                                        Log.i("updateTest", "ShoppingItem: - updated")
                                         viewModel.updateDraftOrder(it, updatedDraftItemsRequest)
                                     }
                                 }
                                 onItemUpdated(updatedDraftOrder)
+
                             },
                             enabled = isMinusEnabled
                         ) {
@@ -478,9 +490,14 @@ fun ShoppingItem(
                                         draftOrder.copy(line_items = updatedDraftItems)
                                     val updatedDraftItemsRequest =
                                         DraftOrderRequest(updatedDraftOrder)
+                                    Log.i("updateTest", "ShoppingItem: + clicked")
 
-                                    coroutineScope.launch {
+                                    updateJob?.cancel()
+
+                                    updateJob = coroutineScope.launch {
+                                        delay(1000)
                                         draftOrder.id?.let {
+                                            Log.i("updateTest", "ShoppingItem: + updated")
                                             viewModel.updateDraftOrder(it, updatedDraftItemsRequest)
                                         }
                                     }
