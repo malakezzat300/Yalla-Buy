@@ -193,21 +193,20 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
                         }
                     }
                     Spacer(modifier = Modifier.width(4.dp))
-                    if (address.isBlank()) {
-                        Button(
-                            onClick = {
-                                navController.navigate(Screen.AddressScreen.createRoute(0L))
-                            },
-                            modifier = Modifier
-                                .width(80.dp)
-                                .height(64.dp)
-                                .padding(top = 8.dp),
-                            shape = RoundedCornerShape(30.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
-                        ) {
-                            Text("New")
-                        }
+                    Button(
+                        onClick = {
+                            navController.navigate(Screen.AddressScreen.createRoute(0L))
+                        },
+                        modifier = Modifier
+                            .width(80.dp)
+                            .height(64.dp)
+                            .padding(top = 8.dp),
+                        shape = RoundedCornerShape(30.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
+                    ) {
+                        Text("New")
                     }
+
                 }
 
 
