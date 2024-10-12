@@ -79,11 +79,13 @@ import java.io.File
 import java.io.IOException
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.Address
@@ -118,6 +120,7 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
     val countries = getCountries(context)
     var searchTextCountry by remember { mutableStateOf("") }
     var filteredCountries by remember { mutableStateOf(countries) }
+    var validPhone by remember { mutableStateOf(false) }
 
 
     val sharedPreferences = context.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
@@ -230,13 +233,7 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                     OutlinedTextField(
                         value = phoneNumber,
                         onValueChange = { input ->
-                            val regex = Regex("^0(1[0125])?\\d{0,8}$")
-                            if (regex.matches(input) || input.isEmpty()) {
                                 phoneNumber = input
-                            } else {
-                                Toast.makeText(context, "Enter a vaild number", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
                         },
                         label = { Text(text = "Phone Number") },
                         shape = RoundedCornerShape(30.dp),
@@ -244,7 +241,9 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                             .fillMaxWidth()
                             .background(color = Color.White)
                             .padding(top = 2.dp),
-                        colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.Teal)
+                        colors = OutlinedTextFieldDefaults.colors(unfocusedBorderColor = AppColors.Teal),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        isError = (phoneNumber.length != 11)
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -502,8 +501,37 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                             .fillMaxWidth()
                             .height(50.dp),
                         onClick = {
-                            if (phoneNumber.isNotBlank()
-                                && addressState.isNotBlank() && city.isNotBlank() && country.isNotBlank()
+                            if (phoneNumber.isNotBlank() ) {
+                                if(phoneNumber.length == 11) {
+                                    if(phoneNumber.substring(0,1).equals("0")
+                                        && (phoneNumber.substring(1,2).equals("0") ||
+                                                phoneNumber.substring(1,2).equals("1") ||
+                                                phoneNumber.substring(1,2).equals("2") ||
+                                                phoneNumber.substring(1,2).equals("5") )
+                                        ) {
+                                        validPhone = true
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            "Please enter a valid phone number",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Please enter a valid phone number",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }  else {
+                                Toast.makeText(
+                                    context,
+                                    "Please enter a phone number",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            if (validPhone && addressState.isNotBlank() && city.isNotBlank() && country.isNotBlank()
                             ) {
                                 userId?.let {
                                     val address1 = Address(
@@ -522,7 +550,10 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                                             AddressRequest(address1)
                                         )
                                     } else {
-                                        viewModel.addNewAddress(it, AddressRequest(address1))
+                                        viewModel.addNewAddress(
+                                            it,
+                                            AddressRequest(address1)
+                                        )
                                     }
                                 }
 
@@ -533,8 +564,6 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
-
-
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
                         shape = RoundedCornerShape(30.dp)

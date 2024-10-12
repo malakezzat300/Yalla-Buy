@@ -50,11 +50,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -252,7 +255,21 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
                     OutlinedTextField(
                         value = cardHolderName,
                         onValueChange = { cardHolderName = it },
-                        label = { Text("Card Holder Name") },
+                        label = {  Text(
+                            text = buildAnnotatedString {
+                                append("Card Holder Name ")
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = Color.Red,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 24.sp
+                                    )
+                                ) {
+                                    append("*")
+                                }
+                            },
+                            fontSize = 18.sp
+                        ) },
                         placeholder = { Text("Enter card holder name") },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(30.dp),
@@ -276,7 +293,21 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
                                 cardNumber = it
                             }
                         },
-                        label = { Text("Card Number") },
+                        label = { Text(
+                            text = buildAnnotatedString {
+                                append("Card Number ")
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = Color.Red,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 24.sp
+                                    )
+                                ) {
+                                    append("*")
+                                }
+                            },
+                            fontSize = 18.sp
+                        ) },
                         placeholder = { Text("4111 1111 1111 1111") },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(30.dp),
@@ -328,7 +359,21 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
                                     }
                                 }
                             },
-                            label = { Text("Expiration") },
+                            label = { Text(
+                                text = buildAnnotatedString {
+                                    append("Expiration ")
+                                    withStyle(
+                                        style = SpanStyle(
+                                            color = Color.Red,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 24.sp
+                                        )
+                                    ) {
+                                        append("*")
+                                    }
+                                },
+                                fontSize = 18.sp
+                            ) },
                             placeholder = { Text("MM/YY") },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(30.dp),
@@ -350,7 +395,21 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
                                     cvv = it
                                 }
                             },
-                            label = { Text("CVV") },
+                            label = { Text(
+                                text = buildAnnotatedString {
+                                    append("CVV ")
+                                    withStyle(
+                                        style = SpanStyle(
+                                            color = Color.Red,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 24.sp
+                                        )
+                                    ) {
+                                        append("*")
+                                    }
+                                },
+                                fontSize = 18.sp
+                            ) },
                             placeholder = { Text("123") },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(30.dp),
