@@ -49,7 +49,6 @@ class SettingsViewModel(private val repository: ProductsRepository): ViewModel()
 
 
     fun getRate(){
-        Log.i("currencyTest", "getRate: getting rate")
         viewModelScope.launch {
             repository.getConversionRate().onStart {
                 _conversionRate.value = ApiState.Loading
