@@ -33,7 +33,7 @@ init {
                 }.collect{categories->
                     val filteredCategories = categories.drop(1)
                     _categoriesList.value = ApiState.Success(filteredCategories)
-                    Log.i(TAG, "getAllCategories: ${categories.get(0).title}")
+                   // Log.i(TAG, "getAllCategories: ${categories.get(0).title}")
                 }
         }
     }
