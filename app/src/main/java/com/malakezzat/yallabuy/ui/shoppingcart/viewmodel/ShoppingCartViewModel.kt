@@ -66,7 +66,7 @@ class ShoppingCartViewModel(private val repository: ProductsRepository) : ViewMo
                 }
                 .collect { draftOrdersResponse ->
                     val draftOrders = draftOrdersResponse.draft_orders.filter {
-                        it.email == FirebaseAuth.getInstance().currentUser?.email
+                        it.email == repository.getUserEmail()
                     }
                     val shoppingCartDraftOrder = draftOrders.filter{
                         it.note == "shoppingCart"

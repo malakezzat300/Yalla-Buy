@@ -3,6 +3,7 @@ package com.malakezzat.yallabuy.data
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.malakezzat.yallabuy.data.remote.ApiState
+import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.model.AddressRequest
 import com.malakezzat.yallabuy.model.AddressResponse
 import com.malakezzat.yallabuy.model.AppliedDiscount
@@ -208,7 +209,111 @@ class FakeRepository : ProductsRepository {
         price_rule = priceRule1
     )
 
+    val address1 = Address(
+        id = 1,
+        customer_id = 101,
+        first_name = "John",
+        last_name = "Doe",
+        company = "Doe Enterprises",
+        address1 = "123 Main St",
+        address2 = "Apt 4B",
+        city = "Springfield",
+        province = "Illinois",
+        country = "USA",
+        zip = "62701",
+        phone = "555-1234",
+        name = "John Doe",
+        province_code = "IL",
+        country_code = "US",
+        country_name = "United States",
+        default = true
+    )
+
+    val address2 = Address(
+        id = 2,
+        customer_id = 102,
+        first_name = "Jane",
+        last_name = "Smith",
+        company = "Smith LLC",
+        address1 = "456 Elm St",
+        address2 = null, // Optional field
+        city = "Los Angeles",
+        province = "California",
+        country = "USA",
+        zip = "90001",
+        phone = "555-5678",
+        name = "Jane Smith",
+        province_code = "CA",
+        country_code = "US",
+        country_name = "United States",
+        default = false
+    )
+
+    val address3 = Address(
+        id = 3,
+        customer_id = 103,
+        first_name = "Alice",
+        last_name = "Johnson",
+        company = "Johnson Corp",
+        address1 = "789 Oak St",
+        address2 = "Suite 100",
+        city = "New York",
+        province = "New York",
+        country = "USA",
+        zip = "10001",
+        phone = "555-9012",
+        name = "Alice Johnson",
+        province_code = "NY",
+        country_code = "US",
+        country_name = "United States",
+        default = true
+    )
+
+    val address33 = Address(
+        id = 4,
+        customer_id = 103,
+        first_name = "Alice",
+        last_name = "Johnson",
+        company = "Johnson Corp",
+        address1 = "143 Oak St",
+        address2 = "Suite 123",
+        city = "New York",
+        province = "New York",
+        country = "USA",
+        zip = "10001",
+        phone = "555-9012",
+        name = "Alice Johnson",
+        province_code = "NY",
+        country_code = "US",
+        country_name = "United States",
+        default = false
+    )
+
+    val address333 = Address(
+        id = 5,
+        customer_id = 103,
+        first_name = "Alice5",
+        last_name = "Johnson5",
+        company = "Johnson Corp5",
+        address1 = "143 Oak St",
+        address2 = "Suite 123",
+        city = "New York",
+        province = "New York",
+        country = "USA",
+        zip = "10001",
+        phone = "555-9012",
+        name = "Alice Johnson",
+        province_code = "NY",
+        country_code = "US",
+        country_name = "United States",
+        default = false
+    )
+
+    private val addresses = mutableListOf(address1,address2,address3,address33)
+
     val customerResponse = CustomerResponse(CustomerDetails(1L, "tastName@gmail.com", "testName","","",""))
+
+    val emails = listOf("customer1@example.com","customer2@example.com","customer3@example.com",)
 
     override suspend fun getAllProducts(): Flow<List<Product>> {
         TODO("Not yet implemented")
@@ -273,11 +378,13 @@ class FakeRepository : ProductsRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getAllDraftOrders(): Flow<DraftOrdersResponse>  = flow {
-        emit(draftOrdersResponse)
-    }.catch { e ->
-        Log.e("testTest", "Error fetching DraftOrders", e)
-        emit(DraftOrdersResponse(emptyList()))
+    override suspend fun getAllDraftOrders(): Flow<DraftOrdersResponse> {
+        return flow {
+            emit(draftOrdersResponse)
+        }.catch { e ->
+            Log.e("FakeRepository", "Error fetching categories", e)
+            emit(DraftOrdersResponse(emptyList()))
+        }
     }
 
     override suspend fun getDraftOrder(draftOrderId: Long): Flow<DraftOrderResponse> {
@@ -326,26 +433,37 @@ class FakeRepository : ProductsRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getConversionRate(): Flow<CurrencyResponse> = flow {
-        ApiState.Success(currencyResponse)
+    override suspend fun getConversionRate(): Flow<CurrencyResponse> {
+        return flow {
+            emit(currencyResponse)
+        }
     }
 
     override suspend fun addNewAddress(
         customerId: Long,
         address: AddressRequest
     ): Flow<CustomerAddress> {
-        TODO("Not yet implemented")
+        return flow {
+            val userAddresses = addresses.filter { it.customer_id == customerId }.toMutableList()
+            userAddresses.add(address.address)
+            emit(CustomerAddress(address.address))
+        }
     }
 
     override suspend fun getUserAddresses(customerId: Long): Flow<AddressResponse> {
-        TODO("Not yet implemented")
+        return flow {
+            val userAddresses = addresses.filter { it.customer_id == customerId }
+            emit(AddressResponse(userAddresses))
+        }
     }
 
     override suspend fun getAddressDetails(
         customerId: Long,
         addressId: Long
     ): Flow<CustomerAddress> {
-        TODO("Not yet implemented")
+        return flow {
+            emit(CustomerAddress(addresses[customerId.toInt()]))
+        }
     }
 
     override suspend fun updateUserAddress(
@@ -353,18 +471,31 @@ class FakeRepository : ProductsRepository {
         addressId: Long,
         address: AddressRequest
     ): Flow<CustomerAddress> {
-        TODO("Not yet implemented")
+        return flow {
+            val afterCustomerId = addresses.filter { it.customer_id == customerId }
+            val afterAddressId = afterCustomerId.find { it.id == addressId }
+            afterAddressId?.let { CustomerAddress(it) }?.let { emit(it) }
+        }
     }
 
     override suspend fun setDefaultAddress(
         customerId: Long,
         addressId: Long
     ): Flow<CustomerAddress> {
-        TODO("Not yet implemented")
+        return flow {
+            val index = addresses.indexOfFirst { it.id == addressId && it.customer_id == customerId }
+            if (index != -1) {
+                addresses.forEach { it.default = false }
+                addresses[index].default = true
+                emit(CustomerAddress(addresses[index]))
+            } else {
+                throw NoSuchElementException("Address not found to set as default")
+            }
+        }
     }
 
     override suspend fun deleteAddress(customerId: Long, addressId: Long) {
-        TODO("Not yet implemented")
+        addresses.removeIf { it.id == addressId && it.customer_id == customerId }
     }
 
     override fun getUserId(): Long {
@@ -376,7 +507,7 @@ class FakeRepository : ProductsRepository {
     }
 
     override fun getUserEmail(): String {
-        TODO("Not yet implemented")
+        return  emails[0]
     }
 
     override fun setUserEmail(string: String) {
