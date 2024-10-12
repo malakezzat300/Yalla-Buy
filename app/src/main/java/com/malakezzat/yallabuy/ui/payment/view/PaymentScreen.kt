@@ -67,6 +67,7 @@ import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
 import com.malakezzat.yallabuy.ui.theme.AppColors
 import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
 import kotlinx.coroutines.delay
+import java.time.LocalDate
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,6 +87,9 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
     var defaultAddress by remember { mutableStateOf(Address()) }
     var isLoading by remember { mutableStateOf(false) }
     var navigateAfterDelay by remember { mutableStateOf(false) }
+    val currentMonth = LocalDate.now().monthValue
+    val currentYear = LocalDate.now().year % 100
+    var vaildData by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val userId by remember {
@@ -368,17 +372,90 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
                         onClick = {
                             if (address.isNotBlank()) {
                                 if (selectedPaymentMethod == "Credit Card") {
-                                    if (cardHolderName.isNotBlank() && cardNumber.isNotBlank()
-                                        && expiration.text.isNotBlank() && cvv.isNotBlank()
-                                    ) {
-                                        isLoading = true
-                                        navigateAfterDelay = true
-                                    } else {
+                                    if (cardHolderName.isBlank()){
+                                        vaildData = false
                                         Toast.makeText(
                                             context,
-                                            "Please fill all fields",
+                                            "Please Enter Card Holder Name",
                                             Toast.LENGTH_SHORT
                                         ).show()
+                                    } else {
+                                        vaildData = true
+                                    }
+                                    if(cardNumber.isNotBlank()) {
+                                        if ((cardNumber.length == 16).not()) {
+                                            vaildData = false
+                                            Toast.makeText(
+                                                context,
+                                                "Please Enter a valid Card Number",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            vaildData = true
+                                        }
+                                    } else {
+                                        vaildData = false
+                                        Toast.makeText(
+                                            context,
+                                            "Please Enter a Card Number",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                    if(expiration.text.isNotBlank() && expiration.text.length == 5) {
+                                        Log.i("dateTest", "PaymentMethodScreen: giving month ${expiration.text.substring(0, 2)}")
+                                        Log.i("dateTest", "PaymentMethodScreen: currentMonth ${currentMonth}")
+                                        Log.i("dateTest", "PaymentMethodScreen: giving year ${expiration.text.takeLast(2)}")
+                                        Log.i("dateTest", "PaymentMethodScreen: currentYear ${currentYear}")
+
+                                        if ((((expiration.text.substring(0, 2)
+                                                .toInt() > currentMonth) &&
+                                                    (expiration.text.substring(0, 2)
+                                                        .toInt() <= 12)
+                                                    && (expiration.text.takeLast(2)
+                                                .toInt() == currentYear)) ||
+                                                    ((expiration.text.substring(0, 2).toInt() <= 12) &&
+                                            (expiration.text.takeLast(2).toInt() > currentYear))).not()
+                                        ) {
+                                            vaildData = false
+                                            Toast.makeText(
+                                                context,
+                                                "Please Enter a valid Expiration Date",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            vaildData = true
+                                        }
+                                    } else {
+                                        vaildData = false
+                                        Toast.makeText(
+                                            context,
+                                            "Please Enter a valid Expiration Date",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                    if (cvv.isNotBlank()) {
+                                        if ((cvv.length == 3).not()) {
+                                            vaildData = false
+                                            Toast.makeText(
+                                                context,
+                                                "Please Enter a valid Expiration CVV",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            vaildData = true
+                                        }
+                                    } else {
+                                        vaildData = false
+                                        Toast.makeText(
+                                            context,
+                                            "Please Enter a CVV",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+
+                                    }
+                                    if(vaildData) {
+                                        isLoading = true
+                                        navigateAfterDelay = true
                                     }
                                 } else {
                                     isLoading = true
