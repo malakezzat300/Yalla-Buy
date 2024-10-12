@@ -172,11 +172,33 @@ fun ProductsByBrandScreen(
     val productState by viewModel.productList.collectAsStateWithLifecycle()
     val categoryId: Long? = id?.toLongOrNull()
 
+    val draftOrderId by viewModel.draftOrderId.collectAsState()
+    val wishListDraftOrderState by viewModel.wishListDraftOrder.collectAsState()
+
+    var draftOrderIdSaved by remember { mutableLongStateOf(0L) }
+    var wishListDraftOrder by remember { mutableStateOf(DraftOrder(0L, "", listOf(), "")) }
+
+    when (draftOrderId) {
+        is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(draftOrderId as ApiState.Error).message}")
+        ApiState.Loading -> {}
+        is ApiState.Success -> {draftOrderIdSaved = (draftOrderId as ApiState.Success).data.draft_order.id ?: 0L
+            Log.i("TAGGGGG", "ProductsByCategoryScreen: ${(draftOrderId as ApiState.Success).data.draft_order.id}")
+        }
+        else -> {}
+    }
+    when (wishListDraftOrderState) {
+        is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(wishListDraftOrderState as ApiState.Error).message}")
+        ApiState.Loading -> {}
+        is ApiState.Success -> wishListDraftOrder = (wishListDraftOrderState as ApiState.Success).data
+    }
+
     LaunchedEffect(Unit) {
         //Log.d(TAG, categoriesState.toString())
         categoryId?.let {
             viewModel.getProductsByCollectionId(it)
+
         }
+        viewModel.getDraftOrders()
     }
     Scaffold(
         topBar = { body?.let { CustomTopBar(navController, it) } },
@@ -201,7 +223,7 @@ fun ProductsByBrandScreen(
 
                 is ApiState.Success -> {
                     val products = (productState as ApiState.Success<List<Product>>).data
-                   // LatestProductsSectionById(products, navController,viewModel,oldDraftOrder)
+                    LatestProductsSectionById(products, navController,viewModel,wishListDraftOrder)
                 }
 
                 is ApiState.Error -> {
