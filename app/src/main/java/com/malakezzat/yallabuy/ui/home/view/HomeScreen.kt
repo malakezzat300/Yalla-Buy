@@ -2,9 +2,13 @@ package com.malakezzat.yallabuy.ui.home.view
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -170,9 +174,14 @@ fun HomeScreen(
                 }
 
                 is ApiState.Error -> {
-                    Text(
+                    /*Text(
                         text = "Error: ${(brandsState as ApiState.Error).message}",
                         color = Color.Red
+                    )*/
+                    Log.i(TAG, "HomeScreen: Error: ${(brandsState as ApiState.Error).message}")
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally),
+                        color = AppColors.Teal
+
                     )
                 }
             }
@@ -230,53 +239,63 @@ fun BrandsList(brands: List<SmartCollection>, navController: NavController) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text("Brands", color = AppColors.Teal, style = MaterialTheme.typography.titleLarge)
-            /*Text(
-                "SEE ALL", style =  MaterialTheme.typography.titleSmall,
-                color = AppColors.RoseLight
-            )*/
         }
-        LazyRow(
-            modifier = Modifier.padding(top = 8.dp)
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(4),
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .height(290.dp)
+                .fillMaxWidth()
+            ,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             itemsIndexed(brands) { index, brand ->
-                var isSelected by remember { mutableStateOf(false) }
-
-                Card(
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .width(120.dp)
-                        .clickable {
-                            Log.i(TAG, "BrandsList: clicked")
-                            navController.navigate("${Screen.ProductsByBrandScreen.route}/${brand.id.toString()}/${brand.title}")
-                        },
-                    shape = RoundedCornerShape(50.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                val visibleState = remember { mutableStateOf(false) }
+                LaunchedEffect(Unit) {
+                    delay(index * 200L)
+                    visibleState.value = true
+                }
+                AnimatedVisibility(
+                    visible = visibleState.value,
+                    enter = slideInHorizontally(
+                        initialOffsetX = { -it },
+                        animationSpec = tween(durationMillis = 2000)
+                    ) + fadeIn(animationSpec = tween(durationMillis = 1500)),
+                    modifier = Modifier.padding(4.dp)
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
+                    Card(
                         modifier = Modifier
-                            .padding(8.dp) // Padding inside the card
+                            .fillMaxWidth()
+                            .clickable {
+                                Log.i(TAG, "BrandsList: clicked${brand.id}/${brand.title}")
+                                navController.navigate("${Screen.ProductsByBrandScreen.route}/${brand.id}/${brand.title}")
+                            },
+                        shape = RoundedCornerShape(50.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White)
                     ) {
-                        Image(
-                            painter = rememberImagePainter(brand.image.src),
-                            contentDescription = brand.title,
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(1f) // Make the image square
-                        )
-                        /*Text(
-                            text = brand.title,
-                            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium),
-                            color = Color.Black,
-                            textAlign = TextAlign.Center
-                        )*/
+                                .padding(8.dp) // Padding inside the card
+                        ) {
+                            Image(
+                                painter = rememberImagePainter(brand.image.src),
+                                contentDescription = brand.title,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(1f) // Make the image square
+                            )
+                        }
                     }
                 }
             }
         }
     }
 }
+
+
 
 
 //@Preview(showBackground = true, showSystemUi = true)
@@ -442,7 +461,6 @@ fun CouponsCard(code: String?) {
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun CategoriesSection(categories: List<CustomCollection>, navController: NavController) {
-    //categories: List<CustomCollection>
     Log.d(TAG, "3. ${categories}")
     Column(modifier = Modifier.padding(16.dp)) {
         Row(
@@ -457,11 +475,31 @@ fun CategoriesSection(categories: List<CustomCollection>, navController: NavCont
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             itemsIndexed(categories) { index, category ->
-                CategoryItem(category, navController)
+                val visibleState = remember { mutableStateOf(false) }
+                LaunchedEffect(Unit) {
+                    delay(index * 200L)
+                    visibleState.value = true
+                }
+
+                AnimatedVisibility(
+                    visible = visibleState.value,
+                    enter = slideInHorizontally(
+                        initialOffsetX = { -it },
+                        animationSpec = tween(durationMillis = 2000)
+                    ) + fadeIn(animationSpec = tween(durationMillis = 2500)),
+                    exit = slideOutHorizontally(
+                        targetOffsetX = { -it },
+                        animationSpec = tween(durationMillis = 300)
+                    ),
+                    modifier = Modifier.padding(4.dp)
+                ) {
+                    CategoryItem(category, navController)
+                }
             }
         }
     }
 }
+
 
 
 //@Preview(showBackground = true, showSystemUi = true)
@@ -470,7 +508,7 @@ fun CategoryItem(category: CustomCollection, navController: NavController) {
     Log.d(TAG, "4. ${category}")
     Card(
         modifier = Modifier
-            .size(120.dp)
+            .size(100.dp)
             .clickable {
                 navController.navigate("${Screen.ProductsByCategoryScreen.route}/${category.id.toString()}/${category.body_html}")
             },
