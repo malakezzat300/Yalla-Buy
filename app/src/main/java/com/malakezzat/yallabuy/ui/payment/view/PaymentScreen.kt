@@ -50,11 +50,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,6 +70,7 @@ import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
 import com.malakezzat.yallabuy.ui.theme.AppColors
 import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
 import kotlinx.coroutines.delay
+import java.time.LocalDate
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,6 +90,9 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
     var defaultAddress by remember { mutableStateOf(Address()) }
     var isLoading by remember { mutableStateOf(false) }
     var navigateAfterDelay by remember { mutableStateOf(false) }
+    val currentMonth = LocalDate.now().monthValue
+    val currentYear = LocalDate.now().year % 100
+    var vaildData by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val userId by remember {
@@ -193,21 +200,20 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
                         }
                     }
                     Spacer(modifier = Modifier.width(4.dp))
-                    if (address.isBlank()) {
-                        Button(
-                            onClick = {
-                                navController.navigate(Screen.AddressScreen.createRoute(0L))
-                            },
-                            modifier = Modifier
-                                .width(80.dp)
-                                .height(64.dp)
-                                .padding(top = 8.dp),
-                            shape = RoundedCornerShape(30.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
-                        ) {
-                            Text("New")
-                        }
+                    Button(
+                        onClick = {
+                            navController.navigate(Screen.AddressScreen.createRoute(0L))
+                        },
+                        modifier = Modifier
+                            .width(80.dp)
+                            .height(64.dp)
+                            .padding(top = 8.dp),
+                        shape = RoundedCornerShape(30.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
+                    ) {
+                        Text("New")
                     }
+
                 }
 
 
@@ -249,7 +255,21 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
                     OutlinedTextField(
                         value = cardHolderName,
                         onValueChange = { cardHolderName = it },
-                        label = { Text("Card Holder Name") },
+                        label = {  Text(
+                            text = buildAnnotatedString {
+                                append("Card Holder Name ")
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = Color.Red,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 24.sp
+                                    )
+                                ) {
+                                    append("*")
+                                }
+                            },
+                            fontSize = 18.sp
+                        ) },
                         placeholder = { Text("Enter card holder name") },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(30.dp),
@@ -273,7 +293,21 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
                                 cardNumber = it
                             }
                         },
-                        label = { Text("Card Number") },
+                        label = { Text(
+                            text = buildAnnotatedString {
+                                append("Card Number ")
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = Color.Red,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 24.sp
+                                    )
+                                ) {
+                                    append("*")
+                                }
+                            },
+                            fontSize = 18.sp
+                        ) },
                         placeholder = { Text("4111 1111 1111 1111") },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(30.dp),
@@ -325,7 +359,21 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
                                     }
                                 }
                             },
-                            label = { Text("Expiration") },
+                            label = { Text(
+                                text = buildAnnotatedString {
+                                    append("Expiration ")
+                                    withStyle(
+                                        style = SpanStyle(
+                                            color = Color.Red,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 24.sp
+                                        )
+                                    ) {
+                                        append("*")
+                                    }
+                                },
+                                fontSize = 18.sp
+                            ) },
                             placeholder = { Text("MM/YY") },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(30.dp),
@@ -347,7 +395,21 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
                                     cvv = it
                                 }
                             },
-                            label = { Text("CVV") },
+                            label = { Text(
+                                text = buildAnnotatedString {
+                                    append("CVV ")
+                                    withStyle(
+                                        style = SpanStyle(
+                                            color = Color.Red,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 24.sp
+                                        )
+                                    ) {
+                                        append("*")
+                                    }
+                                },
+                                fontSize = 18.sp
+                            ) },
                             placeholder = { Text("123") },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(30.dp),
@@ -369,17 +431,90 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
                         onClick = {
                             if (address.isNotBlank()) {
                                 if (selectedPaymentMethod == "Credit Card") {
-                                    if (cardHolderName.isNotBlank() && cardNumber.isNotBlank()
-                                        && expiration.text.isNotBlank() && cvv.isNotBlank()
-                                    ) {
-                                        isLoading = true
-                                        navigateAfterDelay = true
-                                    } else {
+                                    if (cardHolderName.isBlank()){
+                                        vaildData = false
                                         Toast.makeText(
                                             context,
-                                            "Please fill all fields",
+                                            "Please Enter Card Holder Name",
                                             Toast.LENGTH_SHORT
                                         ).show()
+                                    } else {
+                                        vaildData = true
+                                    }
+                                    if(cardNumber.isNotBlank()) {
+                                        if ((cardNumber.length == 16).not()) {
+                                            vaildData = false
+                                            Toast.makeText(
+                                                context,
+                                                "Please Enter a valid Card Number",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            vaildData = true
+                                        }
+                                    } else {
+                                        vaildData = false
+                                        Toast.makeText(
+                                            context,
+                                            "Please Enter a Card Number",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                    if(expiration.text.isNotBlank() && expiration.text.length == 5) {
+                                        Log.i("dateTest", "PaymentMethodScreen: giving month ${expiration.text.substring(0, 2)}")
+                                        Log.i("dateTest", "PaymentMethodScreen: currentMonth ${currentMonth}")
+                                        Log.i("dateTest", "PaymentMethodScreen: giving year ${expiration.text.takeLast(2)}")
+                                        Log.i("dateTest", "PaymentMethodScreen: currentYear ${currentYear}")
+
+                                        if ((((expiration.text.substring(0, 2)
+                                                .toInt() > currentMonth) &&
+                                                    (expiration.text.substring(0, 2)
+                                                        .toInt() <= 12)
+                                                    && (expiration.text.takeLast(2)
+                                                .toInt() == currentYear)) ||
+                                                    ((expiration.text.substring(0, 2).toInt() <= 12) &&
+                                            (expiration.text.takeLast(2).toInt() > currentYear))).not()
+                                        ) {
+                                            vaildData = false
+                                            Toast.makeText(
+                                                context,
+                                                "Please Enter a valid Expiration Date",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            vaildData = true
+                                        }
+                                    } else {
+                                        vaildData = false
+                                        Toast.makeText(
+                                            context,
+                                            "Please Enter a valid Expiration Date",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                    if (cvv.isNotBlank()) {
+                                        if ((cvv.length == 3).not()) {
+                                            vaildData = false
+                                            Toast.makeText(
+                                                context,
+                                                "Please Enter a valid Expiration CVV",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            vaildData = true
+                                        }
+                                    } else {
+                                        vaildData = false
+                                        Toast.makeText(
+                                            context,
+                                            "Please Enter a CVV",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+
+                                    }
+                                    if(vaildData) {
+                                        isLoading = true
+                                        navigateAfterDelay = true
                                     }
                                 } else {
                                     isLoading = true
