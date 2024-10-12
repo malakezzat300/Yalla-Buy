@@ -21,6 +21,7 @@ import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.DraftOrderRequest
 import com.malakezzat.yallabuy.model.DraftOrderResponse
 import com.malakezzat.yallabuy.model.DraftOrdersResponse
+import com.malakezzat.yallabuy.model.ImageCategory
 import com.malakezzat.yallabuy.model.LineItem
 import com.malakezzat.yallabuy.model.Order
 import com.malakezzat.yallabuy.model.PriceRule
@@ -218,8 +219,51 @@ class FakeRepository : ProductsRepository {
     }
 
     override suspend fun getCategories(): Flow<List<CustomCollection>> {
-        TODO("Not yet implemented")
+        val customCollections = listOf(
+            CustomCollection(
+                published_scope = "global",
+                updated_at = "2024-10-11T12:00:00Z",
+                admin_graphql_api_id = "gid://shopify/CustomCollection/1",
+                handle = "collection-1",
+                id = 1L,
+                title = "Winter Collection",
+                published_at = "2024-06-01T12:00:00Z",
+                sort_order = "best-selling",
+                image = ImageCategory(
+                    src = "https://example.com/image1.jpg",
+                    width = 800,
+                    created_at = "2024-06-01T12:00:00Z",
+                    height = 600
+                ),
+                body_html = "<p>Summer collection description</p>"
+            ),
+            CustomCollection(
+                published_scope = "global",
+                updated_at = "2024-10-11T12:00:00Z",
+                admin_graphql_api_id = "gid://shopify/CustomCollection/2",
+                handle = "collection-2",
+                id = 2L,
+                title = "Winter Collection",
+                published_at = "2024-10-01T12:00:00Z",
+                sort_order = "alphabetical",
+                image = ImageCategory(
+                    src = "https://example.com/image2.jpg",
+                    width = 800,
+                    created_at = "2024-10-01T12:00:00Z",
+                    height = 600
+                ),
+                body_html = "<p>Winter collection description</p>"
+            )
+        )
+
+        return flow {
+            emit(customCollections)
+        }.catch { e ->
+            Log.e("FakeRepository", "Error fetching categories", e)
+            emit(emptyList())
+        }
     }
+
 
     override suspend fun getBrands(): Flow<List<SmartCollection>> {
         TODO("Not yet implemented")

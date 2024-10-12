@@ -4,8 +4,7 @@ import com.malakezzat.yallabuy.data.remot.FakeRemoteDataSource
 import com.malakezzat.yallabuy.data.sharedpref.FakeSharedDataSource
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.Customerr
-import com.malakezzat.yallabuy.model.Image
-import com.malakezzat.yallabuy.model.Product
+
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.`is`
