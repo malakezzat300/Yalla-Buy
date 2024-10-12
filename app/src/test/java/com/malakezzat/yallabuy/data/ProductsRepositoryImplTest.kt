@@ -2,12 +2,14 @@ package com.malakezzat.yallabuy.data
 
 import com.malakezzat.yallabuy.data.remot.FakeRemoteDataSource
 import com.malakezzat.yallabuy.data.sharedpref.FakeSharedDataSource
+import com.malakezzat.yallabuy.model.CustomerRequest
+import com.malakezzat.yallabuy.model.Customerr
 import com.malakezzat.yallabuy.model.Image
 import com.malakezzat.yallabuy.model.Product
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.instanceOf
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.core.Is.`is`
 import org.junit.Before
 import org.junit.Test
 
@@ -103,6 +105,34 @@ class ProductsRepositoryImplTest{
         }
     }
 
+    @Test
+    fun createCustomer_returns_created_customer() = runTest {
+        val customerRequest = CustomerRequest(
+            customer = Customerr(
+                first_name = "John",
+                last_name = "Doe",
+                email = "john.doe@example.com",
+                phone = "1234567890"
+            )
+        )
 
-
+        val result = productsRepositoryImpl.createCustomer(customerRequest)
+        result.collect { customerResponse ->
+            // Assert that the response contains the created customer details
+            assertThat(customerResponse.customer.first_name, `is`("John"))
+            assertThat(customerResponse.customer.last_name, `is`("Doe"))
+            assertThat(customerResponse.customer.email, `is`("john.doe@example.com"))
+            assertThat(customerResponse.customer.phone, `is`("1234567890"))
+            assertThat(customerResponse.customer.orders_count, `is`(0))
+        }
+    }
+    @Test
+    fun getProductById_returns_product_when_found() = runTest {
+        val productId = 1L
+        val result = productsRepositoryImpl.getProductById(productId)
+        result.collect { productResponse ->
+            assertThat(productResponse.product.id, `is`(productId))
+            assertThat(productResponse.product.title, `is`("Cool T-Shirt"))
+        }
+    }
 }

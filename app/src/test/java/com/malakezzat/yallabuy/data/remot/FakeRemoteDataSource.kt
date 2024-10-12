@@ -9,6 +9,7 @@ import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.Customer
 import com.malakezzat.yallabuy.model.CustomerAddress
+import com.malakezzat.yallabuy.model.CustomerDetails
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
 import com.malakezzat.yallabuy.model.CustomerSearchRespnse
@@ -294,11 +295,62 @@ class FakeRemoteDataSource(
     }
 
     override suspend fun getProductById(id: Long): Flow<ProductResponse> {
-        TODO("Not yet implemented")
+        return flow {
+            val product = productsList.find { it.id == id }
+            if (product != null) {
+                emit(ProductResponse(product = product))
+            } else {
+                emit(ProductResponse(product = Product(
+                    id = 1,
+                    title = "Cool T-Shirt",
+                    body_html = "<p>This is a cool t-shirt.</p>",
+                    vendor = "T-Shirt Co.",
+                    product_type = "Apparel",
+                    tags = "tshirt,cool,apparel",
+                    images = emptyList(),
+                    image = Image(0L,""),
+                    variants = emptyList(),
+                    options = emptyList()
+                )))
+            }
+        }.catch {
+            emit(ProductResponse(product = Product(
+                id = -1,
+                title = "Not Found",
+                body_html = "<p>Product not found.</p>",
+                vendor = "Unknown",
+                product_type = "Unknown",
+                tags = "",
+                images = emptyList(),
+                image = Image(0L, ""),
+                variants = emptyList(),
+                options = emptyList()
+            )))
+        }
     }
 
     override suspend fun createCustomer(customerRequest: CustomerRequest): Flow<CustomerResponse> {
-        TODO("Not yet implemented")
+        return flow {
+            val createdCustomer = CustomerDetails(
+                id = 1,  // Simulated ID, typically this would come from the backend
+                email = customerRequest.customer.email,
+                first_name = customerRequest.customer.first_name,
+                last_name = customerRequest.customer.last_name,
+                phone = customerRequest.customer.phone,
+                created_at = "2023-10-11T12:00:00Z", // Simulated creation date
+                orders_count = 0 // Initially, the order count is 0
+            )
+            emit(CustomerResponse(customer = createdCustomer))
+        }.catch { e ->
+            // Handle any errors that may occur
+            emit(CustomerResponse(customer = CustomerDetails(id = 0,
+                email = "",
+                first_name = null,
+                last_name = null,
+                phone = null,
+                created_at = "",
+                orders_count = 0)))
+        }
     }
 
     override suspend fun getCustomerByEmai(customer: String): Flow<CustomerSearchRespnse> {
