@@ -11,6 +11,7 @@ import com.malakezzat.yallabuy.model.CurrencyResponse
 import com.malakezzat.yallabuy.model.CustomCollection
 import com.malakezzat.yallabuy.model.Customer
 import com.malakezzat.yallabuy.model.CustomerAddress
+import com.malakezzat.yallabuy.model.CustomerDetails
 import com.malakezzat.yallabuy.model.CustomerRequest
 import com.malakezzat.yallabuy.model.CustomerResponse
 import com.malakezzat.yallabuy.model.CustomerSearchRespnse
@@ -29,6 +30,7 @@ import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.ProductResponse
 import com.malakezzat.yallabuy.model.SmartCollection
 import com.malakezzat.yallabuy.model.VariantResponse
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -205,6 +207,8 @@ class FakeRepository : ProductsRepository {
         price_rule = priceRule1
     )
 
+    val customerResponse = CustomerResponse(CustomerDetails(1L, "tastName@gmail.com", "testName","","",""))
+
     override suspend fun getAllProducts(): Flow<List<Product>> {
         TODO("Not yet implemented")
     }
@@ -260,7 +264,10 @@ class FakeRepository : ProductsRepository {
     }
 
     override suspend fun createCustomer(customerRequest: CustomerRequest): Flow<CustomerResponse> {
-        TODO("Not yet implemented")
+        return flow {
+           //delay(1000)
+            emit(customerResponse)
+        }
     }
 
     override suspend fun getCustomerByEmail(customer: String): Flow<CustomerSearchRespnse> {
