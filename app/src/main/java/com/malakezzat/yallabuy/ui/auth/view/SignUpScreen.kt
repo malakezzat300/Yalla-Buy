@@ -270,7 +270,7 @@ fun SignupScreen(viewModel: SignUpViewModel, navController: NavController) {
         // Signup with Google text
 
         Text(
-            text = "-OR Signup with Google-",
+            text = "OR Signup with Google",
             fontSize = 16.sp,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )

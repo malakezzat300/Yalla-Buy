@@ -1,6 +1,8 @@
 package com.malakezzat.yallabuy
 
 import android.content.Context
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -29,7 +31,7 @@ import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
 import com.malakezzat.yallabuy.ui.wishlist.WishlistViewModelFactory
 
 class MainActivity : ComponentActivity() {
-    private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var networkChangeReceiver: NetworkChangeReceiver
     private val repo by lazy {
         ProductsRepositoryImpl.getInstance(
             ProductsRemoteDataSourceImpl.
@@ -80,7 +82,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         FirebaseApp.initializeApp(this)
+        networkChangeReceiver = NetworkChangeReceiver { isConnected ->
+            // Update the Snackbar state
+            //showSnackbar(isConnected)
+        }
 
+        // Register the receiver
+        val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkChangeReceiver, filter)
         enableEdgeToEdge()
         setContent {
           YallaBuyTheme {
