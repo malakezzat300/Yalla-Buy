@@ -129,9 +129,13 @@ fun HomeScreen(
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
     LaunchedEffect(Unit) {
-        Log.d(TAG, categoriesState.toString())
-        viewModel.getAllProducts()
+        delay(500)
+        viewModel.getBrands()
+        delay(200)
         viewModel.getAllCategories()
+        delay(200)
+        viewModel.getAllProducts()
+        delay(200)
         viewModel.getDraftOrders()
     }
     when (draftOrderId) {
@@ -140,7 +144,6 @@ fun HomeScreen(
         is ApiState.Success -> {
             draftOrderIdSaved = (draftOrderId as ApiState.Success).data.draft_order.id ?: 0L
         }
-        else -> {}
     }
     when (wishListDraftOrderState) {
         is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(wishListDraftOrderState as ApiState.Error).message}")

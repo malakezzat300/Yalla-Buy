@@ -6,10 +6,14 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.os.AsyncTask
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.FirebaseApp
 import com.malakezzat.yallabuy.data.ProductsRepositoryImpl
@@ -32,6 +36,9 @@ import com.malakezzat.yallabuy.ui.settings.viewmodel.SettingsViewModelFactory
 import com.malakezzat.yallabuy.ui.shoppingcart.viewmodel.ShoppingCartViewModelFactory
 import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
 import com.malakezzat.yallabuy.ui.wishlist.WishlistViewModelFactory
+import java.io.IOException
+import java.net.InetSocketAddress
+import java.net.Socket
 
 class MainActivity : ComponentActivity() {
     private val repo by lazy {
@@ -81,41 +88,45 @@ class MainActivity : ComponentActivity() {
         SettingsViewModelFactory(repo)
     }
     private lateinit var connectivityManager: ConnectivityManager
+    private val networkViewModel: NetworkViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialize Firebase and other components
         FirebaseApp.initializeApp(this)
-
-        // Initialize ConnectivityManager
         connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-        // Register Network Callback
         registerNetworkCallback()
 
         setContent {
+            val isConnected by networkViewModel.isConnected.observeAsState(true)
+
             YallaBuyTheme {
-                NavigationApp(
-                    homeScreenViewModelFactory,
-                    signUpViewModelFactory,
-                    logInViewModelFactory,
-                    paymentViewModelFactory,
-                    searchViewModelFactory,
-                    shoppingCartViewModelFactory,
-                    productInfoViewModelFactory,
-                    categoriesScreenViewModelFactory,
-                    productsByCollectionIdViewModelFactory,
-                    wishlistViewModelFactory,
-                    ordersViewModelFactory,
-                    settingsViewModelFactory,
-                    profileScreenViewModelFactory
-                )
+                if (isConnected) {
+                    // Show the regular app UI
+                    NavigationApp(
+                        homeScreenViewModelFactory,
+                        signUpViewModelFactory,
+                        logInViewModelFactory,
+                        paymentViewModelFactory,
+                        searchViewModelFactory,
+                        shoppingCartViewModelFactory,
+                        productInfoViewModelFactory,
+                        categoriesScreenViewModelFactory,
+                        productsByCollectionIdViewModelFactory,
+                        wishlistViewModelFactory,
+                        ordersViewModelFactory,
+                        settingsViewModelFactory,
+                        profileScreenViewModelFactory
+                    )
+                } else {
+                    // Show no internet connection screen with Lottie animation
+                    NoInternetScreen()
+                }
             }
         }
     }
 
-    // Register the network callback to listen for connectivity changes
     private fun registerNetworkCallback() {
         val networkRequest = NetworkRequest.Builder()
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
@@ -123,30 +134,38 @@ class MainActivity : ComponentActivity() {
 
         connectivityManager.registerNetworkCallback(networkRequest, object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
-                // Network is available, notify UI or handle logic here
-                println("Network is available")
+                // When network becomes available, check for internet access
+                hasInternetAccess { hasInternet ->
+                    networkViewModel.updateNetworkStatus(hasInternet)
+                }
             }
 
             override fun onLost(network: Network) {
-                // Network is lost, notify UI or handle logic here
-                println("Network is lost")
-            }
-
-            override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
-                val isConnected = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                if (isConnected) {
-                    println("Network capabilities changed: Internet available")
-                } else {
-                    println("Network capabilities changed: No Internet")
-                }
+                // Network lost, no internet connection
+                networkViewModel.updateNetworkStatus(false)
             }
         })
     }
 
+
+    fun hasInternetAccess(callback: (Boolean) -> Unit) {
+        AsyncTask.execute {
+            try {
+                // Try connecting to a public DNS (Google's in this case)
+                val socket = Socket()
+                socket.connect(InetSocketAddress("8.8.8.8", 53), 5000)
+                socket.close()
+                callback(true)
+            } catch (e: IOException) {
+                callback(false)
+            }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        // Unregister network callback if needed to avoid memory leaks
         connectivityManager.unregisterNetworkCallback(ConnectivityManager.NetworkCallback())
     }
+
 }
 
