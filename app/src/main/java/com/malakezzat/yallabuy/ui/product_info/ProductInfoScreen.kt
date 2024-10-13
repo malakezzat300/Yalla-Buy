@@ -93,6 +93,12 @@ fun ProductInfoScreen(
     var quantity by remember { mutableStateOf(0L) }
     var index by remember { mutableStateOf(0L) }
 
+    var wishListAddButton by remember { mutableStateOf(false) }
+    var shoppingCartAddButton by remember { mutableStateOf("") }
+
+    var isAddedWishList by remember { mutableStateOf(false) }
+    var isAddedShoppingCart by remember { mutableStateOf(false) }
+
     var variant by remember { mutableStateOf(0) }
 
     when (draftOrderId) {
@@ -106,12 +112,34 @@ fun ProductInfoScreen(
     when (shoppingCartDraftOrderState) {
         is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(shoppingCartDraftOrderState as ApiState.Error).message}")
         ApiState.Loading -> {}
-        is ApiState.Success -> shoppingCartDraftOrder = (shoppingCartDraftOrderState as ApiState.Success).data
+        is ApiState.Success -> {
+            shoppingCartDraftOrder = (shoppingCartDraftOrderState as ApiState.Success).data
+            isAddedShoppingCart = true
+        }
     }
     when (wishListDraftOrderState) {
         is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(wishListDraftOrderState as ApiState.Error).message}")
         ApiState.Loading -> {}
-        is ApiState.Success -> wishListDraftOrder = (wishListDraftOrderState as ApiState.Success).data
+        is ApiState.Success -> {
+            wishListDraftOrder = (wishListDraftOrderState as ApiState.Success).data
+            isAddedWishList = true
+        }
+    }
+
+    LaunchedEffect(shoppingCartAddButton,isAddedShoppingCart) {
+        if(shoppingCartAddButton.isNotBlank() && isAddedShoppingCart){
+            Toast.makeText(context, shoppingCartAddButton, Toast.LENGTH_SHORT).show()
+            shoppingCartAddButton = ""
+            isAddedShoppingCart = false
+        }
+    }
+
+    LaunchedEffect(wishListAddButton,isAddedWishList) {
+        if(wishListAddButton && isAddedWishList){
+            Toast.makeText(context, "added to WishList", Toast.LENGTH_SHORT).show()
+            wishListAddButton = false
+            isAddedWishList = false
+        }
     }
 
     // Fetch product data by ID
@@ -176,7 +204,13 @@ fun ProductInfoScreen(
                             tint = Color.White
                         )
                     }
-                    AddToFavorites(viewModel, product, FirebaseAuth.getInstance().currentUser?.email.toString(), wishListDraftOrder,navController)
+                    AddToFavorites(viewModel,
+                        product,
+                        FirebaseAuth.getInstance().currentUser?.email.toString(),
+                        wishListDraftOrder,
+                        navController){ added ->
+                        wishListAddButton = added
+                    }
                 }
 
                 // Product Details
@@ -280,7 +314,9 @@ fun ProductInfoScreen(
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     AddToCart(viewModel, product, FirebaseAuth.getInstance().currentUser?.email.toString(), shoppingCartDraftOrder,
-                                        price,size,color,index,navController)
+                                        price,size,color,index,navController){ added ->
+                                        shoppingCartAddButton = added
+                                    }
 
                                 }
                             }
@@ -301,7 +337,12 @@ fun ProductInfoScreen(
 
 
 @Composable
-fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : String,oldDraftOrder : DraftOrder,navController: NavController){
+fun AddToFavorites(viewModel: ProductInfoViewModel,
+                   product : Product,
+                   email : String,
+                   oldDraftOrder : DraftOrder,
+                   navController: NavController,
+                   onAddedToFavorite : (Boolean) -> Unit){
     var geustClicked by remember { mutableStateOf(false) }
     var clicked by remember { mutableStateOf(false) }
     if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
@@ -348,6 +389,7 @@ fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : Str
                 oldDraftOrder.id?.let { viewModel.updateDraftOrder(it,draftOrderRequest) }
             }
         }
+        onAddedToFavorite(true)
     }) {
         if (clicked) {
             Icon(
@@ -398,7 +440,16 @@ fun AddToFavorites(viewModel: ProductInfoViewModel,product : Product,email : Str
 }
 
 @Composable
-fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,oldDraftOrder : DraftOrder,price : String,size: String,color: String,id : Long,navController: NavController) {
+fun AddToCart(viewModel: ProductInfoViewModel,
+              product : Product,
+              email : String,
+              oldDraftOrder : DraftOrder,
+              price : String,
+              size: String,
+              color: String,
+              id : Long,
+              navController: NavController,
+              onAddedToCart : (String) -> Unit) {
    var geustClicked by remember { mutableStateOf(false) }
     val context = LocalContext.current
     Row(modifier = Modifier.fillMaxWidth()) {
@@ -446,6 +497,7 @@ fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,o
                     DraftOrder(note = "shoppingCart", line_items = lineItems, email = email)
                 val draftOrderRequest = DraftOrderRequest(draftOrder)
                 viewModel.createDraftOrder(draftOrderRequest)
+                onAddedToCart("Added to Cart")
             } else {
                 if (!oldDraftOrder.line_items.contains(
                         LineItem(
@@ -476,9 +528,12 @@ fun AddToCart(viewModel: ProductInfoViewModel,product : Product,email : String,o
                         viewModel.updateDraftOrder(it, draftOrderRequest)
 
                     }
-
+                    onAddedToCart("Added to Cart")
+                } else {
+                    onAddedToCart("Already in Shopping Cart")
                 }
             }
+
         }, modifier = Modifier.weight(1f),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.Teal),
             border = BorderStroke(1.dp, AppColors.Teal)
