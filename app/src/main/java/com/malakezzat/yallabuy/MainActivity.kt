@@ -142,7 +142,9 @@ class MainActivity : ComponentActivity() {
 
             override fun onLost(network: Network) {
                 // Network lost, no internet connection
-                networkViewModel.updateNetworkStatus(false)
+                hasInternetAccess { hasInternet ->
+                    networkViewModel.updateNetworkStatus(hasInternet)
+                }
             }
         })
     }
