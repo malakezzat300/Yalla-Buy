@@ -1,6 +1,11 @@
 package com.malakezzat.yallabuy
 
 import android.content.Context
+import android.content.IntentFilter
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -29,7 +34,6 @@ import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
 import com.malakezzat.yallabuy.ui.wishlist.WishlistViewModelFactory
 
 class MainActivity : ComponentActivity() {
-    private lateinit var googleSignInClient: GoogleSignInClient
     private val repo by lazy {
         ProductsRepositoryImpl.getInstance(
             ProductsRemoteDataSourceImpl.
@@ -76,31 +80,73 @@ class MainActivity : ComponentActivity() {
     private val settingsViewModelFactory by lazy {
         SettingsViewModelFactory(repo)
     }
+    private lateinit var connectivityManager: ConnectivityManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Initialize Firebase and other components
         FirebaseApp.initializeApp(this)
 
-        enableEdgeToEdge()
+        // Initialize ConnectivityManager
+        connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        // Register Network Callback
+        registerNetworkCallback()
+
         setContent {
-          YallaBuyTheme {
-            NavigationApp(
-                homeScreenViewModelFactory,
-                signUpViewModelFactory,
-                logInViewModelFactory,
-                paymentViewModelFactory,
-                searchViewModelFactory,
-                shoppingCartViewModelFactory,
-                productInfoViewModelFactory,
-                categoriesScreenViewModelFactory,
-                productsByCollectionIdViewModelFactory,
-                wishlistViewModelFactory,
-                ordersViewModelFactory,
-                settingsViewModelFactory,
-                profileScreenViewModelFactory
-            )
+            YallaBuyTheme {
+                NavigationApp(
+                    homeScreenViewModelFactory,
+                    signUpViewModelFactory,
+                    logInViewModelFactory,
+                    paymentViewModelFactory,
+                    searchViewModelFactory,
+                    shoppingCartViewModelFactory,
+                    productInfoViewModelFactory,
+                    categoriesScreenViewModelFactory,
+                    productsByCollectionIdViewModelFactory,
+                    wishlistViewModelFactory,
+                    ordersViewModelFactory,
+                    settingsViewModelFactory,
+                    profileScreenViewModelFactory
+                )
+            }
         }
-        }
+    }
+
+    // Register the network callback to listen for connectivity changes
+    private fun registerNetworkCallback() {
+        val networkRequest = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
+
+        connectivityManager.registerNetworkCallback(networkRequest, object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                // Network is available, notify UI or handle logic here
+                println("Network is available")
+            }
+
+            override fun onLost(network: Network) {
+                // Network is lost, notify UI or handle logic here
+                println("Network is lost")
+            }
+
+            override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
+                val isConnected = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                if (isConnected) {
+                    println("Network capabilities changed: Internet available")
+                } else {
+                    println("Network capabilities changed: No Internet")
+                }
+            }
+        })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Unregister network callback if needed to avoid memory leaks
+        connectivityManager.unregisterNetworkCallback(ConnectivityManager.NetworkCallback())
     }
 }
 
