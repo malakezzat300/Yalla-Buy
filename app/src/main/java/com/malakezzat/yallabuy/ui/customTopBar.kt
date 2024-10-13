@@ -50,7 +50,7 @@ fun CustomTopBar(navController: NavController, title :String,backgroundColor: Co
                 text = title,
                 style = TextStyle(
                     fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Normal
                 ), color = backgroundColor,
                 modifier = Modifier.padding(start = 4.dp)
             )

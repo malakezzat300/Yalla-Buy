@@ -255,7 +255,7 @@ fun LatestProductsSectionById(products: List<Product>, navController: NavControl
                 itemsIndexed(products) { index, product ->
                     val visibleState = remember { mutableStateOf(false) }
                     LaunchedEffect(Unit) {
-                        delay(index * 200L)
+                        delay( 50L)
                         visibleState.value = true
                     }
 
@@ -383,6 +383,7 @@ fun ProductCard(product: Product, navController: NavController,viewModel: Produc
 
     }
 }
+
 @Composable
 fun AddToFavorites(viewModel: ProductsByCollectionIdViewModel, product : Product, email : String, oldDraftOrder : DraftOrder, navController: NavController){
    // Log.i(TAG, "AddToFavorites: $product")
