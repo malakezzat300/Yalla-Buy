@@ -2,6 +2,7 @@ package com.malakezzat.yallabuy.ui.payment.view
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -62,6 +63,8 @@ import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
 import com.malakezzat.yallabuy.ui.shoppingcart.view.calculateSubtotal
 import com.malakezzat.yallabuy.ui.theme.AppColors
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 
 @Composable
 fun CheckoutScreen(viewModel: PaymentViewModel, navController: NavController) {
@@ -78,6 +81,8 @@ fun CheckoutScreen(viewModel: PaymentViewModel, navController: NavController) {
     val finalizeDraftOrderState by viewModel.finalizeDraftOrder.collectAsState()
     var draftOrderUpdated by remember { mutableStateOf( DraftOrder() ) }
     var isLoading by remember { mutableStateOf(true) }
+    var isLoadingButton by remember { mutableStateOf(false) }
+
 
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
@@ -138,17 +143,18 @@ fun CheckoutScreen(viewModel: PaymentViewModel, navController: NavController) {
     }
 
     when(finalizeDraftOrderState){
-        is ApiState.Error ->{ Log.i("completeOrderTest", "finalizeDraftOrderState: draftOrder ${(finalizeDraftOrderState as ApiState.Error).message}") }
-        ApiState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-              //  CircularProgressIndicator(color = AppColors.Teal)
+        is ApiState.Error ->{ Log.i("completeOrderTest", "finalizeDraftOrderState: draftOrder ${(finalizeDraftOrderState as ApiState.Error).message}")
+            LaunchedEffect(Unit) {
+                isLoadingButton = false
+                Toast.makeText(context, "Failed to Place Order", Toast.LENGTH_SHORT).show()
             }
+        }
+        ApiState.Loading -> {
+            //isLoadingButton = true
         }
 
         is ApiState.Success -> {
+            isLoadingButton = false
             LaunchedEffect (Unit){
                 Log.i("completeOrderTest", "finalizeDraftOrderState: done ")
                 navController.navigate(Screen.OrderPlacedScreen.route)
@@ -265,12 +271,8 @@ fun CheckoutScreen(viewModel: PaymentViewModel, navController: NavController) {
                     draftOrder.id?.let {
                         val newDraftOrder = draftOrder
                         newDraftOrder.note = "Placed Order"
-                        Log.i(
-                            "completeOrderTest",
-                            "onClick: draftOrder ${newDraftOrder.toString()}"
-                        )
                         viewModel.updateDraftOrder(it, DraftOrderRequest(newDraftOrder))
-
+                        isLoadingButton = true
                     }
                 },
                 modifier = Modifier
@@ -278,9 +280,18 @@ fun CheckoutScreen(viewModel: PaymentViewModel, navController: NavController) {
                     .height(48.dp),
 
                 shape = RoundedCornerShape(30.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
+                enabled = !isLoadingButton
             ) {
-                Text("Place Order")
+                if (isLoadingButton) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = AppColors.Teal,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text("Place Order")
+                }
             }
         }
     }

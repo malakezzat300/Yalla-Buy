@@ -373,6 +373,8 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                                     country = countryOption
                                     searchTextCountry = countryOption
                                     expandedCountry = false
+
+                                    filteredCities = cities.filter { it.contains(searchTextCity, ignoreCase = true) }
                                 }) {
                                     Text(text = countryOption)
                                 }
