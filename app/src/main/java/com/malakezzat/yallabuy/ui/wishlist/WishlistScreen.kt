@@ -131,7 +131,8 @@ fun WishlistScreen(viewModel: WishlistViewModel, navController: NavController) {
         ) {
             TopAppBar(
                 title = { Text(text = "Wishlist", fontSize = 20.sp,
-                    style = MaterialTheme.typography.titleSmall,
+                   // style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Normal,
                     color = AppColors.Teal,
                     modifier = Modifier.padding(start = 4.dp)) },
                 navigationIcon = {

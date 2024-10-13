@@ -511,7 +511,7 @@ fun CategoryItem(category: CustomCollection, navController: NavController) {
     Log.d(TAG, "4. ${category}")
     Card(
         modifier = Modifier
-            .size(100.dp)
+            .size(90.dp)
             .clickable {
                 navController.navigate("${Screen.ProductsByCategoryScreen.route}/${category.id.toString()}/${category.body_html}")
             },
