@@ -49,7 +49,7 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color(0xFF00C4B4)) // Your specified color for upper part
-                    .padding(top=16.dp ,start = 16.dp, bottom = 16.dp, end = 16.dp)
+                    .padding(top=20.dp ,start = 16.dp, bottom = 12.dp, end = 16.dp)
             ) {
                 if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
                     UserInfoSection(navController = navController, onLogoutClick = { showLoginDialog = true })
