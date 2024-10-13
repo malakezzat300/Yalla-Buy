@@ -453,14 +453,7 @@ fun ShoppingItem(
                         // Plus Button
                         IconButton(
                             onClick = {
-                                if (subtotal >= 10000) {
-                                    Toast.makeText(
-                                        context,
-                                        "Maximum payment reached",
-                                        Toast.LENGTH_SHORT
-                                    )
-                                        .show()
-                                } else if (itemsCount >= 10) {
+                                 if (itemsCount >= 10) {
                                     Toast.makeText(
                                         context,
                                         "Maximum items count reached",

@@ -65,6 +65,8 @@ import androidx.navigation.NavController
 import com.malakezzat.yallabuy.R
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.Address
+import com.malakezzat.yallabuy.model.DraftOrder
+import com.malakezzat.yallabuy.model.LineItem
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
 import com.malakezzat.yallabuy.ui.theme.AppColors
@@ -93,6 +95,9 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
     val currentMonth = LocalDate.now().monthValue
     val currentYear = LocalDate.now().year % 100
     var vaildData by remember { mutableStateOf(false) }
+    val shoppingCartOrderState by viewModel.shoppingCartDraftOrder.collectAsState()
+    var draftOrder by remember { mutableStateOf(DraftOrder()) }
+
 
     val context = LocalContext.current
     val userId by remember {
@@ -106,6 +111,7 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
 
     LaunchedEffect(Unit) {
         viewModel.getUserAddresses(userId)
+        viewModel.getDraftOrders()
     }
 
     LaunchedEffect(navigateAfterDelay) {
@@ -134,6 +140,16 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
                 }
             }
             addressesList = getAddressesList(userAddresses)
+        }
+    }
+
+    when(shoppingCartOrderState){
+        is ApiState.Error ->{
+            Log.i("completeOrderTest", "shoppingCartOrderState: draftOrder ${(shoppingCartOrderState as ApiState.Error).message}") }
+        ApiState.Loading -> {
+        }
+        is ApiState.Success -> {
+            draftOrder = (shoppingCartOrderState as ApiState.Success).data
         }
     }
 
@@ -517,8 +533,16 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
                                         navigateAfterDelay = true
                                     }
                                 } else {
-                                    isLoading = true
-                                    navigateAfterDelay = true
+                                    if(draftOrder.total_price.toDouble() < 10000.0) {
+                                        isLoading = true
+                                        navigateAfterDelay = true
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            "Exceeded the cash purchase limit. Choose credit.",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 }
                             } else {
                                 Toast.makeText(
