@@ -232,4 +232,29 @@ class FirebaseAuthun {
                 Log.e("AuthError", "Error: ${e.message}")
             }
         }
+    fun sendPasswordResetEmail(
+        email: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val auth = FirebaseAuth.getInstance()
+        auth.sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.i("PasswordReset", "Password reset email sent successfully")
+                    onSuccess()
+                } else {
+                    try {
+                        throw task.exception!!
+                    } catch (e: FirebaseAuthInvalidUserException) {
+                        Log.e("PasswordReset", "User not found.")
+                        onError("User not found.")
+                    } catch (e: Exception) {
+                        Log.e("PasswordReset", "Failed to send password reset email: ${e.message}")
+                        onError("Failed to send password reset email: ${e.message}")
+                    }
+                }
+            }
     }
+
+}

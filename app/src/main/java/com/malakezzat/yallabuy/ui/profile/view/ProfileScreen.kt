@@ -1,4 +1,5 @@
 package com.malakezzat.yallabuy.ui.profile.view
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,7 +37,8 @@ import com.malakezzat.yallabuy.ui.theme.AppColors
 fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavController) {
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showLoginDialog by remember { mutableStateOf(false) }
-
+    var showResetPassDialog by remember { mutableStateOf(false) }
+    var context = LocalContext.current
     Scaffold { paddingValues ->
         Column(
             modifier = Modifier
@@ -108,10 +110,38 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
 
                     // Account Management Section
                     SectionWithPadding(title = "Account Management") {
-                        ProfileItem(icon = R.drawable.ic_change_password, title = "Change Password",{navController.navigate(Screen.ChangePassScreen.route)})
+                        ProfileItem(icon = R.drawable.ic_change_password, title = "Change Password") {
+
+                        }
                         //DarkThemeToggle() // Dark Theme Toggle inside the Account Management section
                     }
-
+                    if (showResetPassDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showResetPassDialog = false }, // Close dialog on dismiss
+                            title = { Text(text = "Reset Password") },
+                            text = { Text("Are you sure you want to reset your password?") },
+                            confirmButton = {
+                                TextButton(
+                                    onClick = {
+                                        showLogoutDialog = false
+                                        FirebaseAuthun().sendPasswordResetEmail(FirebaseAuth.getInstance().currentUser?.email.toString(), onSuccess = {
+                                            Toast.makeText(context,"Password reset email sent successfully",Toast.LENGTH_LONG)
+                                        }, onError = {})
+                                        // Close the dialog after confirming
+                                    }
+                                ) {
+                                    Text("Yes", color = Color.Red)
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(
+                                    onClick = { showResetPassDialog = false } // Close dialog without action
+                                ) {
+                                    Text("No", color = Color(0xFF00C4B4))
+                                }
+                            }
+                        )
+                    }
                 }
             }
 
