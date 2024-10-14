@@ -155,6 +155,8 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                 addressState= (addressDetails as ApiState.Success).data?.customer_address?.address1.toString()
                 city = (addressDetails as ApiState.Success).data?.customer_address?.city.toString()
                 country = (addressDetails as ApiState.Success).data?.customer_address?.country.toString()
+                searchTextCity = city
+                searchTextCountry = country
             }
         }
     }
