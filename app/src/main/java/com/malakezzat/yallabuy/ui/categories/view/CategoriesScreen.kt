@@ -35,6 +35,7 @@ import com.malakezzat.yallabuy.ui.home.view.CategoryItem
 import com.malakezzat.yallabuy.ui.theme.AppColors
 
 val TAG = "CategoriesScreen"
+
 @Composable
 fun CategoriesScreen(
     viewModel: CategoriesViewModel,
@@ -66,7 +67,10 @@ fun CategoriesScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(color = AppColors.Teal)
+                        CircularProgressIndicator(
+                            color = AppColors.Teal,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
                     }
                 }
 
@@ -78,13 +82,19 @@ fun CategoriesScreen(
                 }
 
                 is ApiState.Error -> {
+
+                    Log.i(TAG, "Error: ${(categoriesState as ApiState.Error).message}")
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
+                        /*Text(
                             text = "Error: ${(categoriesState as ApiState.Error).message}",
                             color = Color.Red
+                        )*/
+                        CircularProgressIndicator(
+                            color = AppColors.Teal,
+                            modifier = Modifier.align(Alignment.Center)
                         )
                     }
                 }
@@ -95,26 +105,29 @@ fun CategoriesScreen(
 
 
 @Composable
-fun CategoriesSectionInCategoriesScreen(categories: List<CustomCollection>,navController: NavController) {
+fun CategoriesSectionInCategoriesScreen(
+    categories: List<CustomCollection>,
+    navController: NavController
+) {
     //categories: List<CustomCollection>
     Log.d(com.malakezzat.yallabuy.ui.home.view.TAG, "3. ${categories}")
     Column(modifier = Modifier.padding(16.dp)) {
 
         Spacer(modifier = Modifier.height(18.dp))
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.fillMaxSize()
-                    .height(600.dp)
-                ,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-                contentPadding = PaddingValues(0.dp)
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier
+                .fillMaxSize()
+                .height(600.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+            contentPadding = PaddingValues(0.dp)
 
-            ) {
-                itemsIndexed(categories) { _, category ->
-                    CategoryItem(category, navController)
-                }
+        ) {
+            itemsIndexed(categories) { _, category ->
+                CategoryItem(category, navController)
             }
+        }
     }
 }
 

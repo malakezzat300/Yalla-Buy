@@ -130,7 +130,16 @@ fun OrdersScreen(
     val customerOrders by viewModel.customerOrders.collectAsStateWithLifecycle()
     when (customerOrders) {
         is ApiState.Loading -> {
-            CircularProgressIndicator()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator(
+                    color = AppColors.Teal
+                )
+            }
         }
 
         is ApiState.Success -> {
@@ -173,7 +182,7 @@ fun NoOrdersScreen(navController: NavController) {
                 )
                 Text(
                     text = "No completed order",
-                    color = AppColors.Rose,
+                    color = AppColors.Teal,
                     style = MaterialTheme.typography.headlineLarge,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
@@ -189,7 +198,7 @@ fun NoOrdersScreen(navController: NavController) {
                 Button(
                     onClick = { navController.navigate(Screen.CategoriesScreen.route) },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Rose),
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
                     shape = RoundedCornerShape(20.dp)
                 ) {
                     Text(text = "Explore Categories", color = Color.White)
@@ -369,7 +378,7 @@ fun OrderHistoryScreen() {
             // No completed order text
             Text(
                 text = "No completed order",
-                color = AppColors.Rose,
+                color = AppColors.Teal,
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.padding(bottom = 8.dp)
 
@@ -390,7 +399,7 @@ fun OrderHistoryScreen() {
             Button(
                 onClick = { /* Action to explore categories */ },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Rose),
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Text(text = "Explore Categories", color = Color.White)
