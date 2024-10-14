@@ -3,4 +3,12 @@
     <string name="web_id" translatable="false">382235296223-lioni0fc68fb8gqf4junhltdcfle6750.apps.googleusercontent.com</string>
     <string name="web_client_id" translatable="false">150141969572-5qqhfaohrq5a479m26bvf5mel5ko4on0.apps.googleusercontent.com</string>
     <string name="title_activity_map">MapActivity</string>
+    <string name="no_completed_order">No completed order</string>
+    <string name="we_don_t_have_any_past_orders_that_have_been_completed_start_shopping_now_and_create_your_first_order_with_us">We don’t have any past orders that have been completed. Start shopping now and create your first order with us.</string>
+    <string name="explore_categories">Explore Categories</string>
+    <string name="your_orders">Your Orders</string>
+    <string name="item_variant">"Item variant: "</string>
+    <string name="quantity">"Quantity: "</string>
+    <string name="price">"Price: "</string>
+    <string name="order_total">"Order Total: "</string>
 </resources>

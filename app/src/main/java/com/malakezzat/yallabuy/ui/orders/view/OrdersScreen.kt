@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -181,13 +182,13 @@ fun NoOrdersScreen(navController: NavController) {
                         .padding(bottom = 16.dp)
                 )
                 Text(
-                    text = "No completed order",
+                    text = stringResource(R.string.no_completed_order),
                     color = AppColors.Teal,
                     style = MaterialTheme.typography.headlineLarge,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 Text(
-                    text = "We don’t have any past orders that have been completed. Start shopping now and create your first order with us.",
+                    text = stringResource(R.string.we_don_t_have_any_past_orders_that_have_been_completed_start_shopping_now_and_create_your_first_order_with_us),
                     color = AppColors.GrayDark,
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
@@ -201,7 +202,7 @@ fun NoOrdersScreen(navController: NavController) {
                     colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
                     shape = RoundedCornerShape(20.dp)
                 ) {
-                    Text(text = "Explore Categories", color = Color.White)
+                    Text(text = stringResource(R.string.explore_categories), color = Color.White)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -213,7 +214,8 @@ fun NoOrdersScreen(navController: NavController) {
 @Composable
 fun CompletedOrdersScreen(orders: List<Order>,navController: NavController) {
     Scaffold(
-        topBar = { CustomTopBar(navController,"Your Orders",AppColors.Teal,{navController.navigateUp()}) },
+        topBar = { CustomTopBar(navController,
+            stringResource(R.string.your_orders),AppColors.Teal,{navController.navigateUp()}) },
         containerColor = Color.White,
         content = { paddingValues ->
             Column(
@@ -238,115 +240,131 @@ fun OrderItem(order: Order) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
+            .padding(16.dp),
+        elevation = CardDefaults.cardElevation(8.dp),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(vertical = 8.dp)
         ) {
-           // Text(text = "Order ID: ${order.id}", style = MaterialTheme.typography.bodyMedium)
-            var count = 1
-            order.line_items.forEach {item ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "${count++}-${item.title }",
-                        fontSize = 22.sp,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.Teal,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1
-                    )
-                    /*Text(
-                        text = item.title,
-                        fontSize = 15.sp,
-                        style = MaterialTheme.typography.bodySmall
-                    )*/
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Item variant: ",
-                        fontSize = 18.sp,
-                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
-                        color = AppColors.GrayDark
-                    )
-                    Text(
-                        text = "${item.variant_title}",
-                        fontSize = 18.sp,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.GrayLight
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Quantity: ",
-                        fontSize = 18.sp,
-                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
-                        color = AppColors.GrayDark
-                    )
-                    Text(
-                        text = "${item.quantity}",
-                        fontSize = 18.sp,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.GrayLight
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Price: ",
-                        fontSize = 18.sp,
-                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
-                        color = AppColors.GrayDark
-                    )
-                    Text(
-                        text = "${item.price} EGP",
-                        fontSize = 18.sp,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.GrayLight
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-            }
+            Text(
+                text = "Order id: ${order.id}",
+                fontSize = 20.sp,
+                style = MaterialTheme.typography.bodySmall,
+                color = AppColors.GrayDark
+            )
             Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Order Total: ",
-                    fontSize = 18.sp,
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
-                )
-                Text(
-                    text = "${order.total_price} EGP",
-                    fontSize = 18.sp,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppColors.Teal
-                )
-            }
 
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(4.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    var count = 1
+                    order.line_items.forEach { item ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "${count++}-${item.title}",
+                                fontSize = 22.sp,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = AppColors.Teal,
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.item_variant),
+                                fontSize = 18.sp,
+                                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                                color = AppColors.GrayDark
+                            )
+                            Text(
+                                text = "${item.variant_title}",
+                                fontSize = 18.sp,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = AppColors.GrayLight
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.quantity),
+                                fontSize = 18.sp,
+                                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                                color = AppColors.GrayDark
+                            )
+                            Text(
+                                text = "${item.quantity}",
+                                fontSize = 18.sp,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = AppColors.GrayLight
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.price),
+                                fontSize = 18.sp,
+                                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                                color = AppColors.GrayDark
+                            )
+                            Text(
+                                text = "${item.price} EGP",
+                                fontSize = 18.sp,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = AppColors.GrayLight
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.order_total),
+                            fontSize = 18.sp,
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                        )
+                        Text(
+                            text = "${order.total_price} EGP",
+                            fontSize = 18.sp,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AppColors.Teal
+                        )
+                    }
+                }
+            }
         }
     }
+
 }
+
 
 
 @Preview(showBackground = true, showSystemUi = true)
@@ -377,7 +395,7 @@ fun OrderHistoryScreen() {
 
             // No completed order text
             Text(
-                text = "No completed order",
+                text = stringResource(R.string.no_completed_order),
                 color = AppColors.Teal,
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -386,7 +404,7 @@ fun OrderHistoryScreen() {
 
             // Additional text
             Text(
-                text = "We don’t have any past orders that have been completed. Start shopping now and create your first order with us.",
+                text =stringResource(R.string.we_don_t_have_any_past_orders_that_have_been_completed_start_shopping_now_and_create_your_first_order_with_us),
                 color = AppColors.GrayDark,
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
