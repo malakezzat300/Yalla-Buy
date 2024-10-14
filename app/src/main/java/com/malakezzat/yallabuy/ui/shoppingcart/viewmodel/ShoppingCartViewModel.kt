@@ -16,6 +16,7 @@ import com.malakezzat.yallabuy.model.PriceRule
 import com.malakezzat.yallabuy.model.PriceRuleResponse
 import com.malakezzat.yallabuy.model.PriceRulesResponse
 import com.malakezzat.yallabuy.model.VariantResponse
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -118,6 +119,7 @@ class ShoppingCartViewModel(private val repository: ProductsRepository) : ViewMo
             try {
                 repository.deleteDraftOrder(draftOrderId)
                 _shoppingCartDraftOrder.value = ApiState.Success(DraftOrder())
+                delay(1000)
                 getDraftOrders()
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to delete draft order: ${e.message}")

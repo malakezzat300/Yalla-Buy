@@ -84,6 +84,7 @@ import com.malakezzat.yallabuy.ui.product_info.ProductInfoViewModel
 import com.malakezzat.yallabuy.ui.productbycategory.viewmodel.ProductsByCollectionIdViewModel
 import com.malakezzat.yallabuy.ui.theme.AppColors
 import kotlinx.coroutines.delay
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.log
 
 val TAG = "ProductsByCollectionIdS"
@@ -282,7 +283,11 @@ fun LatestProductsSectionById(products: List<Product>,
                 contentPadding = PaddingValues(0.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                itemsIndexed(products) { index, product ->
+
+                items(
+                    count = products.size,
+                    key = { item -> products[item].title }
+                ){  item ->
                     val visibleState = remember { mutableStateOf(false) }
                     LaunchedEffect(Unit) {
                         delay( 50L)
@@ -297,12 +302,17 @@ fun LatestProductsSectionById(products: List<Product>,
                         ) + fadeIn(animationSpec = tween(durationMillis = 800)),
                         modifier = Modifier
                     ) {
-                        ProductCard(product = product, navController, viewModel ,oldDraftOrder){ added ->
+                        ProductCard(product = products[item], navController, viewModel ,oldDraftOrder){ added ->
                             onAddedToFavorite(added)
                         }
                     }
                     Spacer(modifier = Modifier.height(10.dp))
+
+
                 }
+//                itemsIndexed(products) { index, product ->
+//
+//                }
             }
         }
     }
@@ -440,7 +450,8 @@ fun AddToFavorites(
     var guestClicked by remember { mutableStateOf(false) }
     var clicked by remember { mutableStateOf(false) }
     var isProcessing by remember { mutableStateOf(false) }
-    val productState by viewModel.searchProductsList.collectAsState()
+
+    val productState by viewModel.searchProductsList.collectAsStateWithLifecycle()
 
     if (FirebaseAuth.getInstance().currentUser?.isAnonymous == true) {
         IconButton(onClick = { guestClicked = true }) {
@@ -452,19 +463,51 @@ fun AddToFavorites(
             )
         }
     } else {
+        clicked = oldDraftOrder.line_items.any { it.product_id == product.id }
+        IconButton(
+            onClick = {
+                isProcessing = true
+                Log.i("catTest", "AddToFavorites: id1 ${product.id}")
+                viewModel.getProductById(product.id ?: 0L)
+            },
+            enabled = !isProcessing
+        ) {
+            if (clicked) {
+                Icon(
+                    imageVector = Icons.Sharp.Favorite,
+                    contentDescription = "Favorite",
+                    tint = AppColors.Teal,
+                    modifier = Modifier.size(35.dp)
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.FavoriteBorder,
+                    contentDescription = "Favorite",
+                    tint = AppColors.Teal,
+                    modifier = Modifier.size(35.dp)
+                )
+            }
+        }
 
-        IconButton(onClick = {
-            isProcessing = true
-            viewModel.getProductById(product.id?:0L)
-            clicked = oldDraftOrder.line_items.any { it.product_id == product.id }
+        LaunchedEffect(productState) {
             when (productState) {
-                is ApiState.Error -> {}
+                is ApiState.Error -> {
+                    Log.e("catTest", "AddToFavorites: Error occurred")
+                    isProcessing = false
+                }
                 ApiState.Loading -> {
-                    Log.i("TAG", "AddToFavorites: loading")}
+                    Log.i("TAG", "AddToFavorites: loading")
+                }
                 is ApiState.Success -> {
                     val p = (productState as ApiState.Success<Product>).data
-                    val properties = listOf(Property(name = "imageUrl",value = p.image.src), Property(name = "size",value = p.variants[0].option1), Property(name = "color",value = p.variants[0].option2)
+                    Log.i("catTest", "AddToFavorites: id2 ${p.id}")
+
+                    val properties = listOf(
+                        Property(name = "imageUrl", value = p.image.src),
+                        Property(name = "size", value = p.variants[0].option1),
+                        Property(name = "color", value = p.variants[0].option2)
                     )
+
                     if (oldDraftOrder.id == 0L) {
                         clicked = true
                         val lineItems = listOf(
@@ -479,6 +522,7 @@ fun AddToFavorites(
                         )
                         val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
                         val draftOrderRequest = DraftOrderRequest(draftOrder)
+
                         viewModel.createDraftOrder(draftOrderRequest)
                         onAddedToFavorite("Added to WishList")
                         Log.i("catTest", "AddToFavorites: create $draftOrder")
@@ -497,6 +541,7 @@ fun AddToFavorites(
                             )
                             val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
                             val draftOrderRequest = DraftOrderRequest(draftOrder)
+
                             oldDraftOrder.id?.let { viewModel.updateDraftOrder(it, draftOrderRequest) }
                             onAddedToFavorite("Added to WishList")
                             Log.i("catTest", "AddToFavorites: update $draftOrder")
@@ -505,7 +550,8 @@ fun AddToFavorites(
                             val lineItems = oldDraftOrder.line_items.filterNot { it.variant_id == p.variants[0].id }
                             val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
                             val draftOrderRequest = DraftOrderRequest(draftOrder)
-                            if(lineItems.isEmpty()){
+
+                            if (lineItems.isEmpty()) {
                                 oldDraftOrder.id?.let { viewModel.deleteDraftOrder(it) }
                             } else {
                                 oldDraftOrder.id?.let { viewModel.updateDraftOrder(it, draftOrderRequest) }
@@ -516,30 +562,6 @@ fun AddToFavorites(
                     }
                     isProcessing = false
                 }
-            }
-//            val properties = listOf(
-//                Property(name = "imageUrl", value = product.image.src),
-//                Property(name = "size", value = product.variants[0].option1),
-//                Property(name = "color", value = product.variants[0].option2)
-//            )
-
-
-        }, enabled = !isProcessing)
-        {
-            if (clicked) {
-                Icon(
-                    imageVector = Icons.Sharp.Favorite,
-                    contentDescription = "Favorite",
-                    tint = AppColors.Teal,
-                    modifier = Modifier.size(35.dp)
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.FavoriteBorder,
-                    contentDescription = "Favorite",
-                    tint = AppColors.Teal,
-                    modifier = Modifier.size(35.dp)
-                )
             }
         }
     }
