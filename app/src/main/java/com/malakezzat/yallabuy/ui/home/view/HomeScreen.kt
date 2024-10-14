@@ -131,16 +131,17 @@ fun HomeScreen(
         if (categoriesState !is ApiState.Success && categoriesState !is ApiState.Loading) {
             viewModel.getAllCategories()
         }
-        if (productState !is ApiState.Success && productState !is ApiState.Loading) {
+//        if (productState !is ApiState.Success && productState !is ApiState.Loading) {
             viewModel.getAllProducts()
-        }
-        if (draftOrderId !is ApiState.Success && draftOrderId !is ApiState.Loading) {
-            viewModel.getDraftOrders()
-        }
+//        }
+//        if (draftOrderId !is ApiState.Success && draftOrderId !is ApiState.Loading) {
+//            viewModel.getDraftOrders()
+//        }
     }
     //Currency
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
+
     when (draftOrderId) {
         is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(draftOrderId as ApiState.Error).message}")
         ApiState.Loading -> {}

@@ -110,8 +110,8 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
 
                     // Account Management Section
                     SectionWithPadding(title = "Account Management") {
-                        ProfileItem(icon = R.drawable.ic_change_password, title = "Change Password") {
-
+                        ProfileItem(icon = R.drawable.ic_change_password, title = "Reset Password") {
+                            showResetPassDialog=true
                         }
                         //DarkThemeToggle() // Dark Theme Toggle inside the Account Management section
                     }
