@@ -253,7 +253,7 @@ fun OrderItem(order: Order) {
                 .padding(18.dp)
         ) {
             Text(
-                text = "Order id: ${order.id}",
+                text = "Order id: ${order.id}#",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.bodySmall,
