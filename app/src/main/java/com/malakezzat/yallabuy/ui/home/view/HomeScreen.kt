@@ -114,6 +114,7 @@ fun HomeScreen(
     viewModel: HomeScreenViewModel,
     navController: NavController,
 ) {
+    val context = LocalContext.current
     val productState by viewModel.productList.collectAsStateWithLifecycle()
     val categoriesState by viewModel.categoriesList.collectAsStateWithLifecycle()
     val brandsState by viewModel.brandsList.collectAsStateWithLifecycle()
@@ -127,6 +128,8 @@ fun HomeScreen(
     var wishListAddButton by remember { mutableStateOf("") }
     var isAddedWishList by remember { mutableStateOf(false) }
 
+    val exchangeRate by viewModel.conversionRate.collectAsState()
+
     LaunchedEffect(Unit) {
         if (brandsState !is ApiState.Success && brandsState !is ApiState.Loading) {
             viewModel.getBrands()
@@ -137,15 +140,28 @@ fun HomeScreen(
 //        if (productState !is ApiState.Success && productState !is ApiState.Loading) {
         viewModel.getAllProducts()
 //        }
-//        if (draftOrderId !is ApiState.Success && draftOrderId !is ApiState.Loading) {
-//            viewModel.getDraftOrders()
-//        }
+        if(CurrencyPreferences.getInstance(context).getFirstLaunch()){
+            viewModel.getRate()
+            CurrencyPreferences.getInstance(context).setFirstLaunch(false)
+        }
+
+
+}
+
+    //DON'T REMOVE IT
+    when(exchangeRate) {
+        is ApiState.Error -> Log.i(
+            "currencyTest",
+            "SettingsScreen: exchangeRate ${(exchangeRate as ApiState.Error).message}"
+        )
+
+        ApiState.Loading -> {}
+        is ApiState.Success -> {
+            CurrencyPreferences.getInstance(context)
+                .saveExchangeRate((exchangeRate as ApiState.Success).data?.conversion_rates)
+        }
     }
-
-
-
     //Currency
-    val context = LocalContext.current
     CurrencyConverter.initialize(context)
 
     when (draftOrderId) {
