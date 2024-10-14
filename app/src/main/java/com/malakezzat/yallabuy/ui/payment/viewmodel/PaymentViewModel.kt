@@ -194,7 +194,6 @@ class PaymentViewModel(private val repository: ProductsRepository) : ViewModel()
         viewModelScope.launch {
             try {
                 repository.deleteDraftOrder(draftOrderId)
-                getDraftOrders()
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to delete draft order: ${e.message}")
             }

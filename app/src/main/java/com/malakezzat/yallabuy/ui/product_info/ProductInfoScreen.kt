@@ -408,12 +408,9 @@ fun AddToFavorites(
                     val lineItems = oldDraftOrder.line_items.filterNot { it.variant_id == product.variants[0].id }
                     val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
                     val draftOrderRequest = DraftOrderRequest(draftOrder)
-                    Log.i("favTest", "AddToFavorites: ${lineItems} ")
                     if(lineItems.isEmpty()){
-                        Log.i("favTest", "AddToFavorites: delete order ")
                         oldDraftOrder.id?.let { viewModel.deleteDraftOrder(it) }
                     } else {
-                        Log.i("favTest", "AddToFavorites: delete item ")
                         oldDraftOrder.id?.let { viewModel.updateDraftOrder(it, draftOrderRequest) }
                     }
                     onAddedToFavorite("Removed from WishList")
@@ -479,8 +476,7 @@ fun AddToCart(viewModel: ProductInfoViewModel,
               id : Long,
               navController: NavController,
               onAddedToCart : (String) -> Unit) {
-   var geustClicked by remember { mutableStateOf(false) }
-    var isProcessing by remember { mutableStateOf(false) }
+    var geustClicked by remember { mutableStateOf(false) }
     val context = LocalContext.current
     Row(modifier = Modifier.fillMaxWidth()) {
         if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
@@ -488,8 +484,7 @@ fun AddToCart(viewModel: ProductInfoViewModel,
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.Teal),
                 border = BorderStroke(1.dp, AppColors.Teal),
                 onClick = { geustClicked=true },
-                modifier = Modifier.weight(1f),
-                enabled = !isProcessing) {
+                modifier = Modifier.weight(1f)) {
                 Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = AppColors.Teal)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(text = "Add To Cart", color = AppColors.Teal)
@@ -501,106 +496,102 @@ fun AddToCart(viewModel: ProductInfoViewModel,
                 onClick = {
                     Toast.makeText(context, "Out of Stock", Toast.LENGTH_SHORT).show()
                 },
-                enabled = !isProcessing,
                 modifier = Modifier.weight(1f)) {
                 Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = AppColors.Gray)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(text = "Add To Cart", color = AppColors.Gray)
             }
         } else{
-        OutlinedButton(
-             onClick = {
-                 isProcessing = true
-             val properties = listOf(Property(name = "imageUrl",value = product.image.src),
-                 Property(name = "size",value = size),
-                 Property(name = "color",value = color),)
-            Log.i("propertiesTest", "AddToCart: id ${id}")
-            if (oldDraftOrder.id == 0L) {
-                val lineItems = listOf(
-                    LineItem(
-                        product.title,
-                        price,
-                        id,
-                        1,
-                        properties = properties,
-                        product.id ?: 0,
-                    )
-                )
-                val draftOrder =
-                    DraftOrder(note = "shoppingCart", line_items = lineItems, email = email)
-                val draftOrderRequest = DraftOrderRequest(draftOrder)
-                viewModel.createDraftOrder(draftOrderRequest)
-                onAddedToCart("Added to Cart")
-            } else {
-                if (!oldDraftOrder.line_items.contains(
-                        LineItem(
-                            product.title,
-                            price,
-                            id,
-                            1,
-                            properties = properties,
-                            product.id ?: 0,
+            OutlinedButton(
+                onClick = {
+                    val properties = listOf(Property(name = "imageUrl",value = product.image.src),
+                        Property(name = "size",value = size),
+                        Property(name = "color",value = color))
+                    Log.i("propertiesTest", "AddToCart: id ${id}")
+                    if (oldDraftOrder.id == 0L) {
+                        val lineItems = listOf(
+                            LineItem(
+                                product.title,
+                                price,
+                                id,
+                                1,
+                                properties = properties,
+                                product.id ?: 0,
+                            )
                         )
-                    )
-                ) {
-                    val lineItems = oldDraftOrder.line_items + listOf(
-                        LineItem(
-                            product.title,
-                            price,
-                            id,
-                            1,
-                            properties = properties,
-                            product.id ?: 0,
-                        )
-                    )
-                    val draftOrder =
-                        DraftOrder(note = "shoppingCart", line_items = lineItems, email = email)
-                    val draftOrderRequest = DraftOrderRequest(draftOrder)
-                    oldDraftOrder.id?.let {
+                        val draftOrder =
+                            DraftOrder(note = "shoppingCart", line_items = lineItems, email = email)
+                        val draftOrderRequest = DraftOrderRequest(draftOrder)
+                        viewModel.createDraftOrder(draftOrderRequest)
+                        onAddedToCart("Added to Cart")
+                    } else {
+                        if (!oldDraftOrder.line_items.contains(
+                                LineItem(
+                                    product.title,
+                                    price,
+                                    id,
+                                    1,
+                                    properties = properties,
+                                    product.id ?: 0,
+                                )
+                            )
+                        ) {
+                            val lineItems = oldDraftOrder.line_items + listOf(
+                                LineItem(
+                                    product.title,
+                                    price,
+                                    id,
+                                    1,
+                                    properties = properties,
+                                    product.id ?: 0,
+                                )
+                            )
+                            val draftOrder =
+                                DraftOrder(note = "shoppingCart", line_items = lineItems, email = email)
+                            val draftOrderRequest = DraftOrderRequest(draftOrder)
+                            oldDraftOrder.id?.let {
 
-                        viewModel.updateDraftOrder(it, draftOrderRequest)
+                                viewModel.updateDraftOrder(it, draftOrderRequest)
 
+                            }
+                            onAddedToCart("Added to Cart")
+                        } else {
+                            onAddedToCart("Already in Shopping Cart")
+                        }
                     }
-                    onAddedToCart("Added to Cart")
-                } else {
-                    onAddedToCart("Already in Shopping Cart")
-                }
-                isProcessing = false
+
+                }, modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.Teal),
+                border = BorderStroke(1.dp, AppColors.Teal),
+            ) {
+
+                Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = AppColors.Teal)
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(text = "Add To Cart", color = AppColors.Teal)
+
             }
-
-        }, modifier = Modifier.weight(1f),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.Teal),
-            border = BorderStroke(1.dp, AppColors.Teal),
-            enabled = isProcessing
-        ) {
-
-            Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = AppColors.Teal)
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(text = "Add To Cart", color = AppColors.Teal)
-
         }
-   }
     }
     if(geustClicked){
-    AlertDialog(
-        containerColor = Color.White,
-        onDismissRequest = { geustClicked = false},
-        title = { Text("Guest") },
-        text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals, and to save your favorite products") },
-        confirmButton = {
-            TextButton(onClick = {
-                geustClicked=false
-                navController.navigate(Screen.LogInScreen.route)
-            }) {
-                Text("Login", color = AppColors.Teal)
+        AlertDialog(
+            containerColor = Color.White,
+            onDismissRequest = { geustClicked = false},
+            title = { Text("Guest") },
+            text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals, and to save your favorite products") },
+            confirmButton = {
+                TextButton(onClick = {
+                    geustClicked=false
+                    navController.navigate(Screen.LogInScreen.route)
+                }) {
+                    Text("Login", color = AppColors.Teal)
+                }
+            },dismissButton = {
+                TextButton(
+                    onClick = { geustClicked = false }
+                ) {
+                    Text("Cancel", color = AppColors.Rose)
+                }
             }
-        },dismissButton = {
-            TextButton(
-                onClick = { geustClicked = false }
-            ) {
-                Text("Cancel", color = AppColors.Rose)
-            }
-        }
 
         )
     }
