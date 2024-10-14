@@ -348,6 +348,7 @@ fun AddToFavorites(
 ) {
     var guestClicked by remember { mutableStateOf(false) }
     var clicked by remember { mutableStateOf(false) }
+    var isProcessing by remember { mutableStateOf(false) }
 
     if (FirebaseAuth.getInstance().currentUser?.isAnonymous == true) {
         IconButton(onClick = { guestClicked = true }) {
@@ -362,6 +363,7 @@ fun AddToFavorites(
         clicked = oldDraftOrder.line_items.any { it.product_id == product.id }
 
         IconButton(onClick = {
+            isProcessing = true
             val properties = listOf(
                 Property(name = "imageUrl", value = product.image.src),
                 Property(name = "size", value = product.variants[0].option1),
@@ -406,11 +408,20 @@ fun AddToFavorites(
                     val lineItems = oldDraftOrder.line_items.filterNot { it.variant_id == product.variants[0].id }
                     val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
                     val draftOrderRequest = DraftOrderRequest(draftOrder)
-                    oldDraftOrder.id?.let { viewModel.updateDraftOrder(it, draftOrderRequest) }
+                    Log.i("favTest", "AddToFavorites: ${lineItems} ")
+                    if(lineItems.isEmpty()){
+                        Log.i("favTest", "AddToFavorites: delete order ")
+                        oldDraftOrder.id?.let { viewModel.deleteDraftOrder(it) }
+                    } else {
+                        Log.i("favTest", "AddToFavorites: delete item ")
+                        oldDraftOrder.id?.let { viewModel.updateDraftOrder(it, draftOrderRequest) }
+                    }
                     onAddedToFavorite("Removed from WishList")
                 }
             }
-        }) {
+            isProcessing = false
+        }, enabled = !isProcessing)
+        {
             if (clicked) {
                 Icon(
                     imageVector = Icons.Sharp.Favorite,
@@ -469,6 +480,7 @@ fun AddToCart(viewModel: ProductInfoViewModel,
               navController: NavController,
               onAddedToCart : (String) -> Unit) {
    var geustClicked by remember { mutableStateOf(false) }
+    var isProcessing by remember { mutableStateOf(false) }
     val context = LocalContext.current
     Row(modifier = Modifier.fillMaxWidth()) {
         if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
@@ -476,7 +488,8 @@ fun AddToCart(viewModel: ProductInfoViewModel,
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.Teal),
                 border = BorderStroke(1.dp, AppColors.Teal),
                 onClick = { geustClicked=true },
-                modifier = Modifier.weight(1f)) {
+                modifier = Modifier.weight(1f),
+                enabled = !isProcessing) {
                 Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = AppColors.Teal)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(text = "Add To Cart", color = AppColors.Teal)
@@ -488,6 +501,7 @@ fun AddToCart(viewModel: ProductInfoViewModel,
                 onClick = {
                     Toast.makeText(context, "Out of Stock", Toast.LENGTH_SHORT).show()
                 },
+                enabled = !isProcessing,
                 modifier = Modifier.weight(1f)) {
                 Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = AppColors.Gray)
                 Spacer(modifier = Modifier.width(4.dp))
@@ -496,9 +510,10 @@ fun AddToCart(viewModel: ProductInfoViewModel,
         } else{
         OutlinedButton(
              onClick = {
+                 isProcessing = true
              val properties = listOf(Property(name = "imageUrl",value = product.image.src),
                  Property(name = "size",value = size),
-                 Property(name = "color",value = color))
+                 Property(name = "color",value = color),)
             Log.i("propertiesTest", "AddToCart: id ${id}")
             if (oldDraftOrder.id == 0L) {
                 val lineItems = listOf(
@@ -550,11 +565,13 @@ fun AddToCart(viewModel: ProductInfoViewModel,
                 } else {
                     onAddedToCart("Already in Shopping Cart")
                 }
+                isProcessing = false
             }
 
         }, modifier = Modifier.weight(1f),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.Teal),
             border = BorderStroke(1.dp, AppColors.Teal),
+            enabled = isProcessing
         ) {
 
             Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = AppColors.Teal)
