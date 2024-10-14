@@ -39,16 +39,19 @@ val TAG = "CategoriesScreen"
 fun CategoriesScreen(
     viewModel: CategoriesViewModel,
     navController: NavController
-){
+) {
+    // Collect categories state
     val categoriesState by viewModel.categoriesList.collectAsStateWithLifecycle()
-    LaunchedEffect(Unit) {
-        Log.d(TAG, categoriesState.toString())
-        if (categoriesState !is ApiState.Success) {
+
+    // Launch effect to trigger the API call only if necessary
+    LaunchedEffect(categoriesState) {
+        if (categoriesState !is ApiState.Success && categoriesState !is ApiState.Loading) {
             viewModel.getAllCategories()
         }
     }
+
     Scaffold(
-        topBar = { CustomTopBar(navController,"Categories") },
+        topBar = { CustomTopBar(navController, "Categories") },
         containerColor = Color.White
     ) {
         Column(
@@ -70,26 +73,23 @@ fun CategoriesScreen(
                 is ApiState.Success -> {
                     val categories =
                         (categoriesState as ApiState.Success<List<CustomCollection>>).data
-                    CategoriesSectionInCategoriesScreen(categories,navController)
-                    Log.d(com.malakezzat.yallabuy.ui.home.view.TAG, "$categoriesState")
+                    CategoriesSectionInCategoriesScreen(categories, navController)
+                    Log.d(TAG, "$categoriesState")
                 }
 
                 is ApiState.Error -> {
-                    /*Text(
-                        text = "Error: ${(categoriesState as ApiState.Error).message}",
-                        color = Color.Red
-                    )*/
-                    Log.i(com.malakezzat.yallabuy.ui.home.view.TAG, "Error: ${(categoriesState as ApiState.Error).message}")
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(color = AppColors.Teal)
+                        Text(
+                            text = "Error: ${(categoriesState as ApiState.Error).message}",
+                            color = Color.Red
+                        )
                     }
                 }
             }
         }
-
     }
 }
 
