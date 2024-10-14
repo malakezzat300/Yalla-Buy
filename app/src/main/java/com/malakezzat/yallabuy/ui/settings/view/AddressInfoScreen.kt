@@ -60,6 +60,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
@@ -68,6 +69,7 @@ import androidx.navigation.NavHostController
 import com.malakezzat.yallabuy.data.remote.ApiState
 import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.model.AddressRequest
+import com.malakezzat.yallabuy.ui.CustomTopBar
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.settings.viewmodel.SettingsViewModel
 import com.malakezzat.yallabuy.ui.shoppingcart.view.DeleteConfirmationDialog
@@ -134,119 +136,128 @@ fun AddressInfoScreen(navController: NavHostController,viewModel: SettingsViewMo
         is ApiState.Success -> address = (addressState as ApiState.Success).data?.customer_address ?: Address()
     }
 
-    LazyColumn(modifier = Modifier.padding(16.dp)) {
-        item{
-            Text(
-                text = "Address Info",
-                style = MaterialTheme.typography.headlineMedium,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "First Name", fontSize = 18.sp,fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(2.dp))
-            address.first_name?.let { Text(text = it, fontSize = 18.sp) }
 
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Last Name", fontSize = 18.sp,fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(2.dp))
-            address.last_name?.let { Text(text = it, fontSize = 18.sp) }
+    Scaffold(
+        topBar = { CustomTopBar(navController,"Address Info",AppColors.Teal,{navController.navigateUp()}) },
+        containerColor = Color.White,
+        content = { paddingValues ->
+            LazyColumn(modifier = Modifier.padding(16.dp).padding(paddingValues))
+            {
+                item{
+                    /*Text(
+                        text = "Address Info",
+                        style = MaterialTheme.typography.headlineMedium,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))*/
+                    Text(text = "First Name", fontSize = 18.sp,fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    address.first_name?.let { Text(text = it, fontSize = 18.sp, color = AppColors.Teal) }
 
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Phone Number", fontSize = 18.sp,fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(2.dp))
-            address.phone?.let { Text(text = it, fontSize = 18.sp) }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = "Last Name", fontSize = 18.sp,fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    address.last_name?.let { Text(text = it, fontSize = 18.sp, color = AppColors.Teal) }
 
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Address", fontSize = 18.sp,fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(2.dp))
-            address.address1?.let { Text(text = it, fontSize = 18.sp,) }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = "Phone Number", fontSize = 18.sp,fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    address.phone?.let { Text(text = it, fontSize = 18.sp, color = AppColors.Teal) }
 
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "City", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(2.dp))
-            address.city?.let { Text(text = it, fontSize = 18.sp) }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = "Address", fontSize = 18.sp,fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    address.address1?.let { Text(text = it, fontSize = 18.sp, color = AppColors.Teal) }
 
-            Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = "City", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    address.city?.let { Text(text = it, fontSize = 18.sp, color = AppColors.Teal) }
 
-            Text(text = "Country", fontSize = 18.sp,fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(2.dp))
-            address.country?.let { Text(text = it, fontSize = 18.sp) }
+                    Spacer(modifier = Modifier.height(8.dp))
 
-            Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = "Country", fontSize = 18.sp,fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    address.country?.let { Text(text = it, fontSize = 18.sp, color = AppColors.Teal) }
 
-            Text(text = "Default", fontSize = 18.sp,fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(2.dp))
-            address.default?.let { Text(text = it.toString(), fontSize = 18.sp) }
+                    Spacer(modifier = Modifier.height(8.dp))
 
-            Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = "Default", fontSize = 18.sp,fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    address.default?.let { Text(text = it.toString(), fontSize = 18.sp, color = AppColors.Teal) }
 
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                onClick = {
-                    address.id?.let {
-                    navController.navigate( Screen.AddressScreen.createRoute(it) )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        onClick = {
+                            address.id?.let {
+                                navController.navigate( Screen.AddressScreen.createRoute(it) )
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
+                        shape = RoundedCornerShape(10.dp),
+                    ) {
+                        Text(
+                            text = "Edit",
+                            color = Color.White,
+                            fontSize = 16.sp
+                        )
                     }
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                shape = RoundedCornerShape(10.dp),
-            ) {
-                Text(
-                    text = "Edit",
-                    color = Color.White,
-                    fontSize = 16.sp
-                )
-            }
 
-            Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-            address.default?.let {
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    onClick = {
-                        showDialog = true
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                    shape = RoundedCornerShape(10.dp),
-                    enabled = !it
-                ) {
-                    Text(
-                        text = "Delete",
-                        color = Color.White,
-                        fontSize = 16.sp
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            address.default?.let { isDefault ->
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    onClick = {
-                        userId?.let { it1 -> address.id?.let { it2 ->
-                            viewModel.setDefaultAddress(it1,
-                                it2
+                    address.default?.let {
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            onClick = {
+                                showDialog = true
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
+                            shape = RoundedCornerShape(10.dp),
+                            enabled = !it
+                        ) {
+                            Text(
+                                text = "Delete",
+                                color = Color.White,
+                                fontSize = 16.sp
                             )
-                        } }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                    shape = RoundedCornerShape(10.dp),
-                    enabled = !isDefault
-                ) {
-                    Text(
-                        text = "Make Default",
-                        color = Color.White,
-                        fontSize = 16.sp
-                    )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    address.default?.let { isDefault ->
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            onClick = {
+                                userId?.let { it1 -> address.id?.let { it2 ->
+                                    viewModel.setDefaultAddress(it1,
+                                        it2
+                                    )
+                                } }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
+                            shape = RoundedCornerShape(10.dp),
+                            enabled = !isDefault
+                        ) {
+                            Text(
+                                text = "Make Default",
+                                color = Color.White,
+                                fontSize = 16.sp
+                            )
+                        }
+                    }
                 }
             }
         }
-    }
+    )
+
 
     if (showDialog) {
         DeleteConfirmationDialog(
