@@ -826,10 +826,10 @@ fun AddToFavorites(
                     onClick = {
                         navController.navigate(Screen.LogInScreen.route) {
                             popUpTo(navController.graph.startDestinationId) {
-                                inclusive = true // Remove all previous screens from the back stack
+                                inclusive = true
                             }
                         }
-                        guestClicked = false // Close the dialog after confirming
+                        guestClicked = false
                     }
                 ) {
                     Text("Login", color = AppColors.Teal)

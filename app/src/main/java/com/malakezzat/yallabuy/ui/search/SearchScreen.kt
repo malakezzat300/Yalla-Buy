@@ -1,6 +1,7 @@
 package com.malakezzat.yallabuy.ui.search
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -69,6 +70,7 @@ import com.malakezzat.yallabuy.model.Product
 import com.malakezzat.yallabuy.model.Property
 import com.malakezzat.yallabuy.ui.CustomTopBar
 import com.malakezzat.yallabuy.ui.Screen
+import com.malakezzat.yallabuy.ui.home.viewmodel.HomeScreenViewModel
 import com.malakezzat.yallabuy.ui.product_info.AddToFavorites
 import com.malakezzat.yallabuy.ui.product_info.ProductInfoViewModel
 import com.malakezzat.yallabuy.ui.theme.AppColors
@@ -88,6 +90,9 @@ fun SearchScreen(viewModel: SearchViewModel,
 
     var draftOrderIdSaved by remember { mutableLongStateOf(0L) }
     var wishListDraftOrder by remember { mutableStateOf(DraftOrder(0L, "", listOf(), "")) }
+
+    var wishListAddButton by remember { mutableStateOf("") }
+    var isAddedWishList by remember { mutableStateOf(false) }
     //Currency
     LaunchedEffect(Unit) { viewModel.getDraftOrders() }
     val context = LocalContext.current
@@ -98,14 +103,27 @@ fun SearchScreen(viewModel: SearchViewModel,
         ApiState.Loading -> {}
         is ApiState.Success -> {
             draftOrderIdSaved = (draftOrderId as ApiState.Success).data.draft_order.id ?: 0L
+            viewModel.getDraftOrders()
         }
         else -> {}
     }
     when (wishListDraftOrderState) {
         is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(wishListDraftOrderState as ApiState.Error).message}")
         ApiState.Loading -> {}
-        is ApiState.Success -> wishListDraftOrder = (wishListDraftOrderState as ApiState.Success).data
+        is ApiState.Success -> {
+            wishListDraftOrder = (wishListDraftOrderState as ApiState.Success).data
+            isAddedWishList = true
+        }
     }
+
+    LaunchedEffect(wishListAddButton,isAddedWishList) {
+        if(wishListAddButton.isNotBlank() && isAddedWishList){
+            Toast.makeText(context, wishListAddButton, Toast.LENGTH_SHORT).show()
+            wishListAddButton = ""
+        }
+        isAddedWishList = false
+    }
+
 
     Scaffold(
        topBar = { CustomTopBar(navController,"",Color.White) },
@@ -178,7 +196,9 @@ fun SearchScreen(viewModel: SearchViewModel,
                         modifier = Modifier.background(Color.White)
                     ) {
                         items(filteredProducts) { searchItem ->
-                            RecentSearchItem(searchItem,navController,viewModel,wishListDraftOrder)
+                            RecentSearchItem(searchItem,navController,viewModel,wishListDraftOrder){ added ->
+                                wishListAddButton = added
+                            }
                         }
                     }
                 }
@@ -188,7 +208,11 @@ fun SearchScreen(viewModel: SearchViewModel,
 
 }
 @Composable
-fun RecentSearchItem(product: Product,navController: NavController,viewModel: SearchViewModel,oldDraftOrder : DraftOrder) {
+fun RecentSearchItem(product: Product,
+                     navController: NavController,
+                     viewModel: SearchViewModel,
+                     oldDraftOrder : DraftOrder,
+                     onAddedToFavorite : (String) -> Unit) {
 
     Box(
         modifier = Modifier
@@ -244,17 +268,34 @@ fun RecentSearchItem(product: Product,navController: NavController,viewModel: Se
 //                tint = AppColors.Teal,
 //                modifier = Modifier.size(35.dp)
 //            )
-            AddToFavorites(viewModel, product, FirebaseAuth.getInstance().currentUser?.email.toString(), oldDraftOrder,navController)
+            AddToFavorites(
+                viewModel,
+                product,
+                FirebaseAuth.getInstance().currentUser?.email.toString(),
+                oldDraftOrder,
+                navController
+            ) { added ->
+                onAddedToFavorite(added)
+            }
         }
     }
 
 }
 @Composable
-fun AddToFavorites(viewModel: SearchViewModel, product : Product, email : String, oldDraftOrder : DraftOrder, navController: NavController){
-    var geustClicked by remember { mutableStateOf(false) }
+fun AddToFavorites(
+    viewModel: SearchViewModel,
+    product: Product,
+    email: String,
+    oldDraftOrder: DraftOrder,
+    navController: NavController,
+    onAddedToFavorite: (String) -> Unit
+) {
+    var guestClicked by remember { mutableStateOf(false) }
     var clicked by remember { mutableStateOf(false) }
-    if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
-        IconButton(onClick = {geustClicked=true}) {
+    var isProcessing by remember { mutableStateOf(false) }
+
+    if (FirebaseAuth.getInstance().currentUser?.isAnonymous == true) {
+        IconButton(onClick = { guestClicked = true }) {
             Icon(
                 imageVector = Icons.Default.FavoriteBorder,
                 contentDescription = "Favorite",
@@ -262,44 +303,66 @@ fun AddToFavorites(viewModel: SearchViewModel, product : Product, email : String
                 modifier = Modifier.size(35.dp)
             )
         }
-    }else{
-        for(item in oldDraftOrder.line_items){
-            if(product.id == item.product_id){
-                clicked=true
-            }
-        }
+    } else {
+        clicked = oldDraftOrder.line_items.any { it.product_id == product.id }
+
         IconButton(onClick = {
-            clicked=true
+            isProcessing = true
             val properties = listOf(
-                Property(name = "imageUrl",value = product.image.src),
-                Property(name = "size",value = product.variants[0].option1),
-                Property(name = "color",value = product.variants[0].option2)
+                Property(name = "imageUrl", value = product.image.src),
+                Property(name = "size", value = product.variants[0].option1),
+                Property(name = "color", value = product.variants[0].option2)
             )
 
-            Log.i("propertiesTest", "AddToFav: ${oldDraftOrder.id}")
-            if(oldDraftOrder.id == 0L) {
-                val lineItems = listOf(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties,product.id?:0))
+            if (oldDraftOrder.id == 0L) {
+                clicked = true
+                val lineItems = listOf(
+                    LineItem(
+                        title = product.title,
+                        price = product.variants[0].price,
+                        variant_id = product.variants[0].id,
+                        quantity = 1,
+                        properties = properties,
+                        product_id = product.id ?: 0
+                    )
+                )
                 val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
                 val draftOrderRequest = DraftOrderRequest(draftOrder)
                 viewModel.createDraftOrder(draftOrderRequest)
+                onAddedToFavorite("Added to WishList")
             } else {
-                if(!oldDraftOrder.line_items.contains(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties,product.id?:0))) {
+                if (!oldDraftOrder.line_items.any { it.variant_id == product.variants[0].id }) {
+                    clicked = true
                     val lineItems = oldDraftOrder.line_items + listOf(
                         LineItem(
-                            product.title,
-                            product.variants[0].price,
-                            product.variants[0].id,
-                            1,
+                            title = product.title,
+                            price = product.variants[0].price,
+                            variant_id = product.variants[0].id,
+                            quantity = 1,
                             properties = properties,
-                            product.id?:0
+                            product_id = product.id ?: 0
                         )
                     )
                     val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
                     val draftOrderRequest = DraftOrderRequest(draftOrder)
-                    oldDraftOrder.id?.let { viewModel.updateDraftOrder(it,draftOrderRequest) }
+                    oldDraftOrder.id?.let { viewModel.updateDraftOrder(it, draftOrderRequest) }
+                    onAddedToFavorite("Added to WishList")
+                } else {
+                    clicked = false
+                    val lineItems = oldDraftOrder.line_items.filterNot { it.variant_id == product.variants[0].id }
+                    val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
+                    val draftOrderRequest = DraftOrderRequest(draftOrder)
+                    if(lineItems.isEmpty()){
+                        oldDraftOrder.id?.let { viewModel.deleteDraftOrder(it) }
+                    } else {
+                        oldDraftOrder.id?.let { viewModel.updateDraftOrder(it, draftOrderRequest) }
+                    }
+                    onAddedToFavorite("Removed from WishList")
                 }
             }
-        }) {
+            isProcessing = false
+        }, enabled = !isProcessing)
+        {
             if (clicked) {
                 Icon(
                     imageVector = Icons.Sharp.Favorite,
@@ -315,32 +378,30 @@ fun AddToFavorites(viewModel: SearchViewModel, product : Product, email : String
                     modifier = Modifier.size(35.dp)
                 )
             }
-
         }
     }
-    if(geustClicked){
+
+    if (guestClicked) {
         AlertDialog(
-            onDismissRequest = { geustClicked = false }, // Close dialog on dismiss
+            onDismissRequest = { guestClicked = false },
             title = { Text(text = "Guest") },
-            text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals, and to save your favorite products") },
+            text = { Text("You need to login first.") },
             confirmButton = {
                 TextButton(
                     onClick = {
                         navController.navigate(Screen.LogInScreen.route) {
                             popUpTo(navController.graph.startDestinationId) {
-                                inclusive = true // Remove all previous screens from the back stack
+                                inclusive = true
                             }
                         }
-                        geustClicked = false // Close the dialog after confirming
+                        guestClicked = false
                     }
                 ) {
                     Text("Login", color = AppColors.Teal)
                 }
             },
             dismissButton = {
-                TextButton(
-                    onClick = { geustClicked = false }
-                ) {
+                TextButton(onClick = { guestClicked = false }) {
                     Text("Cancel", color = AppColors.Rose)
                 }
             }
