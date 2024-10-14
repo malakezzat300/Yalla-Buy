@@ -121,7 +121,7 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
     var searchTextCountry by remember { mutableStateOf("") }
     var filteredCountries by remember { mutableStateOf(countries) }
     var validPhone by remember { mutableStateOf(false) }
-
+    var isMap by remember { mutableStateOf(false) }
 
     val sharedPreferences = context.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
     LaunchedEffect(Unit) {
@@ -133,7 +133,10 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
             screenTitle = "Edit Address"
         } else {
             if (address != null) {
-                addressState = address
+                if(address.isNotBlank()){
+                    addressState = address
+                    isMap = true
+                }
             }
         }
     }
@@ -172,7 +175,12 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
         is ApiState.Success -> {
             LaunchedEffect(Unit) {
                 Toast.makeText(context, "Address has been added", Toast.LENGTH_SHORT).show()
-                navController.navigateUp()
+                if(isMap){
+                    navController.navigateUp()
+                    navController.navigateUp()
+                } else {
+                    navController.navigateUp()
+                }
             }
         }
     }
@@ -209,11 +217,6 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                 .padding(paddingValues)
                 .background(color = Color.White)) {
                 item {
-                    /*Text(
-                        text = "New Address",
-                        style = MaterialTheme.typography.headlineMedium,
-                    )*/
-
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = buildAnnotatedString {
@@ -267,25 +270,7 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                             fontSize = 18.sp,
                             modifier = Modifier.align(Alignment.CenterVertically)
                         )
-//                Text(text = "Address",
-//                    fontSize = 18.sp,
-//                    modifier = Modifier.align(Alignment.CenterVertically)
-//                )
                         Row {
-//                    Button(
-//                        onClick = {
-//
-//                        },
-//                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-//                        shape = RoundedCornerShape(30.dp)
-//                    ) {
-//                        Text(
-//                            text = "Map",
-//                            color = Color.White,
-//                            fontSize = 16.sp
-//                        )
-//                    }
-//                    Spacer(modifier = Modifier.width(8.dp))
                             Button(
                                 onClick = {
                                     if (ContextCompat.checkSelfPermission(

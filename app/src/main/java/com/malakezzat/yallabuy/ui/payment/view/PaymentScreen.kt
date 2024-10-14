@@ -69,6 +69,7 @@ import com.malakezzat.yallabuy.model.DraftOrder
 import com.malakezzat.yallabuy.model.LineItem
 import com.malakezzat.yallabuy.ui.Screen
 import com.malakezzat.yallabuy.ui.payment.viewmodel.PaymentViewModel
+import com.malakezzat.yallabuy.ui.settings.view.AddressDialog
 import com.malakezzat.yallabuy.ui.theme.AppColors
 import com.malakezzat.yallabuy.ui.theme.YallaBuyTheme
 import kotlinx.coroutines.delay
@@ -97,6 +98,7 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
     var vaildData by remember { mutableStateOf(false) }
     val shoppingCartOrderState by viewModel.shoppingCartDraftOrder.collectAsState()
     var draftOrder by remember { mutableStateOf(DraftOrder()) }
+    var showAddressDialog by remember { mutableStateOf(false) }
 
 
     val context = LocalContext.current
@@ -218,7 +220,7 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
                     Spacer(modifier = Modifier.width(4.dp))
                     Button(
                         onClick = {
-                            navController.navigate(Screen.AddressScreen.createRoute(""))
+                            showAddressDialog = true
                         },
                         modifier = Modifier
                             .width(80.dp)
@@ -571,8 +573,29 @@ fun PaymentMethodScreen(viewModel: PaymentViewModel, navController: NavControlle
                     }
 
         }
+            if (showAddressDialog) {
+                AddressDialog(
+                    showDialog = showAddressDialog,
+                    onDismiss = {
+                        showAddressDialog = false
+                    },
+                    onWriteAddress = {
+                        navController.navigate(Screen.AddressScreen.createRoute(""))
+                        showAddressDialog = false
+                    },
+                    onGetFromMap = {
+                        val latitude = 27.18039285293778
+                        val longitude = 31.186714348461493
+                        navController.navigate("mapScreen/$latitude/$longitude")
+                        showAddressDialog = false
+                    }
+                )
+
+            }
         }
+
     )
+
 }
 
 @Composable
