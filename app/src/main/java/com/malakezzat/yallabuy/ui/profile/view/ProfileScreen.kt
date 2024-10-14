@@ -123,9 +123,9 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
                             confirmButton = {
                                 TextButton(
                                     onClick = {
-                                        showLogoutDialog = false
+                                        showResetPassDialog = false
                                         FirebaseAuthun().sendPasswordResetEmail(FirebaseAuth.getInstance().currentUser?.email.toString(), onSuccess = {
-                                            Toast.makeText(context,"Password reset email sent successfully",Toast.LENGTH_LONG)
+                                            Toast.makeText(context,"Password reset email sent successfully",Toast.LENGTH_LONG).show()
                                         }, onError = {})
                                         // Close the dialog after confirming
                                     }

@@ -441,7 +441,7 @@ fun AddToFavorites(
         AlertDialog(
             onDismissRequest = { guestClicked = false },
             title = { Text(text = "Guest") },
-            text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals, and to save your favorite products") },
+            text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals") },
             confirmButton = {
                 TextButton(
                     onClick = {
