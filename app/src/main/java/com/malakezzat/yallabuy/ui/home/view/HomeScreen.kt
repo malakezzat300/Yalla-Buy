@@ -124,7 +124,20 @@ fun HomeScreen(
     var draftOrderIdSaved by remember { mutableLongStateOf(0L) }
     var wishListDraftOrder by remember { mutableStateOf(DraftOrder(0L, "", listOf(), "")) }
 
-
+    LaunchedEffect(Unit) {
+        if (brandsState !is ApiState.Success) {
+            viewModel.getBrands()
+        }
+        if (categoriesState !is ApiState.Success) {
+            viewModel.getAllCategories()
+        }
+        if (productState !is ApiState.Success) {
+            viewModel.getAllProducts()
+        }
+        if (draftOrderId !is ApiState.Success) {
+            viewModel.getDraftOrders()
+        }
+    }
     //Currency
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
