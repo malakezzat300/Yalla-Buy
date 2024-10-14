@@ -3,6 +3,7 @@ package com.malakezzat.yallabuy.ui.categories.view
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -58,7 +59,12 @@ fun CategoriesScreen(
         ) {
             when (categoriesState) {
                 is ApiState.Loading -> {
-                    CircularProgressIndicator(color = AppColors.Teal,modifier = Modifier.align(Alignment.CenterHorizontally))
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = AppColors.Teal)
+                    }
                 }
 
                 is ApiState.Success -> {
@@ -74,10 +80,12 @@ fun CategoriesScreen(
                         color = Color.Red
                     )*/
                     Log.i(com.malakezzat.yallabuy.ui.home.view.TAG, "Error: ${(categoriesState as ApiState.Error).message}")
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally),
-                        color = AppColors.Teal
-
-                    )
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = AppColors.Teal)
+                    }
                 }
             }
         }
