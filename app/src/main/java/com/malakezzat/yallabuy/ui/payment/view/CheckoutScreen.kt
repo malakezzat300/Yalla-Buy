@@ -136,7 +136,9 @@ fun CheckoutScreen(viewModel: PaymentViewModel, navController: NavController) {
             draftOrderUpdated = (draftOrderState as ApiState.Success).data.draft_order
             Log.i("completeOrderTest", "draftOrderUpdated: draftOrder ${draftOrderUpdated.toString()}")
             LaunchedEffect(Unit) {
-                draftOrderUpdated.id?.let { viewModel.finalizeDraftOrder(it) }
+                draftOrderUpdated.id?.let {
+                    viewModel.finalizeDraftOrder(it)
+                }
 
             }
         }
@@ -146,7 +148,7 @@ fun CheckoutScreen(viewModel: PaymentViewModel, navController: NavController) {
         is ApiState.Error ->{ Log.i("completeOrderTest", "finalizeDraftOrderState: draftOrder ${(finalizeDraftOrderState as ApiState.Error).message}")
             LaunchedEffect(Unit) {
                 isLoadingButton = false
-                Toast.makeText(context, "Failed to Place Order", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(context, "Failed to Place Order", Toast.LENGTH_SHORT).show()
             }
         }
         ApiState.Loading -> {
@@ -156,6 +158,11 @@ fun CheckoutScreen(viewModel: PaymentViewModel, navController: NavController) {
         is ApiState.Success -> {
             isLoadingButton = false
             LaunchedEffect (Unit){
+                (finalizeDraftOrderState as ApiState.Success).data.draft_order.id?.let {
+                    viewModel.deleteDraftOrder(
+                        it
+                    )
+                }
                 Log.i("completeOrderTest", "finalizeDraftOrderState: done ")
                 navController.navigate(Screen.OrderPlacedScreen.route)
             }
