@@ -775,7 +775,7 @@ fun AddToFavorites(viewModel: HomeScreenViewModel, product : Product, email : St
         AlertDialog(
             onDismissRequest = { geustClicked = false }, // Close dialog on dismiss
             title = { Text(text = "Guest") },
-            text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals, and to save your favorite products") },
+            text = { Text("You need to login first.") },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -990,7 +990,7 @@ fun BottomNavigationBar(navController: NavController) {
         AlertDialog(
             onDismissRequest = { geustClicked = false }, // Close dialog on dismiss
             title = { Text(text = "Guest") },
-            text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals, and to save your favorite products") },
+            text = { Text("You need to login first.") },
             confirmButton = {
                 TextButton(
                     onClick = {
