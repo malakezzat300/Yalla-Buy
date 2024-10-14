@@ -44,6 +44,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.malakezzat.yallabuy.model.Address
 import com.malakezzat.yallabuy.ui.Screen
+import com.malakezzat.yallabuy.ui.theme.AppColors
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -88,8 +89,8 @@ fun MapScreen(navController : NavController,latitude: Double, longitude: Double)
                         popUpTo(Screen.AddressScreen.route) { inclusive = true }
                     }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
+                shape = RoundedCornerShape(30.dp),
                 enabled = selectedAddress.isNotEmpty()
             ) {
                 Text(

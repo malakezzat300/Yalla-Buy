@@ -121,6 +121,8 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
     var searchTextCountry by remember { mutableStateOf("") }
     var filteredCountries by remember { mutableStateOf(countries) }
     var validPhone by remember { mutableStateOf(false) }
+    var isMap by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
 
 
     val sharedPreferences = context.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
@@ -133,7 +135,10 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
             screenTitle = "Edit Address"
         } else {
             if (address != null) {
-                addressState = address
+                if(address.isNotBlank()){
+                    addressState = address
+                    isMap = true
+                }
             }
         }
     }
@@ -172,7 +177,12 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
         is ApiState.Success -> {
             LaunchedEffect(Unit) {
                 Toast.makeText(context, "Address has been added", Toast.LENGTH_SHORT).show()
-                navController.navigateUp()
+                if(isMap){
+                    navController.navigateUp()
+                    navController.navigateUp()
+                } else {
+                    navController.navigateUp()
+                }
             }
         }
     }
@@ -209,11 +219,6 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                 .padding(paddingValues)
                 .background(color = Color.White)) {
                 item {
-                    /*Text(
-                        text = "New Address",
-                        style = MaterialTheme.typography.headlineMedium,
-                    )*/
-
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = buildAnnotatedString {
@@ -267,34 +272,20 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                             fontSize = 18.sp,
                             modifier = Modifier.align(Alignment.CenterVertically)
                         )
-//                Text(text = "Address",
-//                    fontSize = 18.sp,
-//                    modifier = Modifier.align(Alignment.CenterVertically)
-//                )
                         Row {
-//                    Button(
-//                        onClick = {
-//
-//                        },
-//                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-//                        shape = RoundedCornerShape(30.dp)
-//                    ) {
-//                        Text(
-//                            text = "Map",
-//                            color = Color.White,
-//                            fontSize = 16.sp
-//                        )
-//                    }
-//                    Spacer(modifier = Modifier.width(8.dp))
                             Button(
                                 onClick = {
+                                    locationEnabled = isLocationEnabled(context)
                                     if (ContextCompat.checkSelfPermission(
                                             context,
                                             Manifest.permission.ACCESS_FINE_LOCATION
                                         ) == PackageManager.PERMISSION_GRANTED
                                     ) {
-                                        getUserLocation(context, fusedLocationClient) { loc ->
-                                            addressState = loc
+                                        permissionGranted = true
+                                        if (locationEnabled) {
+                                            getUserLocation(context, fusedLocationClient) { loc ->
+                                                addressState = loc
+                                            }
                                         }
                                     } else {
                                         permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -582,11 +573,26 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
 
 
     if (!locationEnabled && permissionGranted) {
-        LocationPrompt()
+        showDialog = true
+    }
+    if (showDialog) {
+        EnableLocationDialog(
+            onConfirm = {
+                context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            },
+            onDismiss = {
+                showDialog = false
+            }
+        )
+        locationEnabled = true
     }
 }
 
-fun getUserLocation(context: Context, fusedLocationClient: FusedLocationProviderClient,  onLocationReceived: (String) -> Unit) {
+fun getUserLocation(
+    context: Context,
+    fusedLocationClient: FusedLocationProviderClient,
+    onLocationReceived: (String) -> Unit
+) {
     if (ActivityCompat.checkSelfPermission(
             context,
             Manifest.permission.ACCESS_FINE_LOCATION
@@ -615,9 +621,7 @@ fun getUserLocation(context: Context, fusedLocationClient: FusedLocationProvider
 
             onLocationReceived(address)
         }
-
     }
-
 }
 
 fun isLocationEnabled(context: Context): Boolean {
@@ -646,27 +650,39 @@ fun EnableLocationDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
         }
     )
 }
-
-@Composable
-fun LocationPrompt() {
-    val context = LocalContext.current
-    var showDialog by remember { mutableStateOf(false) }
-
-    if (!isLocationEnabled(context)) {
-        showDialog = true
-    }
-
-    if (showDialog) {
-        EnableLocationDialog(
-            onConfirm = {
-                context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-            },
-            onDismiss = {
-                showDialog = false
-            }
-        )
-    }
-}
+//
+//@Composable
+//fun LocationPrompt() {
+//    val context = LocalContext.current
+//    var showDialog by remember { mutableStateOf(false) }
+//
+//    Button(
+//        onClick = {
+//            if (!isLocationEnabled(context)) {
+//                showDialog = true
+//            }
+//        },
+//        colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
+//        shape = RoundedCornerShape(30.dp)
+//    ) {
+//        Text(
+//            text = "Enable Location",
+//            color = Color.White,
+//            fontSize = 16.sp
+//        )
+//    }
+//
+//    if (showDialog) {
+//        EnableLocationDialog(
+//            onConfirm = {
+//                context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+//            },
+//            onDismiss = {
+//                showDialog = false
+//            }
+//        )
+//    }
+//}
 
 fun getCitiesFromCountries(context: Context, countryName: String): List<String> {
     val json: String
