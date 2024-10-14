@@ -110,8 +110,8 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
 
                     // Account Management Section
                     SectionWithPadding(title = "Account Management") {
-                        ProfileItem(icon = R.drawable.ic_change_password, title = "Change Password") {
-
+                        ProfileItem(icon = R.drawable.ic_change_password, title = "Reset Password") {
+                            showResetPassDialog=true
                         }
                         //DarkThemeToggle() // Dark Theme Toggle inside the Account Management section
                     }
@@ -123,9 +123,9 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
                             confirmButton = {
                                 TextButton(
                                     onClick = {
-                                        showLogoutDialog = false
+                                        showResetPassDialog = false
                                         FirebaseAuthun().sendPasswordResetEmail(FirebaseAuth.getInstance().currentUser?.email.toString(), onSuccess = {
-                                            Toast.makeText(context,"Password reset email sent successfully",Toast.LENGTH_LONG)
+                                            Toast.makeText(context,"Password reset email sent successfully",Toast.LENGTH_LONG).show()
                                         }, onError = {})
                                         // Close the dialog after confirming
                                     }

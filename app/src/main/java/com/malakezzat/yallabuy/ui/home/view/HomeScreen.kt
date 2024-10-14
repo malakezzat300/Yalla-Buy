@@ -131,16 +131,17 @@ fun HomeScreen(
         if (categoriesState !is ApiState.Success && categoriesState !is ApiState.Loading) {
             viewModel.getAllCategories()
         }
-        if (productState !is ApiState.Success && productState !is ApiState.Loading) {
+//        if (productState !is ApiState.Success && productState !is ApiState.Loading) {
             viewModel.getAllProducts()
-        }
-        if (draftOrderId !is ApiState.Success && draftOrderId !is ApiState.Loading) {
-            viewModel.getDraftOrders()
-        }
+//        }
+//        if (draftOrderId !is ApiState.Success && draftOrderId !is ApiState.Loading) {
+//            viewModel.getDraftOrders()
+//        }
     }
     //Currency
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
+
     when (draftOrderId) {
         is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(draftOrderId as ApiState.Error).message}")
         ApiState.Loading -> {}
@@ -774,7 +775,7 @@ fun AddToFavorites(viewModel: HomeScreenViewModel, product : Product, email : St
         AlertDialog(
             onDismissRequest = { geustClicked = false }, // Close dialog on dismiss
             title = { Text(text = "Guest") },
-            text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals, and to save your favorite products") },
+            text = { Text("You need to login first.") },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -989,7 +990,7 @@ fun BottomNavigationBar(navController: NavController) {
         AlertDialog(
             onDismissRequest = { geustClicked = false }, // Close dialog on dismiss
             title = { Text(text = "Guest") },
-            text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals, and to save your favorite products") },
+            text = { Text("You need to login first.") },
             confirmButton = {
                 TextButton(
                     onClick = {

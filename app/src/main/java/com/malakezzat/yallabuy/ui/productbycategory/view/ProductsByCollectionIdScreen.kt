@@ -471,7 +471,7 @@ fun AddToFavorites(viewModel: ProductsByCollectionIdViewModel, product : Product
         AlertDialog(
             onDismissRequest = { geustClicked = false }, // Close dialog on dismiss
             title = { Text(text = "Guest") },
-            text = { Text("You’re shopping as a guest. Log in for a faster checkout, exclusive deals, and to save your favorite products") },
+            text = { Text("You need to login first.") },
             confirmButton = {
                 TextButton(
                     onClick = {
