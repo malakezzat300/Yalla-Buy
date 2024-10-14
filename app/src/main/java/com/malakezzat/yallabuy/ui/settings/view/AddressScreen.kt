@@ -122,6 +122,8 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
     var filteredCountries by remember { mutableStateOf(countries) }
     var validPhone by remember { mutableStateOf(false) }
     var isMap by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+
 
     val sharedPreferences = context.getSharedPreferences("MySharedPrefs", Context.MODE_PRIVATE)
     LaunchedEffect(Unit) {
@@ -273,13 +275,17 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
                         Row {
                             Button(
                                 onClick = {
+                                    locationEnabled = isLocationEnabled(context)
                                     if (ContextCompat.checkSelfPermission(
                                             context,
                                             Manifest.permission.ACCESS_FINE_LOCATION
                                         ) == PackageManager.PERMISSION_GRANTED
                                     ) {
-                                        getUserLocation(context, fusedLocationClient) { loc ->
-                                            addressState = loc
+                                        permissionGranted = true
+                                        if (locationEnabled) {
+                                            getUserLocation(context, fusedLocationClient) { loc ->
+                                                addressState = loc
+                                            }
                                         }
                                     } else {
                                         permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -567,11 +573,26 @@ fun AddressScreen(navController: NavHostController,viewModel: SettingsViewModel,
 
 
     if (!locationEnabled && permissionGranted) {
-        LocationPrompt()
+        showDialog = true
+    }
+    if (showDialog) {
+        EnableLocationDialog(
+            onConfirm = {
+                context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            },
+            onDismiss = {
+                showDialog = false
+            }
+        )
+        locationEnabled = true
     }
 }
 
-fun getUserLocation(context: Context, fusedLocationClient: FusedLocationProviderClient,  onLocationReceived: (String) -> Unit) {
+fun getUserLocation(
+    context: Context,
+    fusedLocationClient: FusedLocationProviderClient,
+    onLocationReceived: (String) -> Unit
+) {
     if (ActivityCompat.checkSelfPermission(
             context,
             Manifest.permission.ACCESS_FINE_LOCATION
@@ -600,9 +621,7 @@ fun getUserLocation(context: Context, fusedLocationClient: FusedLocationProvider
 
             onLocationReceived(address)
         }
-
     }
-
 }
 
 fun isLocationEnabled(context: Context): Boolean {
@@ -631,27 +650,39 @@ fun EnableLocationDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
         }
     )
 }
-
-@Composable
-fun LocationPrompt() {
-    val context = LocalContext.current
-    var showDialog by remember { mutableStateOf(false) }
-
-    if (!isLocationEnabled(context)) {
-        showDialog = true
-    }
-
-    if (showDialog) {
-        EnableLocationDialog(
-            onConfirm = {
-                context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-            },
-            onDismiss = {
-                showDialog = false
-            }
-        )
-    }
-}
+//
+//@Composable
+//fun LocationPrompt() {
+//    val context = LocalContext.current
+//    var showDialog by remember { mutableStateOf(false) }
+//
+//    Button(
+//        onClick = {
+//            if (!isLocationEnabled(context)) {
+//                showDialog = true
+//            }
+//        },
+//        colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
+//        shape = RoundedCornerShape(30.dp)
+//    ) {
+//        Text(
+//            text = "Enable Location",
+//            color = Color.White,
+//            fontSize = 16.sp
+//        )
+//    }
+//
+//    if (showDialog) {
+//        EnableLocationDialog(
+//            onConfirm = {
+//                context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+//            },
+//            onDismiss = {
+//                showDialog = false
+//            }
+//        )
+//    }
+//}
 
 fun getCitiesFromCountries(context: Context, countryName: String): List<String> {
     val json: String
