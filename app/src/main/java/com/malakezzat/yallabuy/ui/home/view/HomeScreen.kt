@@ -125,16 +125,16 @@ fun HomeScreen(
     var wishListDraftOrder by remember { mutableStateOf(DraftOrder(0L, "", listOf(), "")) }
 
     LaunchedEffect(Unit) {
-        if (brandsState !is ApiState.Success) {
+        if (brandsState !is ApiState.Success && brandsState !is ApiState.Loading) {
             viewModel.getBrands()
         }
-        if (categoriesState !is ApiState.Success) {
+        if (categoriesState !is ApiState.Success && categoriesState !is ApiState.Loading) {
             viewModel.getAllCategories()
         }
-        if (productState !is ApiState.Success) {
+        if (productState !is ApiState.Success && productState !is ApiState.Loading) {
             viewModel.getAllProducts()
         }
-        if (draftOrderId !is ApiState.Success) {
+        if (draftOrderId !is ApiState.Success && draftOrderId !is ApiState.Loading) {
             viewModel.getDraftOrders()
         }
     }
