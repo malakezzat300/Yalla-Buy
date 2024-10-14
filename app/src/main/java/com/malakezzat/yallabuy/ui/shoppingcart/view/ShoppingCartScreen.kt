@@ -806,8 +806,8 @@ fun VoucherBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
+                shape = RoundedCornerShape(30.dp),
                 enabled = !discountApplied
             ) {
                 Text(
