@@ -128,16 +128,6 @@ fun HomeScreen(
     //Currency
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
-    LaunchedEffect(Unit) {
-        delay(500)
-        viewModel.getBrands()
-        //delay(200)
-        viewModel.getAllCategories()
-        //delay(200)
-        viewModel.getAllProducts()
-        //delay(200)
-        viewModel.getDraftOrders()
-    }
     when (draftOrderId) {
         is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(draftOrderId as ApiState.Error).message}")
         ApiState.Loading -> {}
