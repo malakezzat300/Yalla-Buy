@@ -176,6 +176,7 @@ class SearchViewModel(var repository : ProductsRepository) : ViewModel(){
         viewModelScope.launch {
             try {
                 repository.deleteDraftOrder(draftOrderId)
+                _wishListDraftOrder.value = ApiState.Success(DraftOrder())
                 getDraftOrders()
             } catch (e: Exception) {
                 Log.e("TAG", "Failed to delete draft order: ${e.message}")
