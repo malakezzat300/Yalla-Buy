@@ -40,10 +40,10 @@ fun CategoriesScreen(
     navController: NavController
 ){
     val categoriesState by viewModel.categoriesList.collectAsStateWithLifecycle()
-    LaunchedEffect(Unit) {
+    /*LaunchedEffect(Unit) {
         Log.d(TAG, categoriesState.toString())
         viewModel.getAllCategories()
-    }
+    }*/
     Scaffold(
         topBar = { CustomTopBar(navController,"Categories") },
         containerColor = Color.White
