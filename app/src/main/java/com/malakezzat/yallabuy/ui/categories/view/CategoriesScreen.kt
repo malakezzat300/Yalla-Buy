@@ -9,16 +9,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -37,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
@@ -57,7 +62,6 @@ fun CategoriesScreen(
 ) {
     // Collect categories state
     val categoriesState by viewModel.categoriesList.collectAsStateWithLifecycle()
-
     // Launch effect to trigger the API call only if necessary
     LaunchedEffect(categoriesState) {
         if (categoriesState !is ApiState.Success && categoriesState !is ApiState.Loading) {
@@ -100,10 +104,16 @@ fun CategoriesScreen(
                 is ApiState.Error -> {
                     // Log error and center progress bar as a fallback
                     Log.i(TAG, "Error: ${(categoriesState as ApiState.Error).message}")
-                    CircularProgressIndicator(
-                        color = AppColors.Teal,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        androidx.compose.material3.CircularProgressIndicator(
+                            color = AppColors.Teal
+                        )
+                    }
                 }
             }
         }
@@ -120,18 +130,15 @@ fun CategoriesSectionInCategoriesScreen(
     Column(modifier = Modifier.padding(16.dp)) {
 
         Spacer(modifier = Modifier.height(18.dp))
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier
-                .fillMaxSize()
-                .height(600.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+                .height(900.dp)
+            ,
             verticalArrangement = Arrangement.spacedBy(6.dp),
             contentPadding = PaddingValues(0.dp)
-
         ) {
             itemsIndexed(categories) { _, category ->
-                CategoryItem(category, navController)
+                CategoryItem2(category, navController)
             }
         }
     }
@@ -141,36 +148,40 @@ fun CategoriesSectionInCategoriesScreen(
 fun CategoryItem2(category: CustomCollection, navController: NavController) {
     Card(
         modifier = Modifier
-            .width(200.dp)
-            .height(200.dp)
+            .fillMaxWidth()
             .clickable {
-                navController.navigate("${Screen.ProductsByCategoryScreen.route}/${category.id.toString()}/${category.body_html}")
+                navController.navigate("${Screen.ProductsByCategoryScreen.route}/${category.id}/${category.body_html}")
             },
         shape = RoundedCornerShape(28.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         border = BorderStroke(1.dp, Color(0xFFE0E0E0))
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        Row(
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
                 painter = rememberAsyncImagePainter(category.image?.src),
                 contentDescription = "category item",
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .clip(RoundedCornerShape(28.dp)),
+                    .width(200.dp)
+                    .height(130.dp)
+                    .clip(RoundedCornerShape(16.dp)),
                 contentScale = ContentScale.FillBounds
             )
-            Text(
-                text = category.title,
-                style = MaterialTheme.typography.bodyMedium,
-                color = AppColors.Teal,
-                modifier = Modifier.padding(top = 10.dp, bottom = 10.dp)
-            )
+            Spacer(modifier = Modifier.width(10.dp))
+            Box(
+                modifier = Modifier.weight(1f).fillMaxHeight(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = category.title,
+                    fontSize = 20.sp,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AppColors.Teal
+                )
+            }
         }
     }
 }
