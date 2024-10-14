@@ -360,9 +360,10 @@ fun AddressDialog(
 ) {
     if (showDialog) {
         AlertDialog(
+            containerColor = Color.White,
             onDismissRequest = { onDismiss() },
             title = {
-                Text(text = "Address From Map")
+                Text(text = "Address From Map" ,color = AppColors.Teal)
             },
             text = {
                 Text("Do you want to get address from Map?")
@@ -372,9 +373,10 @@ fun AddressDialog(
                     onClick = {
                         onGetFromMap()
                         onDismiss()
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
                 ) {
-                    Text("Yes")
+                    Text("Yes", color = Color.White)
                 }
             },
             dismissButton = {
@@ -383,8 +385,9 @@ fun AddressDialog(
                         onWriteAddress()
                         onDismiss()
                     }
+                    ,colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
                 ) {
-                    Text("No")
+                    Text("No", color = Color.White)
                 }
             }
         )

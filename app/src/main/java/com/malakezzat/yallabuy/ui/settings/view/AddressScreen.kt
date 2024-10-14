@@ -634,20 +634,24 @@ fun isLocationEnabled(context: Context): Boolean {
 @Composable
 fun EnableLocationDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
+        containerColor = Color.White,
         onDismissRequest = onDismiss,
-        title = { Text(text = "Enable Location") },
+        title = { Text(text = "Enable Location", color = AppColors.Teal) },
         text = { Text("Please enable location services to use this feature.") },
         confirmButton = {
             Button(onClick = {
                 onConfirm()
                 onDismiss()
-            }) {
-                Text("Settings")
+            },
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
+            ) {
+                Text("Settings", color = Color.White)
             }
         },
         dismissButton = {
-            Button(onClick = onDismiss) {
-                Text("Cancel")
+            Button(onClick = {onDismiss},
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)) {
+                Text("Cancel", color = Color.White)
             }
         }
     )

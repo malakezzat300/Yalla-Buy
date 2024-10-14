@@ -117,8 +117,9 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
                     }
                     if (showResetPassDialog) {
                         AlertDialog(
+                            containerColor = Color.White,
                             onDismissRequest = { showResetPassDialog = false }, // Close dialog on dismiss
-                            title = { Text(text = "Reset Password") },
+                            title = { Text(text = "Reset Password", color = AppColors.Teal) },
                             text = { Text("Are you sure you want to reset your password?") },
                             confirmButton = {
                                 TextButton(
@@ -128,16 +129,18 @@ fun ProfileScreen(viewModel: ProfileScreenViewModel, navController: NavControlle
                                             Toast.makeText(context,"Password reset email sent successfully",Toast.LENGTH_LONG).show()
                                         }, onError = {})
                                         // Close the dialog after confirming
-                                    }
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
                                 ) {
-                                    Text("Yes", color = Color.Red)
+                                    Text("Yes", color = Color.White)
                                 }
                             },
                             dismissButton = {
                                 TextButton(
-                                    onClick = { showResetPassDialog = false } // Close dialog without action
+                                    onClick = { showResetPassDialog = false },
+                                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal) // Close dialog without action
                                 ) {
-                                    Text("No", color = Color(0xFF00C4B4))
+                                    Text("No", color = Color.White)
                                 }
                             }
                         )
@@ -207,8 +210,8 @@ fun UserInfoSection(navController: NavController, onLogoutClick: () -> Unit) {
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(FirebaseAuth.getInstance().currentUser?.photoUrl)
                     .crossfade(true)
-                    .placeholder(R.drawable.profile)
-                    .error(R.drawable.profile)
+                    .placeholder(R.drawable.person)
+                    .error(R.drawable.person)
                     .build()
             ),
             contentDescription = "User Profile Picture",
