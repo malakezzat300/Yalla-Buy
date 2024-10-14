@@ -177,8 +177,8 @@ fun UserInfoSection(navController: NavController, onLogoutClick: () -> Unit) {
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(FirebaseAuth.getInstance().currentUser?.photoUrl)
                     .crossfade(true)
-                    .placeholder(R.drawable.person)
-                    .error(R.drawable.person)
+                    .placeholder(R.drawable.profile)
+                    .error(R.drawable.profile)
                     .build()
             ),
             contentDescription = "User Profile Picture",

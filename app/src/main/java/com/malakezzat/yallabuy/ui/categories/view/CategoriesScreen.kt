@@ -40,10 +40,12 @@ fun CategoriesScreen(
     navController: NavController
 ){
     val categoriesState by viewModel.categoriesList.collectAsStateWithLifecycle()
-    /*LaunchedEffect(Unit) {
+    LaunchedEffect(Unit) {
         Log.d(TAG, categoriesState.toString())
-        viewModel.getAllCategories()
-    }*/
+        if (categoriesState !is ApiState.Success) {
+            viewModel.getAllCategories()
+        }
+    }
     Scaffold(
         topBar = { CustomTopBar(navController,"Categories") },
         containerColor = Color.White
@@ -67,9 +69,14 @@ fun CategoriesScreen(
                 }
 
                 is ApiState.Error -> {
-                    Text(
+                    /*Text(
                         text = "Error: ${(categoriesState as ApiState.Error).message}",
                         color = Color.Red
+                    )*/
+                    Log.i(com.malakezzat.yallabuy.ui.home.view.TAG, "Error: ${(categoriesState as ApiState.Error).message}")
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally),
+                        color = AppColors.Teal
+
                     )
                 }
             }
