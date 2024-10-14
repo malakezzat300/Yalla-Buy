@@ -27,7 +27,7 @@ import com.malakezzat.yallabuy.ui.theme.AppColors
 
 @Composable
 fun SplashScreen(navController: NavController) {
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.splash))
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.splashhh))
     val progress by animateLottieCompositionAsState(composition)
 
     Column(
@@ -42,7 +42,7 @@ fun SplashScreen(navController: NavController) {
             progress = progress
         )
         //Spacer(modifier = Modifier.height(16.dp)) // Optional spacing between animation and text
-        Text("Welcome to YallaBuy", fontSize = 24.sp, color = AppColors.MintGreen, fontWeight = FontWeight.Normal)
+        Text("Welcome to YallaBuy", fontSize = 24.sp, color = AppColors.Teal, fontWeight = FontWeight.Normal)
     }
 
     LaunchedEffect(Unit) {
