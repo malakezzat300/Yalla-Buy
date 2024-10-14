@@ -205,9 +205,14 @@ fun HomeScreen(
                 }
 
                 is ApiState.Error -> {
-                    Text(
+                    /*Text(
                         text = "Error: ${(categoriesState as ApiState.Error).message}",
                         color = Color.Red
+                    )*/
+                    Log.i(TAG, "Error: ${(categoriesState as ApiState.Error).message}")
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally),
+                        color = AppColors.Teal
+
                     )
                 }
             }
@@ -223,9 +228,14 @@ fun HomeScreen(
                 }
 
                 is ApiState.Error -> {
-                    Text(
+                    /*Text(
                         text = "Error: ${(productState as ApiState.Error).message}",
                         color = Color.Red
+                    )*/
+                    Log.i(TAG, "Error: ${(productState as ApiState.Error).message}")
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally),
+                        color = AppColors.Teal
+
                     )
                 }
             }
