@@ -156,14 +156,15 @@ fun CustomDialog(navController: NavController) {
     AlertDialog(
         containerColor = Color.White,
         onDismissRequest = {  showDialog = false },
-        title = { Text("Change Password") },
+        title = { Text("Change Password",color = AppColors.Teal) },
         text = { Text("Your password has been changed successfully") },
         confirmButton = {
             TextButton(onClick = {
                 showDialog = false
                 navController.navigate(Screen.HomeScreen.route)
-            }) {
-                Text("Ok", color = Color.Red)
+            },
+                colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)) {
+                Text("Ok", color = Color.White)
             }
         },
 

@@ -315,7 +315,7 @@ fun SignupScreen(viewModel: SignUpViewModel, navController: NavController) {
                 onDismissRequest = { showDialog = false },
                 confirmButton = {
                     TextButton(onClick = { showDialog = false; navController.navigate(Screen.LogInScreen.route) }) {
-                        Text("OK", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = AppColors.MintGreen)
+                        Text("OK", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = AppColors.Teal)
                     }
                 },
                 title = { Text(text = "Success", fontSize = 24.sp, fontWeight = FontWeight.Bold) },

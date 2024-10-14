@@ -852,9 +852,10 @@ fun DeleteConfirmationDialog(
 ) {
     if (showDialog) {
         AlertDialog(
+            containerColor = Color.White,
             onDismissRequest = { onDismiss() },
             title = {
-                Text(text = "Delete Confirmation")
+                Text(text = "Delete Confirmation", color = AppColors.Teal)
             },
             text = {
                 Text("Are you sure you want to delete this item? This action cannot be undone.")
@@ -865,15 +866,18 @@ fun DeleteConfirmationDialog(
                         onConfirmDelete()
                         onDismiss()
                     }
+                    ,colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
                 ) {
-                    Text("Delete")
+                    Text("Delete", color = Color.White)
                 }
             },
             dismissButton = {
                 Button(
-                    onClick = { onDismiss() }
+                    onClick = { onDismiss()
+                    }
+                    ,colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
                 ) {
-                    Text("Cancel")
+                    Text("Cancel", color = Color.White)
                 }
             }
         )

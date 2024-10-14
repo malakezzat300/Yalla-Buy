@@ -439,6 +439,7 @@ fun AddToFavorites(
 
     if (guestClicked) {
         AlertDialog(
+            containerColor = Color.White,
             onDismissRequest = { guestClicked = false },
             title = { Text(text = "Guest") },
             text = { Text("You need to login first.") },
@@ -452,13 +453,15 @@ fun AddToFavorites(
                         }
                         guestClicked = false // Close the dialog after confirming
                     }
+                    ,colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
                 ) {
-                    Text("Login", color = AppColors.Teal)
+                    Text("Login", color = Color.White)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { guestClicked = false }) {
-                    Text("Cancel", color = AppColors.Rose)
+                TextButton(onClick = { guestClicked = false }
+                    ,colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)) {
+                    Text("Cancel", color = Color.White)
                 }
             }
         )
@@ -582,14 +585,16 @@ fun AddToCart(viewModel: ProductInfoViewModel,
                 TextButton(onClick = {
                     geustClicked=false
                     navController.navigate(Screen.LogInScreen.route)
-                }) {
-                    Text("Login", color = AppColors.Teal)
+                }
+                    ,colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)) {
+                    Text("Login", color = Color.White)
                 }
             },dismissButton = {
                 TextButton(
                     onClick = { geustClicked = false }
+                    ,colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
                 ) {
-                    Text("Cancel", color = AppColors.Rose)
+                    Text("Cancel", color = Color.White)
                 }
             }
 

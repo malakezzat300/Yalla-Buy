@@ -36,6 +36,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.sharp.Favorite
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -568,8 +569,9 @@ fun AddToFavorites(
 
     if (guestClicked) {
         AlertDialog(
+            containerColor = Color.White,
             onDismissRequest = { guestClicked = false },
-            title = { Text(text = "Guest") },
+            title = { Text(text = "Guest",color = AppColors.Teal) },
             text = { Text("You need to login first.") },
             confirmButton = {
                 TextButton(
@@ -580,14 +582,16 @@ fun AddToFavorites(
                             }
                         }
                         guestClicked = false
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
                 ) {
-                    Text("Login", color = AppColors.Teal)
+                    Text("Login", color = Color.White)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { guestClicked = false }) {
-                    Text("Cancel", color = AppColors.Rose)
+                TextButton(onClick = { guestClicked = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)) {
+                    Text("Cancel", color = Color.White)
                 }
             }
         )

@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -322,9 +323,10 @@ fun DeleteConfirmationDialog2(
 ) {
     if (showDialog) {
         AlertDialog(
+            containerColor = Color.White,
             onDismissRequest = { onDismiss() },
             title = {
-                Text(text = "Delete Confirmation")
+                Text(text = "Delete Confirmation",color = AppColors.Teal)
             },
             text = {
                 Text("Are you sure you want to delete this item? This action cannot be undone.")
@@ -334,18 +336,22 @@ fun DeleteConfirmationDialog2(
                     onClick = {
                         onConfirmDelete()
                         onDismiss()
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
                 ) {
-                    Text("Delete")
+                    Text("Delete", color = Color.White)
                 }
             },
             dismissButton = {
                 Button(
-                    onClick = { onDismiss() }
+                    onClick = { onDismiss()
+                              }
+                    ,colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal)
                 ) {
-                    Text("Cancel")
+                    Text("Cancel", color = Color.White)
                 }
             }
+
         )
     }
 }
