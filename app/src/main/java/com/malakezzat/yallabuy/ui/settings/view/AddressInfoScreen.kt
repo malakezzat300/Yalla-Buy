@@ -197,7 +197,7 @@ fun AddressInfoScreen(navController: NavHostController,viewModel: SettingsViewMo
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
-                        shape = RoundedCornerShape(10.dp),
+                        shape = RoundedCornerShape(30.dp),
                     ) {
                         Text(
                             text = "Edit",
@@ -217,7 +217,7 @@ fun AddressInfoScreen(navController: NavHostController,viewModel: SettingsViewMo
                                 showDialog = true
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
-                            shape = RoundedCornerShape(10.dp),
+                            shape = RoundedCornerShape(30.dp),
                             enabled = !it
                         ) {
                             Text(
@@ -243,7 +243,7 @@ fun AddressInfoScreen(navController: NavHostController,viewModel: SettingsViewMo
                                 } }
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = AppColors.Teal),
-                            shape = RoundedCornerShape(10.dp),
+                            shape = RoundedCornerShape(30.dp),
                             enabled = !isDefault
                         ) {
                             Text(
