@@ -122,7 +122,9 @@ fun ShoppingCartScreen(
         }
         is ApiState.Success -> {
             variant = (variantState as ApiState.Success).data.variant
+            Log.i("quantityTest", "ShoppingItem: variantState ${variantSet}")
             variantSet.add(variant)
+
             emptyScreen = true
         }
     }
@@ -143,7 +145,9 @@ fun ShoppingCartScreen(
             draftOrder = (shoppingCartOrder as ApiState.Success).data
             LaunchedEffect (Unit){
                 if(orderItems.isNotEmpty()) {
-                    viewModel.getVariantById(orderItems.get(0).variant_id)
+                    repeat(orderItems.size)  {
+                        viewModel.getVariantById(orderItems[it].variant_id)
+                    }
                 }
             }
 
@@ -465,7 +469,12 @@ fun ShoppingItem(
                                         variantSet.find { it.id == item.variant_id }?.inventory_quantity?.toInt()
                                             ?: 1
                                     )
-                                    if (itemQuantity == newQuantity) {
+                                     Log.i("quantityTest", "ShoppingItem: variantSet ${variantSet}")
+                                     Log.i("quantityTest", "ShoppingItem: variant_id ${item.variant_id}")
+                                     Log.i("quantityTest", "ShoppingItem: max ${variantSet.find { it.id == item.variant_id }?.inventory_quantity?.toInt()}")
+
+
+                                     if (itemQuantity == variantSet.find { it.id == item.variant_id }?.inventory_quantity?.toInt()) {
                                         Toast.makeText(context, "Out of Stock", Toast.LENGTH_SHORT)
                                             .show()
                                     }
