@@ -117,6 +117,7 @@ class ShoppingCartViewModel(private val repository: ProductsRepository) : ViewMo
         viewModelScope.launch {
             try {
                 repository.deleteDraftOrder(draftOrderId)
+                _shoppingCartDraftOrder.value = ApiState.Success(DraftOrder())
                 getDraftOrders()
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to delete draft order: ${e.message}")

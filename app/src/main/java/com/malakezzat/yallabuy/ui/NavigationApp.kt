@@ -147,7 +147,7 @@ fun NavigationApp(
                     val categoryId = backStackEntry.arguments?.getString("categoryId")
                     val bodyHtml = backStackEntry.arguments?.getString("body_html")
                     val viewModel: ProductsByCollectionIdViewModel = viewModel(factory = productsByCollectionIdViewModelFactory)
-                    ProductsByBrandScreen(viewModel = viewModel, navController, categoryId, bodyHtml)
+                    ProductsByBrandScreen(viewModel = viewModel, navController, categoryId, bodyHtml){}
                 }
                 composable(Screen.SignUpScreen.route) {
                     val viewModel: SignUpViewModel = viewModel(factory = signUpViewModelFactory)
