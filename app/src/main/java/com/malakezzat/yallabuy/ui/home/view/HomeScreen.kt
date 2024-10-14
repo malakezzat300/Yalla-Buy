@@ -137,9 +137,9 @@ fun HomeScreen(
         if (categoriesState !is ApiState.Success && categoriesState !is ApiState.Loading) {
             viewModel.getAllCategories()
         }
-//        if (productState !is ApiState.Success && productState !is ApiState.Loading) {
-        viewModel.getAllProducts()
-//        }
+        if (productState !is ApiState.Success && productState !is ApiState.Loading) {
+            viewModel.getAllProducts()
+        }
         if(CurrencyPreferences.getInstance(context).getFirstLaunch()){
             viewModel.getRate()
             CurrencyPreferences.getInstance(context).setFirstLaunch(false)

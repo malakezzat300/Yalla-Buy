@@ -160,7 +160,7 @@ fun ProductInfoScreen(
         when (productState) {
             is ApiState.Loading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+                    androidx.compose.material.CircularProgressIndicator(color = AppColors.Teal)
                 }
             }
             is ApiState.Success -> {
