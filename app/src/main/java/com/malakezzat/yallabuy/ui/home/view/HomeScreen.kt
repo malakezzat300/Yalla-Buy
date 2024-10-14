@@ -124,6 +124,9 @@ fun HomeScreen(
     var draftOrderIdSaved by remember { mutableLongStateOf(0L) }
     var wishListDraftOrder by remember { mutableStateOf(DraftOrder(0L, "", listOf(), "")) }
 
+    var wishListAddButton by remember { mutableStateOf("") }
+    var isAddedWishList by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         if (brandsState !is ApiState.Success && brandsState !is ApiState.Loading) {
             viewModel.getBrands()
@@ -132,12 +135,15 @@ fun HomeScreen(
             viewModel.getAllCategories()
         }
 //        if (productState !is ApiState.Success && productState !is ApiState.Loading) {
-            viewModel.getAllProducts()
+        viewModel.getAllProducts()
 //        }
 //        if (draftOrderId !is ApiState.Success && draftOrderId !is ApiState.Loading) {
 //            viewModel.getDraftOrders()
 //        }
     }
+
+
+
     //Currency
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
@@ -147,13 +153,26 @@ fun HomeScreen(
         ApiState.Loading -> {}
         is ApiState.Success -> {
             draftOrderIdSaved = (draftOrderId as ApiState.Success).data.draft_order.id ?: 0L
+            viewModel.getDraftOrders()
         }
     }
     when (wishListDraftOrderState) {
         is ApiState.Error -> Log.i("draftOrderTest", "Error: ${(wishListDraftOrderState as ApiState.Error).message}")
         ApiState.Loading -> {}
-        is ApiState.Success -> wishListDraftOrder = (wishListDraftOrderState as ApiState.Success).data
+        is ApiState.Success ->{
+            wishListDraftOrder = (wishListDraftOrderState as ApiState.Success).data
+            isAddedWishList = true
+        }
     }
+
+    LaunchedEffect(wishListAddButton,isAddedWishList) {
+        if(wishListAddButton.isNotBlank() && isAddedWishList){
+            Toast.makeText(context, wishListAddButton, Toast.LENGTH_SHORT).show()
+            wishListAddButton = ""
+        }
+        isAddedWishList = false
+    }
+
     Scaffold(
         topBar = { CustomTopBarHome(navController) },
         containerColor = Color.White,
@@ -225,7 +244,9 @@ fun HomeScreen(
 
                 is ApiState.Success -> {
                     val products = (productState as ApiState.Success<List<Product>>).data
-                    LatestProductsSection(products, navController,viewModel,wishListDraftOrder)
+                    LatestProductsSection(products, navController,viewModel,wishListDraftOrder){ added ->
+                        wishListAddButton = added
+                    }
                 }
 
                 is ApiState.Error -> {
@@ -561,7 +582,12 @@ fun CategoryItem(category: CustomCollection, navController: NavController) {
 
 //@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun LatestProductsSection(products: List<Product>, navController: NavController,viewModel: HomeScreenViewModel,oldDraftOrder : DraftOrder) {
+fun LatestProductsSection(products: List<Product>,
+                          navController: NavController,
+                          viewModel: HomeScreenViewModel,
+                          oldDraftOrder : DraftOrder,
+                          onAddedToFavorite: (String) -> Unit
+                          ) {
     //
     Column(modifier = Modifier.padding(16.dp)) {
         Row(
@@ -595,7 +621,9 @@ fun LatestProductsSection(products: List<Product>, navController: NavController,
 
             ) {
                 itemsIndexed(products) { _, product ->
-                    ProductCard(product = product, navController,viewModel,oldDraftOrder)
+                    ProductCard(product = product, navController,viewModel,oldDraftOrder){ added ->
+                        onAddedToFavorite(added)
+                    }
                 }
             }
         }
@@ -604,7 +632,12 @@ fun LatestProductsSection(products: List<Product>, navController: NavController,
 
 
 @Composable
-fun ProductCard(product: Product, navController: NavController,viewModel: HomeScreenViewModel,oldDraftOrder : DraftOrder) {
+fun ProductCard(product: Product,
+                navController: NavController,
+                viewModel: HomeScreenViewModel,
+                oldDraftOrder : DraftOrder,
+                onAddedToFavorite: (String) -> Unit
+                ) {
     //Currency
     val context = LocalContext.current
     CurrencyConverter.initialize(context)
@@ -675,19 +708,29 @@ fun ProductCard(product: Product, navController: NavController,viewModel: HomeSc
                 FirebaseAuth.getInstance().currentUser?.email.toString(),
                 oldDraftOrder,
                 navController
-            )
+            ) { added ->
+                onAddedToFavorite(added)
+            }
 
         }
 
     }
 }
 @Composable
-fun AddToFavorites(viewModel: HomeScreenViewModel, product : Product, email : String, oldDraftOrder : DraftOrder, navController: NavController){
-    var geustClicked by remember { mutableStateOf(false) }
+fun AddToFavorites(
+    viewModel: HomeScreenViewModel,
+    product: Product,
+    email: String,
+    oldDraftOrder: DraftOrder,
+    navController: NavController,
+    onAddedToFavorite: (String) -> Unit
+) {
+    var guestClicked by remember { mutableStateOf(false) }
     var clicked by remember { mutableStateOf(false) }
-    var contains by remember { mutableStateOf(false) }
-    if(FirebaseAuth.getInstance().currentUser?.isAnonymous==true){
-        IconButton(onClick = {geustClicked=true}) {
+    var isProcessing by remember { mutableStateOf(false) }
+
+    if (FirebaseAuth.getInstance().currentUser?.isAnonymous == true) {
+        IconButton(onClick = { guestClicked = true }) {
             Icon(
                 imageVector = Icons.Default.FavoriteBorder,
                 contentDescription = "Favorite",
@@ -695,64 +738,66 @@ fun AddToFavorites(viewModel: HomeScreenViewModel, product : Product, email : St
                 modifier = Modifier.size(35.dp)
             )
         }
-    }else{
-        LaunchedEffect(Unit) {
-            for(item in oldDraftOrder.line_items){
-                if(product.id == item.product_id){
-                    clicked=true
-                }
-            }
-        }
-        val properties = listOf(
-            Property(name = "imageUrl",value = product.image.src),
-            Property(name = "size",value = product.variants[0].option1),
-            Property(name = "color",value = product.variants[0].option2)
-        )
-        contains = oldDraftOrder.line_items.contains(LineItem(
-            product.title,
-            product.variants[0].price,
-            product.variants[0].id,
-            1,
-            properties = properties,
-            product.id?:0
-        ))
+    } else {
+        clicked = oldDraftOrder.line_items.any { it.product_id == product.id }
+
         IconButton(onClick = {
+            isProcessing = true
+            val properties = listOf(
+                Property(name = "imageUrl", value = product.image.src),
+                Property(name = "size", value = product.variants[0].option1),
+                Property(name = "color", value = product.variants[0].option2)
+            )
 
-
-
-            Log.i("propertiesTest", "AddToFav: ${oldDraftOrder.id}")
-            if(oldDraftOrder.id == 0L) {
-                val lineItems = listOf(LineItem(product.title,product.variants[0].price,product.variants[0].id,1, properties = properties,product.id?:0))
+            if (oldDraftOrder.id == 0L) {
+                clicked = true
+                val lineItems = listOf(
+                    LineItem(
+                        title = product.title,
+                        price = product.variants[0].price,
+                        variant_id = product.variants[0].id,
+                        quantity = 1,
+                        properties = properties,
+                        product_id = product.id ?: 0
+                    )
+                )
                 val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
                 val draftOrderRequest = DraftOrderRequest(draftOrder)
                 viewModel.createDraftOrder(draftOrderRequest)
+                onAddedToFavorite("Added to WishList")
             } else {
-                    var lineItems = listOf<LineItem>()
-
-                    if(contains){
-                        clicked=false
-                        lineItems = oldDraftOrder.line_items.filter { it.variant_id != product.variants[0].id }
-                        Log.i(TAG, "AddToFavorites: contains ${lineItems}")
-                    } else {
-                        clicked=true
-                        lineItems = oldDraftOrder.line_items + listOf(
-                            LineItem(
-                                product.title,
-                                product.variants[0].price,
-                                product.variants[0].id,
-                                1,
-                                properties = properties,
-                                product.id ?: 0
-                            )
+                if (!oldDraftOrder.line_items.any { it.variant_id == product.variants[0].id }) {
+                    clicked = true
+                    val lineItems = oldDraftOrder.line_items + listOf(
+                        LineItem(
+                            title = product.title,
+                            price = product.variants[0].price,
+                            variant_id = product.variants[0].id,
+                            quantity = 1,
+                            properties = properties,
+                            product_id = product.id ?: 0
                         )
-                        Log.i(TAG, "AddToFavorites: not contains ${lineItems}")
-                    }
+                    )
                     val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
                     val draftOrderRequest = DraftOrderRequest(draftOrder)
-                    oldDraftOrder.id?.let { viewModel.updateDraftOrder(it,draftOrderRequest) }
+                    oldDraftOrder.id?.let { viewModel.updateDraftOrder(it, draftOrderRequest) }
+                    onAddedToFavorite("Added to WishList")
+                } else {
+                    clicked = false
+                    val lineItems = oldDraftOrder.line_items.filterNot { it.variant_id == product.variants[0].id }
+                    val draftOrder = DraftOrder(note = "wishList", line_items = lineItems, email = email)
+                    val draftOrderRequest = DraftOrderRequest(draftOrder)
+                    if(lineItems.isEmpty()){
+                        oldDraftOrder.id?.let { viewModel.deleteDraftOrder(it) }
+                    } else {
+                        oldDraftOrder.id?.let { viewModel.updateDraftOrder(it, draftOrderRequest) }
+                    }
+                    onAddedToFavorite("Removed from WishList")
                 }
-
-        }) {
+            }
+            isProcessing = false
+        }, enabled = !isProcessing)
+        {
             if (clicked) {
                 Icon(
                     imageVector = Icons.Sharp.Favorite,
@@ -768,12 +813,12 @@ fun AddToFavorites(viewModel: HomeScreenViewModel, product : Product, email : St
                     modifier = Modifier.size(35.dp)
                 )
             }
-
         }
     }
-    if(geustClicked){
+
+    if (guestClicked) {
         AlertDialog(
-            onDismissRequest = { geustClicked = false }, // Close dialog on dismiss
+            onDismissRequest = { guestClicked = false },
             title = { Text(text = "Guest") },
             text = { Text("You need to login first.") },
             confirmButton = {
@@ -784,16 +829,14 @@ fun AddToFavorites(viewModel: HomeScreenViewModel, product : Product, email : St
                                 inclusive = true // Remove all previous screens from the back stack
                             }
                         }
-                        geustClicked = false // Close the dialog after confirming
+                        guestClicked = false // Close the dialog after confirming
                     }
                 ) {
                     Text("Login", color = AppColors.Teal)
                 }
             },
             dismissButton = {
-                TextButton(
-                    onClick = { geustClicked = false }
-                ) {
+                TextButton(onClick = { guestClicked = false }) {
                     Text("Cancel", color = AppColors.Rose)
                 }
             }
